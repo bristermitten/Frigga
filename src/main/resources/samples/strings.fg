@@ -1,0 +1,5 @@
+firstName = "Alex"
+
+secondName = "Wood"
+
+name = firstName + secondName

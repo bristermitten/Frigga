@@ -1,0 +1,11 @@
+age = 16
+month = 3
+
+x::Int = 3
+
+print(x)
+
+print(age ^ month ^ 3)
+
+
+
