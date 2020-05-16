@@ -3,8 +3,8 @@ package me.bristermitten.frigga
 import FriggaParser
 import me.bristermitten.frigga.expression.Expression
 import me.bristermitten.frigga.expression.math.*
-import me.bristermitten.frigga.type.IntType
-import me.bristermitten.frigga.type.Types
+import me.bristermitten.frigga.rewrite.type.IntType
+import me.bristermitten.frigga.rewrite.type.Types
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 

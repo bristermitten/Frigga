@@ -9,11 +9,6 @@ import kotlin.system.measureTimeMillis
 
 
 object Test {
-    private val functions = mapOf(
-        "print" to { params: List<Any> ->
-            println(params[0])
-        }
-    )
 
     @JvmStatic
     fun main(args: Array<String>) {

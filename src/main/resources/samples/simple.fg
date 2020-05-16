@@ -3,9 +3,10 @@ month = 3
 
 x::Int = 3
 
+print = value::Any -> Nothing {
+    stdout.println(value)
+}
+
 print(x)
 
 print(age ^ month ^ 3)
-
-
-

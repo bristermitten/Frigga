@@ -3,7 +3,7 @@ package me.bristermitten.frigga
 import me.bristermitten.frigga.context.FriggaContext
 import me.bristermitten.frigga.context.FunctionContext
 import me.bristermitten.frigga.expression.Expression
-import me.bristermitten.frigga.type.Type
+import me.bristermitten.frigga.rewrite.type.Type
 
 data class Function(
     val contents: List<Statement>,
