@@ -10,8 +10,9 @@ SECRET: 'secret';
 STATIC: 'static';
 
 //Literals
-INTLIT: '0'|[1-9][0-9]* ;
-DECLIT: INTLIT '.' INTLIT ;
+INT: [0-9]+;
+DOUBLE: INT '.' INT ;
+BOOL: 'true' | 'false';
 
 //Operators
 PLUS: '+';
@@ -19,6 +20,7 @@ MINUS: '-';
 ASTERISK: '*';
 DIVIDE: '/';
 POWER: '^';
+INVERSE: '!';
 ASSIGN: '=';
 LPAREN: '(';
 RPAREN: ')';
@@ -29,6 +31,8 @@ COLON: ':';
 DOT: '.';
 TYPEDECL: COLON COLON;
 ARROW: '->';
+QUOTE: '"';
 
 //Identifier
 ID: [a-zA-Z0-9]+;
+STRING : '"' ( '\\"' | . )*? '"' ;

@@ -4,24 +4,29 @@ options { tokenVocab=FriggaLexer; }
 
 friggaFile : lines=line* EOF;
 
-line: (expression|statement) NEWLINE*?;
+line: expression NEWLINE*?;
 
 expression:
          ID #varReference
-         | functionCall #functionExpression
          | literal #literalExpression
-         |left = expression operator=(DIVIDE|ASTERISK|PLUS|MINUS|POWER) right=expression #binaryOperation
-         |left = expression operator=(PLUS|MINUS) right=expression #binaryOperation
+         | functionCall #functionCallExpression
+         | left = expression operator=(DIVIDE|ASTERISK|PLUS|MINUS|POWER) right=expression #binaryOperation
+         | INVERSE expression #inverseOperation
 //         | LPAREN expression RPAREN # parenExpression
          |functionDecl #functionDeclarationExpression
+         |assignment #assignmentExpression
          ;
 
-objectRef: (ID DOT);
-functionCall: objectRef? ID LPAREN functionParams RPAREN;
+literal:
+      (MINUS? INT) #intLiteral
+    | (MINUS? DOUBLE) #decLiteral
+    | BOOL #boolLiteral
+    | (STRING) #stringLiteral;
+
+objectRef: ID DOT;
+functionCall: (objectRef)? ID LPAREN functionParams RPAREN;
 
 functionParams: (expression COMMA?)*;
-
-statement:  assignment #assignmentStatement;
 
 functionSignature: (parameterDefinition COMMA?)+ ARROW ID;
 parameterDefinition: (ID typeSpec) | (ID);
@@ -31,7 +36,4 @@ functionDecl: functionSignature? LCPAREN (NEWLINE*) line* RCPAREN;
 typeSpec: TYPEDECL ID;
 
 assignment: ID typeSpec? ASSIGN expression;
-
-literal:     INTLIT #intLiteral
-            | DECLIT #decLiteral;
 

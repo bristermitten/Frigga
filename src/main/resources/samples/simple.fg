@@ -1,12 +1,6 @@
-age = 16
-month = 3
-
-x::Int = 3
-
-print = value::Any -> Nothing {
-    stdout.println(value)
+printHello = {
+   stdout.println("Hello")
 }
 
-print(x)
-
-print(age ^ month ^ 3)
+printHelloTwice = printHello * 2
+printHelloTwice()
