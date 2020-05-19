@@ -1,6 +1,14 @@
-printHello = {
-   stdout.println("Hello")
+print = value::Any -> _ {
+    stdout.println(value)
 }
 
-printHelloTwice = printHello * 2
-printHelloTwice()
+get3 = () -> Int {
+    yield(3)
+}
+
+print(get3())
+
+print(4)
+print(get3() + 2)
+
+print(print(3))

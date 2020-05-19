@@ -9,6 +9,7 @@ import me.bristermitten.frigga.runtime.entity.Function
 import me.bristermitten.frigga.runtime.entity.type.Types
 import me.bristermitten.frigga.runtime.expression.*
 import me.bristermitten.frigga.runtime.expression.binary.BinaryMathOperation
+import me.bristermitten.frigga.runtime.expression.binary.EqualityOperation
 import me.bristermitten.frigga.runtime.expression.binary.Val
 import me.bristermitten.frigga.util.escape
 
@@ -55,10 +56,16 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, inFunction: Boole
         }
         is FriggaParser.FunctionCallExpressionContext -> {
             val functionCall = functionCall()
+            val paramExpressions = functionCall.functionParams().expression().map { it.toAST(name, inFunction) }
+            if (functionCall.ID().text == "yield") {
+                return YieldExpression(
+                    paramExpressions[0].type
+                ) { _, _ -> paramExpressions[0] }
+            }
             FunctionCallExpression(
                 functionCall.objectRef()?.ID()?.text,
                 functionCall.ID().text,
-                functionCall.functionParams().expression().map { it.toAST(name, inFunction) }
+                paramExpressions
             )
         }
         is FriggaParser.BinaryOperationContext -> {
@@ -98,6 +105,7 @@ fun FriggaParser.BinaryOperationContext.toAST(): Expression {
         "*" -> BinaryMathOperation(left.toAST(), right.toAST(), Val<*>::times)
         "/" -> BinaryMathOperation(left.toAST(), right.toAST(), Val<*>::div)
         "^" -> BinaryMathOperation(left.toAST(), right.toAST(), Val<*>::exp)
+        "==" -> EqualityOperation(left.toAST(), right.toAST())
         else -> throw UnsupportedOperationException(javaClass.name + " " + operator.text)
     }
 }

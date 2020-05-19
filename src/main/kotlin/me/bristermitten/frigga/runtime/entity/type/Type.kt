@@ -24,5 +24,6 @@ object AnyType : BasicType("Any") {
 }
 
 object NothingType : BasicType("Nothing") {
+    const val alias: String = "_"
     override fun matches(other: Type): Boolean = true
 }

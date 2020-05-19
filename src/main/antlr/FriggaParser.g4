@@ -10,7 +10,7 @@ expression:
          ID #varReference
          | literal #literalExpression
          | functionCall #functionCallExpression
-         | left = expression operator=(DIVIDE|ASTERISK|PLUS|MINUS|POWER) right=expression #binaryOperation
+         | left = expression operator=(DIVIDE|ASTERISK|PLUS|MINUS|POWER|EQUAL) right=expression #binaryOperation
          | INVERSE expression #inverseOperation
 //         | LPAREN expression RPAREN # parenExpression
          |functionDecl #functionDeclarationExpression
@@ -28,12 +28,12 @@ functionCall: (objectRef)? ID LPAREN functionParams RPAREN;
 
 functionParams: (expression COMMA?)*;
 
-functionSignature: (parameterDefinition COMMA?)+ ARROW ID;
-parameterDefinition: (ID typeSpec) | (ID);
 
-functionDecl: functionSignature? LCPAREN (NEWLINE*) line* RCPAREN;
+functionDecl: functionSignature? LCPAREN (NEWLINE*) line* RCPAREN; //value::Any -> _ { print(value) }
+functionSignature: (LPAREN? (parameterDefinition COMMA?)* RPAREN?) ARROW ID; //value::Any, other::Any -> _
+parameterDefinition: (ID typeSpec) | (ID); //value::Any
 
-typeSpec: TYPEDECL ID;
+typeSpec: DOUBLE_COLON ID; //::Any
 
 assignment: ID typeSpec? ASSIGN expression;
 

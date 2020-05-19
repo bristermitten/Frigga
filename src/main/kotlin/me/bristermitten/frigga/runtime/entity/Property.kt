@@ -17,7 +17,7 @@ data class Property(
 
     val getter: Function = Function(
         propertyName,
-        listOf(YieldExpression(value, value.type)),
+        listOf(YieldExpression(value.type) { _, _ -> value }),
         Signature(this.type, emptyMap())
     )
 

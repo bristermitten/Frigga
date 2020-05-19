@@ -29,10 +29,11 @@ LCPAREN: '{';
 RCPAREN: '}';
 COLON: ':';
 DOT: '.';
-TYPEDECL: COLON COLON;
+DOUBLE_COLON: COLON COLON;
 ARROW: '->';
 QUOTE: '"';
+EQUAL: '==';
 
 //Identifier
-ID: [a-zA-Z0-9]+;
+ID: [a-zA-Z0-9_]+;
 STRING : '"' ( '\\"' | . )*? '"' ;

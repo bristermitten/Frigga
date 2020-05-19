@@ -13,6 +13,7 @@ class FriggaContext {
 
     init {
         scope.add(globalScope)
+        GlobalScope.initialize(globalScope)
     }
 
     fun getProperty(name: String): Property? {

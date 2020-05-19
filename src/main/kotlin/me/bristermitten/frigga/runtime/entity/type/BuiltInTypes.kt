@@ -52,4 +52,5 @@ fun registerBuiltInTypes(context: FriggaContext) {
         }
     )
     context.assign("stdout", expression)
+
 }

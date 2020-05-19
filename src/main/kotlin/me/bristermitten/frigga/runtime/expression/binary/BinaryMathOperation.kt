@@ -17,12 +17,13 @@ data class BinaryMathOperation(
     override val type: Type = AnyType
 
     override fun eval(stack: Stack, context: FriggaContext) {
-
+        left.initialize(context)
         left.eval(stack, context)
         val pulledLeft = stack.pull()
 
         val leftValue = (pulledLeft as? LiteralExpression)?.value ?: pulledLeft
 
+        right.initialize(context)
         right.eval(stack, context)
         val pulledRight = stack.pull()
 
@@ -41,7 +42,7 @@ data class BinaryMathOperation(
             is Function -> {
                 FunctionValue(leftValue)
             }
-            else -> throw UnsupportedOperationException("Left end of operator must be String or Number")
+            else -> throw UnsupportedOperationException("Left end of operator must be String, Number or Function.")
         }
 
         val rightVal = when (rightValue) {
@@ -57,11 +58,15 @@ data class BinaryMathOperation(
             is Function -> {
                 FunctionValue(rightValue)
             }
-            else -> throw UnsupportedOperationException("Right end of operator must be String or Number")
+            else -> throw UnsupportedOperationException("Right end of operator must be String or Number. It is $rightValue")
         }
 
         val result = task(leftVal, rightVal)
-        stack.push(result)
+        if (result is LiteralExpression) {
+            stack.push(result.value)
+        } else {
+            stack.push(result)
+        }
     }
 }
 
@@ -285,6 +290,9 @@ data class FunctionValue(override val value: Function) : Val<FunctionValue>(valu
     }
 
     override fun plus(other: Val<*>): Expression {
+        if (other is StringValue) {
+            return StringLiteralExpression(value.toString() + other.value)
+        }
         throw cannotPerformOperation("add", other)
     }
 
