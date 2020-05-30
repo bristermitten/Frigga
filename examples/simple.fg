@@ -1,0 +1,9 @@
+#Hashtag denotes a comment
+
+##
+  Multi line comments
+  also exist via \#\#
+##
+
+x = 3 #simple property declaration with inference (inferred to Int)
+pi::Dec = 3.14 #property declaration with explicit type of Dec

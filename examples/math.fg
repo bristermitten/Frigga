@@ -1,0 +1,9 @@
+namespace Math #allows things like `Math.pi` rather than `pi`
+
+pi = 3.14159
+e = 2.71828
+
+factorial = num::BigInt -> BigInt {
+    if(num <= 0, throw[IllegalArgError("Num must be more than 0")])
+    if(
+}

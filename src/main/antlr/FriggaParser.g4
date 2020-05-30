@@ -2,7 +2,7 @@ parser grammar FriggaParser;
 
 options { tokenVocab=FriggaLexer; }
 
-friggaFile : lines=line* EOF;
+friggaFile : line* EOF;
 
 line: expression NEWLINE*?;
 
@@ -12,10 +12,12 @@ expression:
          | functionCall #functionCallExpression
          | left = expression operator=(DIVIDE|ASTERISK|PLUS|MINUS|POWER|EQUAL) right=expression #binaryOperation
          | INVERSE expression #inverseOperation
-//         | LPAREN expression RPAREN # parenExpression
-         |functionDecl #functionDeclarationExpression
-         |assignment #assignmentExpression
+         | functionDecl #functionDeclarationExpression
+         | assignment #assignmentExpression
+         | paranthesisExpression # parenExpression
          ;
+
+paranthesisExpression: LPAREN expression RPAREN;
 
 literal:
       (MINUS? INT) #intLiteral

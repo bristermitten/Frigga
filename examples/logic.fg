@@ -1,0 +1,18 @@
+canDrink = age::Int -> Bool {
+    yield(age >= 18)
+}
+
+branches = first::Bool, second::Bool -> _ {
+    when(first) {
+        true -> print("First is true")
+        else ->
+    }
+    else {
+        print("First is false")
+    }
+
+    if(second) {
+        print("Second is true")
+    }
+
+}

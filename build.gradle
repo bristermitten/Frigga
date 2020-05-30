@@ -54,5 +54,3 @@ generateGrammarSource {
 clean.doLast {
     file('generated-src').deleteDir()
 }
-
-//build.

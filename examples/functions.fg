@@ -1,0 +1,14 @@
+#Print function with body
+print = value::Any -> _ {
+    stdout.println(value) #stdout is a property in the global scope
+}
+
+#Expression based function declaration
+printIntAdd1 = stdout.println[value::Int + 1] #square brackets create a function reference rather than invoking println. Signature copied from println
+
+#Generic function that returns a tuple of its parameters while printing them
+printAndReturn2Numbers = <A::Number, B::Number> value1::A, value2::B -> (first::A, second::B) {
+    print(value1)
+    print(value2)
+    yield(tuple(first: value1, second: value2))
+}

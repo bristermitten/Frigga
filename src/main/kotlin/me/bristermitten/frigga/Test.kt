@@ -32,6 +32,7 @@ fun main() {
     val execTime = measureTimeMillis {
         val context = FriggaContext()
         registerBuiltInTypes(context)
+        println(file)
         file.contents.forEach {
             it.initialize(context)
             it.eval(context.stack, context)

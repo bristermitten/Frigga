@@ -74,6 +74,9 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, inFunction: Boole
         is FriggaParser.InverseOperationContext -> {
             InverseOperationExpression(expression().toAST(name, inFunction))
         }
+        is FriggaParser.ParenExpressionContext -> {
+            paranthesisExpression().expression().toAST()
+        }
         else -> throw UnsupportedOperationException(javaClass.name + " " + text)
     }
 }

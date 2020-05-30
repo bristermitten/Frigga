@@ -39,7 +39,7 @@ data class Function(
 
     override val type: Type = signature
 
-    fun toCodeString(): String {
+    override fun toString(): String {
         return buildString {
             append("Function {\n")
 
