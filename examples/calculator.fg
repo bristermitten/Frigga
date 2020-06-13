@@ -1,0 +1,11 @@
+use "math"
+
+main = {
+   println("Hello, please enter a calculation in the format <number>[+-*/]<number>")
+   calculation = readln(String).stripAll(" ")
+   number1 = calculation.untilFirst("[+-*/]")
+   operand = calculation.first("[+-*/]")
+   number2 = calculation.afterFirst("[+-*/]")
+
+
+}

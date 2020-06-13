@@ -3,16 +3,26 @@ canDrink = age::Int -> Bool {
 }
 
 branches = first::Bool, second::Bool -> _ {
-    when(first) {
-        true -> print("First is true")
-        else ->
+    if(first) {
+        print("First is true")
     }
     else {
         print("First is false")
     }
-
     if(second) {
         print("Second is true")
     }
+}
 
+functionalBranches = first::Bool -> _ {
+    first.ifTrue {
+        print("First is true with a function")
+    }
+
+    first.ifFalse(print["First is false with a function"])
+
+    first.test(
+        print["It's true"],
+        print["It's false"]
+    )
 }

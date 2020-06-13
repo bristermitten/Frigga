@@ -1,18 +1,4 @@
 print = value::Any -> _ {
     stdout.println(value)
 }
-
-get3 = () -> Int {
-    yield(3)
-}
-
-print(get3())
-
-print(4)
-print(get3() + 2)
-
-print(print(3))
-
-print(get3() + get3())
-
-y = (3 + 4)
+print("Hello World")
