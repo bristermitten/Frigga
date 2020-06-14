@@ -1,28 +1,30 @@
+use "std"
+
 canDrink = (age::Int) -> Bool {
     yield(age >= 18)
 }
 
 branches = (first::Bool, second::Bool) -> _ {
     if(first) {
-        print("First is true")
+        println("First is true")
     }
     else {
-        print("First is false")
+        println("First is false")
     }
     if(second) {
-        print("Second is true")
+        println("Second is true")
     }
 }
 
 functionalBranches = (first::Bool) -> _ {
     first.ifTrue {
-        print("First is true with a function")
+        println("First is true with a function")
     }
 
-    first.ifFalse(print["First is false with a function"])
+    first.ifFalse(println["First is false with a function"])
 
     first.test(
-        print["It's true"],
-        print["It's false"]
+        println["It's true"],
+        println["It's false"]
     )
 }
