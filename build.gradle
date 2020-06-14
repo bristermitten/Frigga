@@ -14,12 +14,6 @@ repositories {
     mavenCentral()
 }
 
-//configurations {
-//    compile {
-//        extendsFrom = extendsFrom.findAll { it != configurations.antlr }
-//    }
-//}
-
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
@@ -55,4 +49,11 @@ generateGrammarSource {
 
 clean.doLast {
     file('generated-src').deleteDir()
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }

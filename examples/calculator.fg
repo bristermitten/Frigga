@@ -7,5 +7,13 @@ main = {
    operand = calculation.first("[+-*/]")
    number2 = calculation.afterFirst("[+-*/]")
 
+   operator::(Int, Int) -> Int = operand.match(
+        ('+', (a, b) -> a + b),
+        ('-', (a, b) -> a - b),
+        ('*', (a, b) -> a * b),
+        ('/', (a, b) -> a / b),
+        throw(IllegalArgError("Unknown operation " + operand))
+    )
 
+    println(operator(number1, number2))
 }

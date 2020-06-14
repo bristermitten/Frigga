@@ -18,14 +18,14 @@ object TypeInferer {
 //      return yields ?: NothingType
 //  }
 
-    fun getExplicitType(context: FriggaParser.AssignmentExpressionContext): Type? {
-        val assignment = context.assignment()
-        val explicitType = assignment.typeSpec()?.ID()?.text
-        if (explicitType != null) {
-            return Types.byName(explicitType)
-        }
-        return null
-    }
+//    fun getExplicitType(context: FriggaParser.AssignmentExpressionContext): Type? {
+//        val assignment = context.assignment()
+//        val explicitType = assignment.typeSpec()?.ID()?.text
+//        if (explicitType != null) {
+//            return Types.byName(explicitType)
+//        }
+//        return null
+//    }
 
     fun inferFunctionSignature(
         params: Map<String, Type>,

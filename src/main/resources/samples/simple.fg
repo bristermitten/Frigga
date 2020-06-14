@@ -1,4 +1,0 @@
-print = value::Any -> _ {
-    stdout.println(value)
-}
-print("Hello World")

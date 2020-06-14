@@ -1,8 +1,8 @@
-canDrink = age::Int -> Bool {
+canDrink = (age::Int) -> Bool {
     yield(age >= 18)
 }
 
-branches = first::Bool, second::Bool -> _ {
+branches = (first::Bool, second::Bool) -> _ {
     if(first) {
         print("First is true")
     }
@@ -14,7 +14,7 @@ branches = first::Bool, second::Bool -> _ {
     }
 }
 
-functionalBranches = first::Bool -> _ {
+functionalBranches = (first::Bool) -> _ {
     first.ifTrue {
         print("First is true with a function")
     }
