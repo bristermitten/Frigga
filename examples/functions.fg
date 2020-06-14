@@ -1,6 +1,8 @@
+use "std"
+
 #Print function with body
 print = (value::Any) -> _ {
-    stdout.println(value) #stdout is a property in the global scope
+    println(value)
 }
 
 #Expression based function declaration
