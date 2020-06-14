@@ -1,0 +1,9 @@
+namespace "std"
+
+println = (value::Any) -> {
+    #TODO
+}
+
+readln = () -> Any {
+    #TODO
+}

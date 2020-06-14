@@ -1,4 +1,4 @@
-namespace "math" #allows things like `math.pi` rather than `pi`
+namespace "std"
 
 pi = 3.14159
 e = 2.71828
