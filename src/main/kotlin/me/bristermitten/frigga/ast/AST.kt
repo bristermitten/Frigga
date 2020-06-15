@@ -45,7 +45,7 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
         function().toAST(name!!)
     }
     is FriggaParser.VarReferenceContext -> {
-        VarReference(text)
+        PropertyReference(text)
     }
     is FriggaParser.CallExpressionContext -> {
         Call(expression().text, call().args().expression().map { it.toAST(name, previous) })
@@ -74,7 +74,7 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
 fun FriggaParser.PropertyContext.toAST(): Expression {
     val property = ID()
     if (property != null) {
-        return VarReference(property.text)
+        return PropertyReference(property.text)
     }
     val call = call()
     if (call != null) {

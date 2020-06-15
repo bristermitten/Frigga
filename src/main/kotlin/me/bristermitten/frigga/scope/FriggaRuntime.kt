@@ -3,11 +3,11 @@ package me.bristermitten.frigga.scope
 import me.bristermitten.frigga.ast.element.FriggaFile
 import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.Assignment
+import me.bristermitten.frigga.ast.element.expression.value.BinaryOperator
 import me.bristermitten.frigga.ast.element.expression.value.Literal
-import me.bristermitten.frigga.runtime.Command
-import me.bristermitten.frigga.runtime.CommandLiteral
-import me.bristermitten.frigga.runtime.CommandPropertyDefine
-import kotlin.math.exp
+import me.bristermitten.frigga.ast.element.expression.value.PropertyReference
+import me.bristermitten.frigga.runtime.*
+import me.bristermitten.frigga.runtime.operator.CommandBinaryAdd
 
 class FriggaRuntime {
     private val context = FriggaContext()
@@ -16,6 +16,11 @@ class FriggaRuntime {
         file.contents.forEach {
             val command = process(it)
             command.eval(context.stack, context)
+        }
+        val leftover = context.stack.peek()
+        if (leftover != null) {
+            val toPrint = (leftover as? Value)?.value ?: leftover
+            println(toPrint)
         }
     }
 
@@ -31,7 +36,16 @@ class FriggaRuntime {
             return defineCommand
         }
         if (expression is Literal<*>) {
-            return CommandLiteral(expression)
+            return CommandLiteral(
+                Value(expression.type, expression.value)
+            )
+        }
+        if (expression is PropertyReference) {
+            return CommandPropertyReference(expression.referencing)
+        }
+        if (expression is BinaryOperator) {
+            //TODO more operators
+            return CommandBinaryAdd(process(expression.left), process(expression.right))
         }
         throw UnsupportedOperationException(expression.javaClass.simpleName + " " + expression)
     }

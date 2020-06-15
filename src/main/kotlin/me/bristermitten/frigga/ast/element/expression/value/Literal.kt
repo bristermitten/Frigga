@@ -5,7 +5,7 @@ import me.bristermitten.frigga.ast.element.IntType
 import me.bristermitten.frigga.ast.element.Type
 import me.bristermitten.frigga.ast.element.expression.Expression
 
-sealed class Literal<T>(val type: Type, val value: T) : Expression {
+sealed class Literal<T : Any>(val type: Type, val value: T) : Expression {
     override fun toString(): String {
         return value.toString()
     }

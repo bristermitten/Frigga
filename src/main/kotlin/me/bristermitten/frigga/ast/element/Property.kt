@@ -1,8 +1,9 @@
 package me.bristermitten.frigga.ast.element
 
+import me.bristermitten.frigga.runtime.Value
+
 internal data class Property(
     override val name: String,
-    val type: Type,
     val modifiers: Set<Modifier>,
-    var value: Any
+    var value: Value
 ) : Named
