@@ -4,17 +4,16 @@ import FriggaParser
 import me.bristermitten.frigga.ast.element.FriggaFile
 import me.bristermitten.frigga.ast.element.Namespace
 import me.bristermitten.frigga.ast.element.SimpleType
-import me.bristermitten.frigga.ast.element.exp.Expression
-import me.bristermitten.frigga.ast.element.exp.value.*
+import me.bristermitten.frigga.ast.element.expression.Expression
+import me.bristermitten.frigga.ast.element.expression.value.*
 import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
-
 
 internal fun FriggaParser.FriggaFileContext.toAST(name: String): FriggaFile {
     return FriggaFile(
         name,
         body().line().toAST(),
-        headers()?.toAST() ?: emptySet()
+        usingList()?.toAST() ?: emptySet()
     )
 }
 
@@ -28,9 +27,19 @@ private fun List<FriggaParser.LineContext>.toAST(): List<Expression> {
     }
 }
 
+fun FriggaParser.LiteralContext.toAST() = when (this) {
+    is FriggaParser.IntLiteralContext -> {
+        IntLiteral(INT().text.toLong())
+    }
+    is FriggaParser.DecLiteralContext -> {
+        DecLiteral(DEC().text.toDouble())
+    }
+    else -> throw UnsupportedOperationException(javaClass.simpleName)
+}
+
 fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Expression? = null): Expression = when (this) {
     is FriggaParser.LiteralExpressionContext -> {
-        Literal(literal().text)
+        literal().toAST()
     }
     is FriggaParser.FunctionExpressionContext -> {
         function().toAST(name!!)
@@ -45,7 +54,7 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
         Assignment(assignment().ID().text!!, assignment().expression().toAST(assignment().ID().text!!, previous))
     }
     is FriggaParser.AccessExpressionContext -> {
-        Access(previous!!, access().expression().toAST(name, previous))
+        Access(access().property().toAST())
     }
     is FriggaParser.ReferencedCallExpressionContext -> {
         ReferencedCall(name!!, referencedCall().args().expression().map { it.toAST(name, previous) })
@@ -62,8 +71,24 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
     else -> throw UnsupportedOperationException(javaClass.simpleName)
 }
 
-internal fun FriggaParser.LambdaContext.toAST(): Lambda {
+fun FriggaParser.PropertyContext.toAST(): Expression {
+    val property = ID()
+    if (property != null) {
+        return VarReference(property.text)
+    }
+    val call = call()
+    if (call != null) {
+        return Call(expression().text, call().args().expression().map { it.toAST() })
+    }
+    val referencedCall = referencedCall()
+    if (referencedCall != null) {
+        ReferencedCall(expression().text, referencedCall().args().expression().map { it.toAST() })
+    }
 
+    throw UnsupportedOperationException(this.javaClass.simpleName)
+}
+
+internal fun FriggaParser.LambdaContext.toAST(): Lambda {
     return Lambda(
         this.lambdaParams()?.lamdaParam()?.map {
             val fullParam = it.functionParam()
@@ -100,7 +125,7 @@ internal fun FriggaParser.FunctionContext.toAST(name: String): Function {
                 SimpleType(it.typeSpec().type().text)
     }?.toMap() ?: emptyMap()
 
-    val output = SimpleType(signature?.type()?.text ?: "Inferred Type")
+    val output = SimpleType(signature?.type()?.text ?: "InferredType")
 
     var previous: Expression? = null
     val body = block().body().line().map {
@@ -119,8 +144,8 @@ internal fun FriggaParser.FunctionContext.toAST(name: String): Function {
     )
 }
 
-fun FriggaParser.HeadersContext.toAST(): Set<Namespace> {
+fun FriggaParser.UsingListContext.toAST(): Set<Namespace> {
     return use().map {
-        Namespace(it.STRING().text)
+        Namespace(it.NAMESPACE_TEXT().text.removeSurrounding("\""))
     }.toSet()
 }

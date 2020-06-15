@@ -2,8 +2,8 @@ package me.bristermitten.frigga
 
 import FriggaLexer
 import FriggaParser
-import me.bristermitten.frigga.ast.element.FriggaFile
 import me.bristermitten.frigga.ast.toAST
+import me.bristermitten.frigga.scope.FriggaRuntime
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
@@ -18,9 +18,10 @@ class LexTest {
     @Test
     fun test() {
         val samples = File("examples/")
-        val files = samples.walkTopDown().filter {
-            it.isFile
-        }
+//        val files = samples.walkTopDown().filter {
+//            it.isFile
+//        }
+        val files = listOf(samples.resolve("simple.fg"))
         files.forEach { file ->
             val friggaLexer = FriggaLexer(CharStreams.fromStream(file.inputStream()))
 
@@ -40,6 +41,8 @@ class LexTest {
                 }
 
                 val ast = friggaFile.toAST(file.name)
+                val runtime = FriggaRuntime()
+                runtime.process(ast)
             }
             println("Parsed $file (${file.length()} bytes) in $parseTime ms")
         }

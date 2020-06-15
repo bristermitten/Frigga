@@ -1,7 +1,14 @@
 lexer grammar FriggaLexer;
 
-WHITESPACE:  [ \t\r\n] -> skip;
+WHITESPACE: [ \t\r\n] -> skip;
 NEWLINE: ('\r'? '\n' | '\r') ;
+
+//Literals
+INT: [0-9]+;
+DEC: INT '.' INT ;
+BOOL: 'true' | 'false';
+CHAR: '\'' (. | '\\' .) '\'';
+STRING: QUOTE ( '\\"' | . )*? QUOTE;
 
 // Keywords
 MUTABLE: 'mutable';
@@ -9,13 +16,7 @@ STATEFUL: 'stateful';
 SECRET: 'secret';
 STATIC: 'static';
 USE: 'use';
-
-//Literals
-INT: [0-9]+;
-DOUBLE: INT '.' INT ;
-BOOL: 'true' | 'false';
-CHAR: '\'' (. | '\\' .) '\'';
-STRING : '"' ( '\\"' | . )*? '"' ;
+NAMESPACE: 'namespace';
 
 //Operators
 PLUS: '+';
@@ -48,8 +49,8 @@ BACKSLASH: '\\';
 NOTHING: '_';
 
 //Identifier
-ID: [a-zA-Z0-9_]+;
+ID: [a-zA-Z_0-9]+;
+NAMESPACE_TEXT: QUOTE [a-z/]+ QUOTE;
 
-//TEXT: .+?;
 
 ERROR_CHAR: .;

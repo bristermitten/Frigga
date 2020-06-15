@@ -1,4 +1,5 @@
 use "std"
+use "io"
 
 main = {
    println("Hello, please enter a calculation in the format <number>[+-*/]<number>")

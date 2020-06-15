@@ -3,40 +3,48 @@ parser grammar FriggaParser;
 options { tokenVocab=FriggaLexer; }
 
 friggaFile:
-    headers?
+    namespace?
+    usingList
     body
     EOF;
 
 //Headers
-use: USE STRING;
-headers:
-    use+?;
+use: USE NAMESPACE_TEXT;
+namespace: NAMESPACE NAMESPACE_TEXT;
+
+usingList:
+    (use)*;
 
 //Body
 body: line+? | NEWLINE*;
+
 line: expression NEWLINE*?;
 
 
 expression:
-          left=expression operator=(PLUS | MINUS | TIMES | DIVIDE ) right=expression #binaryOperator
+           assignment #assignmentExpression
+         |  literal #literalExpression
+         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE ) right=expression #binaryOperator
          | left=expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
          | function #functionExpression
          | lambda #lambdaExpression
          | expression call #callExpression
-         | literal #literalExpression
          | expression referencedCall #referencedCallExpression
          | access #accessExpression
-         | assignment #assignmentExpression
+
          | ID #varReference
         ;
 
+         property: id=ID |(expression call) | (expression referencedCall) ;
          assignment: ID typeSpec? ASSIGN expression;
          block: LCPAREN body RCPAREN;
-         call: LPAREN args RPAREN;
+
+         call:  LPAREN args RPAREN;
+
          referencedCall: LSPAREN args RSPAREN;
 
          args: expression? (COMMA expression)*;
-         access: DOT expression;
+         access: DOT property;
          typeSpec: DOUBLE_COLON type;
 
          type: functionType | ID | NOTHING | tuple;
@@ -74,7 +82,7 @@ functionParamTypes: (LPAREN type? (COMMA type)* RPAREN);
 
 literal:
       MINUS? INT #intLiteral
-    | MINUS? DOUBLE #decLiteral
+    | MINUS? DEC #decLiteral
     | BOOL #boolLiteral
     | STRING #stringLiteral
     | CHAR #charLiteral

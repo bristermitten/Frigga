@@ -1,8 +1,13 @@
 package me.bristermitten.frigga.ast.element
 
-internal sealed class Type(
+sealed class Type(
     override val name: String
-) : Named
+) : Named {
+    override fun toString() = name
+}
+
+object IntType : Type("Int")
+object DecType : Type("Dec")
 
 internal data class SimpleType(override val name: String) : Type(name)
 internal data class FunctionType(override val name: String) : Type(name)
