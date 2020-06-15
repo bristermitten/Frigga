@@ -17,8 +17,8 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-    antlr "org.antlr:antlr4:4.7.1"
-    implementation "org.antlr:antlr4-runtime:4.7.1"
+    antlr "org.antlr:antlr4:4.8-1"
+    implementation "org.antlr:antlr4-runtime:4.8-1"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
 }
