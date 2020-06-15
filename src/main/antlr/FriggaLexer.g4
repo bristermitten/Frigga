@@ -50,5 +50,6 @@ NOTHING: '_';
 //Identifier
 ID: [a-zA-Z0-9_]+;
 
-TEXT: .+?;
+//TEXT: .+?;
 
+ERROR_CHAR: .;

@@ -4,7 +4,8 @@ options { tokenVocab=FriggaLexer; }
 
 friggaFile:
     headers?
-    body EOF;
+    body
+    EOF;
 
 //Headers
 use: USE STRING;
@@ -12,20 +13,21 @@ headers:
     use+?;
 
 //Body
-body: line+?;
-line: expression+? NEWLINE*?;
+body: line+? | NEWLINE*;
+line: expression NEWLINE*?;
 
 
 expression:
-           ID #varReference
-         | assignment #assignmentExpression
+          left=expression operator=(PLUS | MINUS | TIMES | DIVIDE ) right=expression #binaryOperator
+         | left=expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
+         | function #functionExpression
          | lambda #lambdaExpression
-         | call #callExpression
-         | referencedCall #referencedCallExpression
+         | expression call #callExpression
          | literal #literalExpression
+         | expression referencedCall #referencedCallExpression
          | access #accessExpression
-         | expression operator=(PLUS | MINUS | TIMES | DIVIDE ) expression #binaryOperator
-         | expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) expression #binaryLogicalOperator
+         | assignment #assignmentExpression
+         | ID #varReference
         ;
 
          assignment: ID typeSpec? ASSIGN expression;
@@ -33,13 +35,13 @@ expression:
          call: LPAREN args RPAREN;
          referencedCall: LSPAREN args RSPAREN;
 
-         args: (expression COMMA?)*;
+         args: expression? (COMMA expression)*;
          access: DOT expression;
          typeSpec: DOUBLE_COLON type;
 
          type: functionType | ID | NOTHING | tuple;
 
-         tuple: (LPAREN (typeParam) (COMMA typeParam)* RPAREN);
+         tuple: (LPAREN (tupleParam) (COMMA tupleParam)* RPAREN);
          tupleParam : ID typeSpec;
 
 /*
@@ -50,9 +52,19 @@ typeParam: (ID typeSpec) | ID;
 /*
 Functions
 */
-lambda: generic? (functionParams ARROW type? (expression | block)) | block; //{} OR (a::Int) -> Int OR (a::Int) -> Int {}
-functionParams: (LPAREN functionParam? (COMMA functionParam)* RPAREN); //(a::Int) OR (a)
-functionParam: (ID typeSpec) | ID; //a::Int OR a
+function: generic? (functionSignature block); //{} OR (a::Int) -> Int {}
+functionSignature: functionParams ARROW type; //() -> _ OR (a::Int) -> Int
+functionParams: (LPAREN functionParam? (COMMA functionParam)* RPAREN); //(a::Int) OR (a::Int, b::Int, etc)
+functionParam: ID typeSpec; //a::Int
+
+lambda: block | (lambdaParams ARROW (expression | block)); //{} OR (a::Int) -> Int OR (a::Int) -> Int {}
+/*
+(a, b) -> 3
+(a::Int, b::Int) -> a + b
+() -> {}
+*/
+lambdaParams: (LPAREN lamdaParam? (COMMA lamdaParam)* RPAREN); //(a::Int) OR (a, b, etc)
+lamdaParam: functionParam | ID; //a::Int OR a
 
 /*
 Function Types
@@ -65,5 +77,6 @@ literal:
     | MINUS? DOUBLE #decLiteral
     | BOOL #boolLiteral
     | STRING #stringLiteral
-    | CHAR #charLiteral;
+    | CHAR #charLiteral
+    | LPAREN expression (COMMA expression)* RPAREN #tupleLiteral;
 
