@@ -26,3 +26,8 @@ or `name::Type = value`
 
 All properties are reference immutable by default,
 but can be made mutable with the `mutable` keyword. 
+This keyword is deliberately verbose to discourage mutability.
+
+
+Functions (which are first class types) are declared 
+the same way as properties.
