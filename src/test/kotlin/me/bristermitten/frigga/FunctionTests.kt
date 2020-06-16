@@ -68,9 +68,11 @@ class FunctionTests : FriggaTest() {
         val originalOut = System.out
         val out = ByteArrayOutputStream()
         System.setOut(PrintStream(out))
+
         val result = runtime.execute(code, "function")
         handleExceptions(result)
         System.setOut(originalOut)
+
         out.size() shouldBe 0
     }
 }
