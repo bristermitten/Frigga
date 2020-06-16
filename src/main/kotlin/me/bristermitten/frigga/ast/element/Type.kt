@@ -7,11 +7,13 @@ import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
 
 sealed class Type(
-    override val name: String,
-    val parent: Type? = AnyType
+    final override val name: String,
+    private val parent: Type? = AnyType
 ) : Named {
 
+
     init {
+        @Suppress("LeakingThis")
         types[name] = this
     }
 
@@ -85,7 +87,7 @@ object NothingType : Type("Nothing", null) {
     }
 }
 
-internal data class SimpleType(override val name: String) : Type(name)
+internal class SimpleType(name: String) : Type(name)
 internal data class FunctionType(val signature: Signature) : Type(signature.toString())
 
 data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
