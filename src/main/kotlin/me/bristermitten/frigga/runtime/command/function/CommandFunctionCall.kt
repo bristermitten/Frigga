@@ -28,8 +28,12 @@ class CommandFunctionCall(
             it.eval(stack, context)
         }
         context.enterScope(calling)
-        function.signature.input.forEach { (paramName, _) ->
-            context.defineProperty(paramName, stack.pull() as Value)
+        function.signature.input.forEach { (paramName, paramType) ->
+            val paramValue = stack.pull() as Value
+            if (!paramType.accepts(paramValue.type)) {
+                throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType")
+            }
+            context.defineProperty(paramName, paramValue)
         }
         if (callingUpon != null) {
             context.defineProperty("__upon", callingUpon as Value)
