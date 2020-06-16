@@ -12,7 +12,7 @@ sealed class Type(
 ) : Named {
 
     init {
-        _types[name] = this
+        types[name] = this
     }
 
     protected val typeFunctions: MutableMap<String, FunctionValue> = mutableMapOf()
@@ -95,9 +95,9 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                 Signature(
                     emptyMap(),
                     it.parameters.map { param ->
-                        param.name to (_types[name] ?: JVMType(param.type))
+                        param.name to (types[name] ?: JVMType(param.type))
                     }.toMap(),
-                    (_types[it.returnType.simpleName] ?: JVMType(it.returnType))
+                    (types[it.returnType.simpleName] ?: JVMType(it.returnType))
                 ),
                 listOf(object : Command() {
                     override fun eval(stack: Stack, context: FriggaContext) {
@@ -153,10 +153,10 @@ object OutputType : Type("Output") {
     }
 }
 
-private val _types = mutableMapOf<String, Type>()
+private val types = mutableMapOf<String, Type>()
 
 fun loadTypes() {
-    fun Type.load() = _types.put(name, this)
+    fun Type.load() = types.put(name, this)
     NumType.load()
     IntType.load()
     DecType.load()
@@ -167,7 +167,7 @@ fun loadTypes() {
     OutputType.load()
 }
 
-fun getType(name: String) = _types.getOrPut(name) {
+fun getType(name: String) = types.getOrPut(name) {
     SimpleType(name)
 }
 
