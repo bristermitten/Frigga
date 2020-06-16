@@ -25,6 +25,20 @@ class FunctionTests : FriggaTest() {
     }
 
     @Test
+    fun `Test correct handling of a No-Op Function with an explicit Type`() {
+        val code = """
+            doNothing::() -> _ = () -> _ {
+            
+            }
+            doNothing()
+        """.trimIndent()
+
+        val result = runtime.execute(code, "function")
+        handleExceptions(result)
+        result.leftoverStack.shouldBeEmpty()
+    }
+
+    @Test
     fun `Test correct handling of a Simple Function that yields a value`() {
         runtime.loadStdLib()
         val code = """

@@ -13,6 +13,7 @@ abstract class FriggaTest {
         runtime = FriggaRuntime()
     }
 
+
     fun handleExceptions(result: FullExecutionResult) {
         result.exceptions.forEach {
             throw it
