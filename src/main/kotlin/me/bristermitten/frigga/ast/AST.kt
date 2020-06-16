@@ -1,9 +1,8 @@
 package me.bristermitten.frigga.ast
 
 import FriggaParser
+import me.bristermitten.frigga.ast.element.*
 import me.bristermitten.frigga.ast.element.FriggaFile
-import me.bristermitten.frigga.ast.element.Modifier
-import me.bristermitten.frigga.ast.element.Namespace
 import me.bristermitten.frigga.ast.element.SimpleType
 import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.*
@@ -135,12 +134,12 @@ internal fun FriggaParser.FunctionContext.toAST(name: String): Function {
     val signature = functionSignature()
     val typeSignature = generic()?.typeParam()
         ?.map {
-            it.ID().text to SimpleType(it.typeSpec().type().text)
+            it.ID().text to getType(it.typeSpec().type().text)
         }?.toMap() ?: emptyMap()
 
     val params = signature?.functionParams()?.functionParam()?.map {
         it.ID().text to
-                SimpleType(it.typeSpec().type().text)
+                getType(it.typeSpec().type().text)
     }?.toMap() ?: emptyMap()
 
     val output = SimpleType(signature?.type()?.text ?: "InferredType")

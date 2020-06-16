@@ -28,7 +28,7 @@ sealed class Type(
             return TypeRelationship.Subtype
         }
         val isSupertype = other.isSubtypeOf(this)
-        if(isSupertype) {
+        if (isSupertype) {
             return TypeRelationship.Supertype
         }
         return TypeRelationship.NoRelationship
@@ -38,6 +38,7 @@ sealed class Type(
         val relationshipTo = relationshipTo(other)
         return relationshipTo == TypeRelationship.Same || relationshipTo == TypeRelationship.Supertype
     }
+
     protected open fun isSubtypeOf(other: Type): Boolean {
         var thisParent = this.parent
         while (thisParent != null) {
@@ -94,9 +95,9 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                 Signature(
                     emptyMap(),
                     it.parameters.map { param ->
-                        param.name to (types[name] ?: JVMType(param.type))
+                        param.name to (_types[name] ?: JVMType(param.type))
                     }.toMap(),
-                    (types[it.returnType.simpleName] ?: JVMType(it.returnType))
+                    (_types[it.returnType.simpleName] ?: JVMType(it.returnType))
                 ),
                 listOf(object : Command() {
                     override fun eval(stack: Stack, context: FriggaContext) {
@@ -109,6 +110,10 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                 })
             )
         }
+    }
+
+    override fun accepts(other: Type): Boolean {
+        return true //JVM type will accept any value, actual validation is done by the JVM via reflection
     }
 }
 
@@ -149,7 +154,22 @@ object OutputType : Type("Output") {
 }
 
 private val _types = mutableMapOf<String, Type>()
-val types: Map<String, Type> = _types
+
+fun loadTypes() {
+    fun Type.load() = _types.put(name, this)
+    NumType.load()
+    IntType.load()
+    DecType.load()
+    StringType.load()
+    AnyType.load()
+    NothingType.load()
+    CallerType.load()
+    OutputType.load()
+}
+
+fun getType(name: String) = _types.getOrPut(name) {
+    SimpleType(name)
+}
 
 enum class TypeRelationship {
     Same,

@@ -8,6 +8,7 @@ import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.*
 import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
+import me.bristermitten.frigga.ast.element.loadTypes
 import me.bristermitten.frigga.ast.toAST
 import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.command.Command
@@ -39,6 +40,7 @@ class FriggaRuntime {
 
     @OptIn(ExperimentalTime::class)
     fun execute(friggaCode: String, name: String): FullExecutionResult {
+        loadTypes()
         val (lexer, lexTime) = measureTimedValue {
             FriggaLexer(CharStreams.fromString(friggaCode))
         }

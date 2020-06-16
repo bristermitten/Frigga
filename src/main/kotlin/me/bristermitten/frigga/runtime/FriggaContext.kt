@@ -1,8 +1,6 @@
 package me.bristermitten.frigga.runtime
 
 import me.bristermitten.frigga.ast.element.*
-import me.bristermitten.frigga.ast.element.Property
-import me.bristermitten.frigga.runtime.Value
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
 
 class FriggaContext {
@@ -15,24 +13,24 @@ class FriggaContext {
 
     private fun loadGlobalScope(): FriggaScope {
         val globalScope = FriggaScope("global")
-        globalScope.properties["__stack"] = Property(
-            "__stack",
+        globalScope.properties[STACK_NAME] = Property(
+            STACK_NAME,
             emptySet(),
             Value(
                 JVMType(Stack::class.java),
                 stack
             )
         )
-        globalScope.properties["__caller"] = Property(
-            "__caller",
+        globalScope.properties[CALLER_NAME] = Property(
+            CALLER_NAME,
             emptySet(),
             Value(
                 CallerType,
                 Unit
             )
         )
-        globalScope.properties["__stdout"] = Property(
-            "__stdout",
+        globalScope.properties[STDOUT_NAME] = Property(
+            STDOUT_NAME,
             emptySet(),
             Value(
                 OutputType,
@@ -70,6 +68,9 @@ class FriggaContext {
     }
 
     internal fun defineProperty(property: Property) {
+        if (property.name in reservedNames) {
+            throw IllegalArgumentException("Cannot define property with reserved name ${property.name}")
+        }
         scope[0].properties[property.name] = property
         val value = property.value.value
         if (value is FunctionValue) {

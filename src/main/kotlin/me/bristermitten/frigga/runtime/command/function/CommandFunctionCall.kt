@@ -31,7 +31,7 @@ class CommandFunctionCall(
         function.signature.input.forEach { (paramName, paramType) ->
             val paramValue = stack.pull() as Value
             if (!paramType.accepts(paramValue.type)) {
-                throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType")
+                throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType for function $calling")
             }
             context.defineProperty(paramName, paramValue)
         }
