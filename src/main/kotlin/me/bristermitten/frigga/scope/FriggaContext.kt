@@ -24,4 +24,13 @@ class FriggaContext {
         scope[0].properties[property.name] = property
     }
 
+    fun reset() {
+        stack.clear()
+        scope.forEach {
+            it.functions.clear()
+            it.properties.clear()
+            it.types.clear()
+        }
+    }
+
 }

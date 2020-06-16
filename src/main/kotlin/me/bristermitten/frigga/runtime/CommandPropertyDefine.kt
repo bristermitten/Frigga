@@ -13,20 +13,25 @@ internal class CommandPropertyDefine(
 
     override fun eval(stack: Stack, context: FriggaContext) {
         val existing = context.findProperty(name)
+
         if (existing != null) {
+            val redefineTo = stack.pull() //Pull irrespective of mutability to ensure no leftover values on the stack
             require(Modifier.MUTABLE in existing.modifiers) {
                 "Attempting to redefine a non mutable property ${existing.name}"
             }
-            existing.value = stack.pull() as Value
+
+            existing.value = redefineTo as Value
+            return
         }
-        val value = stack.pull() as Value
+
+        val propertyValue = stack.pull() as Value
+
         val property = Property(
             name,
-            emptySet(), //TODO
-            value
+            value.modifiers,
+            propertyValue
         )
 
-        println("Successfully defined $property")
         context.defineProperty(property)
     }
 }

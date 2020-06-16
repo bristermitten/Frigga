@@ -11,4 +11,7 @@ class Stack(private val stack: Deque<Any> = ArrayDeque()) {
     override fun toString(): String {
         return stack.toString()
     }
+
+    fun toList() = stack.toList()
+    fun clear() = stack.clear()
 }

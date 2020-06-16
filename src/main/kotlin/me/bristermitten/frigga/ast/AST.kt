@@ -2,12 +2,14 @@ package me.bristermitten.frigga.ast
 
 import FriggaParser
 import me.bristermitten.frigga.ast.element.FriggaFile
+import me.bristermitten.frigga.ast.element.Modifier
 import me.bristermitten.frigga.ast.element.Namespace
 import me.bristermitten.frigga.ast.element.SimpleType
 import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.*
 import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
+import java.util.*
 
 internal fun FriggaParser.FriggaFileContext.toAST(name: String): FriggaFile {
     return FriggaFile(
@@ -51,7 +53,15 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
         Call(expression().text, call().args().expression().map { it.toAST(name, previous) })
     }
     is FriggaParser.AssignmentExpressionContext -> {
-        Assignment(assignment().ID().text!!, assignment().expression().toAST(assignment().ID().text!!, previous))
+        val modifiers = this.assignment().propertyModifiers()
+
+        val mutable = modifiers.MUTABLE()?.text
+        val modifierSet = EnumSet.noneOf(Modifier::class.java)
+        if (mutable != null) {
+            modifierSet += Modifier.MUTABLE
+        }
+        val id = assignment().ID().text
+        Assignment(id, modifierSet, assignment().expression().toAST(id, previous))
     }
     is FriggaParser.AccessExpressionContext -> {
         Access(access().property().toAST())

@@ -6,19 +6,36 @@ sealed class Type(
     override val name: String,
     protected val typeFunctions: MutableMap<String, Function> = mutableMapOf()
 ) : Named {
-    override fun toString() = name
+
+//    override fun toString() = name
+
+
     val functions: Map<String, Function> = typeFunctions
 
     open infix fun union(other: Type): Type = AnyType
 }
 
 object IntType : Type("Int") {
-    init {
-//        typeFunctions["add"] = Function()
+
+    override fun union(other: Type): Type {
+        if (other is DecType) {
+            return DecType
+        }
+        if (other is IntType) {
+            return IntType
+        }
+        return super.union(other)
     }
 }
 
-object DecType : Type("Dec")
+object DecType : Type("Dec") {
+    override fun union(other: Type): Type {
+        if (other is IntType || other is DecType) {
+            return DecType
+        }
+        return super.union(other)
+    }
+}
 
 object AnyType : Type("Any")
 

@@ -9,5 +9,6 @@
 x = 3 #simple property declaration with inference (inferred to Int)
 pi::Dec = 3.141 #property declaration with explicit type of Dec
 
-y = x + pi
+mutable y = x + pi
+y = y + 1
 y

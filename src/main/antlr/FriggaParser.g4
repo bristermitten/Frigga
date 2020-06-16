@@ -35,8 +35,12 @@ expression:
          | ID #varReference
         ;
 
-         property: id=ID |(expression call) | (expression referencedCall) ;
-         assignment: ID typeSpec? ASSIGN expression;
+         property: id=ID | (expression call) | (expression referencedCall) ;
+
+         propertyModifiers:
+            MUTABLE?;
+
+         assignment: propertyModifiers ID typeSpec? ASSIGN expression;
          block: LCPAREN body RCPAREN;
 
          call:  LPAREN args RPAREN;

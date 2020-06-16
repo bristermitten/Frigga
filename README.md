@@ -25,4 +25,4 @@ Property declaration is done with the syntax:
 or `name::Type = value`
 
 All properties are reference immutable by default,
-but can be made mutable with the `mutable` keyword. 
+but can be made mutable with the `mutable` keyword.~~~~ 
