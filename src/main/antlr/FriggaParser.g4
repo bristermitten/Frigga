@@ -50,7 +50,7 @@ expression:
          referencedCall: LSPAREN args RSPAREN;
 
          args: expression? (COMMA expression)*;
-         access: DOT property;
+         access: DOT ID;
          typeSpec: DOUBLE_COLON type;
 
          type: functionType | ID | NOTHING | tuple;

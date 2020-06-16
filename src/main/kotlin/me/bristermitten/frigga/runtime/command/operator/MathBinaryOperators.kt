@@ -1,10 +1,9 @@
-package me.bristermitten.frigga.runtime.operator
+package me.bristermitten.frigga.runtime.command.operator
 
-import me.bristermitten.frigga.runtime.Command
+import me.bristermitten.frigga.runtime.FriggaContext
+import me.bristermitten.frigga.runtime.Stack
+import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.Value
-import me.bristermitten.frigga.scope.FriggaContext
-import me.bristermitten.frigga.scope.Stack
-
 data class CommandBinaryAdd(val left: Command, val right: Command) : Command() {
     override fun eval(stack: Stack, context: FriggaContext) {
         left.eval(stack, context)
@@ -56,10 +55,7 @@ data class CommandBinarySubtract(val left: Command, val right: Command) : Comman
                 else -> throw IllegalArgumentException("$leftValue - $rightValue")
             }
         stack.push(
-            Value(
-                type,
-                result
-            )
+            Value(type, result)
         )
     }
 }

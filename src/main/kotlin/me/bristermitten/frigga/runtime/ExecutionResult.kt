@@ -1,13 +1,13 @@
-package me.bristermitten.frigga.scope
+package me.bristermitten.frigga.runtime
 
 data class ExecutionResult(
     val leftoverStack: List<Any>,
-    val exceptions: List<Any> //TODO
+    val exceptions: List<Throwable> //TODO
 )
 
 data class FullExecutionResult(
     val leftoverStack: List<Any>,
-    val exceptions: List<Any>, //TODO
+    val exceptions: List<Throwable>, //TODO
     val timings: Timings
 )
 

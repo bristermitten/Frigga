@@ -36,6 +36,9 @@ fun FriggaParser.LiteralContext.toAST() = when (this) {
     is FriggaParser.DecLiteralContext -> {
         DecLiteral(DEC().text.toDouble())
     }
+    is FriggaParser.StringLiteralContext -> {
+        StringLiteral(STRING().text.removeSurrounding("\""))
+    }
     else -> throw UnsupportedOperationException(javaClass.simpleName)
 }
 
@@ -50,7 +53,9 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
         PropertyReference(text)
     }
     is FriggaParser.CallExpressionContext -> {
-        Call(expression().text, call().args().expression().map { it.toAST(name, previous) })
+        val expression = expression()
+        val callUpon = (expression.toAST(name, previous) as? Access)?.property ?: expression.text
+        Call(callUpon, call().args().expression().map { it.toAST(name, previous) })
     }
     is FriggaParser.AssignmentExpressionContext -> {
         val modifiers = this.assignment().propertyModifiers()
@@ -64,7 +69,7 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
         Assignment(id, modifierSet, assignment().expression().toAST(id, previous))
     }
     is FriggaParser.AccessExpressionContext -> {
-        Access(access().property().toAST())
+        Access(access().ID().text)
     }
     is FriggaParser.ReferencedCallExpressionContext -> {
         ReferencedCall(name!!, referencedCall().args().expression().map { it.toAST(name, previous) })

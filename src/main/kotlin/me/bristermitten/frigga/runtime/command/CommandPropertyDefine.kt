@@ -1,10 +1,11 @@
-package me.bristermitten.frigga.runtime
+package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.ast.element.Modifier
 import me.bristermitten.frigga.ast.element.Property
 import me.bristermitten.frigga.ast.element.expression.value.Assignment
-import me.bristermitten.frigga.scope.FriggaContext
-import me.bristermitten.frigga.scope.Stack
+import me.bristermitten.frigga.runtime.FriggaContext
+import me.bristermitten.frigga.runtime.Stack
+import me.bristermitten.frigga.runtime.Value
 
 internal class CommandPropertyDefine(
     val name: String,

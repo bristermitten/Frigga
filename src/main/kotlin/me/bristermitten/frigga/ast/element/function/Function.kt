@@ -6,5 +6,5 @@ import me.bristermitten.frigga.ast.element.expression.Expression
 data class Function(
     override val name: String,
     val signature: Signature,
-    val contents: List<Any>
+    val contents: List<Expression>
 ) : Named, Expression

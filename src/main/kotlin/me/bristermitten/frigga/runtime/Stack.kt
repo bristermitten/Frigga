@@ -1,4 +1,4 @@
-package me.bristermitten.frigga.scope
+package me.bristermitten.frigga.runtime
 
 import java.util.*
 

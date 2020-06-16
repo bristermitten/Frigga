@@ -1,0 +1,4 @@
+yield = (value::Any) -> _ {
+    __stack.push(value)
+    __caller.break()
+}

@@ -1,6 +1,7 @@
 package me.bristermitten.frigga
 
-import me.bristermitten.frigga.scope.FriggaRuntime
+import me.bristermitten.frigga.runtime.FriggaRuntime
+import me.bristermitten.frigga.runtime.FullExecutionResult
 import org.junit.jupiter.api.BeforeEach
 
 abstract class FriggaTest {
@@ -10,5 +11,11 @@ abstract class FriggaTest {
     @BeforeEach
     fun setUp() {
         runtime = FriggaRuntime()
+    }
+
+    fun handleExceptions(result: FullExecutionResult) {
+        result.exceptions.forEach {
+            throw it
+        }
     }
 }
