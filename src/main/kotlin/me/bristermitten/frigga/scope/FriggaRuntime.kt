@@ -11,6 +11,7 @@ import me.bristermitten.frigga.ast.element.expression.value.PropertyReference
 import me.bristermitten.frigga.ast.toAST
 import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.operator.CommandBinaryAdd
+import me.bristermitten.frigga.runtime.operator.CommandBinarySubtract
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
@@ -99,8 +100,11 @@ class FriggaRuntime {
             return CommandPropertyReference(expression.referencing)
         }
         if (expression is BinaryOperator) {
-            //TODO more operators
-            return CommandBinaryAdd(process(expression.left), process(expression.right))
+            return when (expression.operator) {
+                "+" -> CommandBinaryAdd(process(expression.left), process(expression.right))
+                "-" -> CommandBinarySubtract(process(expression.left), process(expression.right))
+                else -> throw UnsupportedOperationException(expression.operator)
+            }
         }
         throw UnsupportedOperationException(expression.javaClass.simpleName + " " + expression)
     }

@@ -66,7 +66,6 @@ class SimpleTests : FriggaTest() {
             mutable x = 3
             x = 4.0
             x + 1
-
         """.trimIndent()
         val result = runtime.execute(code, "simple")
 
