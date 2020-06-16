@@ -1,24 +1,27 @@
 package me.bristermitten.frigga.ast.element
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import me.bristermitten.frigga.ast.element.function.Signature
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
+import me.bristermitten.frigga.runtime.Value
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
+import me.bristermitten.frigga.runtime.command.singleCommand
+import me.bristermitten.frigga.util.set
 
 sealed class Type(
     final override val name: String,
     private val parent: Type? = AnyType
 ) : Named {
-
-
     init {
         @Suppress("LeakingThis")
         types[name] = this
     }
 
-    protected val typeFunctions: MutableMap<String, FunctionValue> = mutableMapOf()
-    val functions: Map<String, FunctionValue> = typeFunctions
+    protected val typeFunctions: Multimap<String, FunctionValue> = HashMultimap.create()
+    fun getFunctions(name: String): Collection<FunctionValue> = typeFunctions[name]
 
     open infix fun union(other: Type): Type = AnyType
 
@@ -62,6 +65,20 @@ object IntType : Type("Int", NumType) {
             is IntType -> IntType
             else -> super.union(other)
         }
+    }
+
+    init {
+        typeFunctions["add"] = FunctionValue(
+            Signature(
+                input = mapOf("value" to IntType),
+                output = IntType
+            ),
+            singleCommand { stack, context ->
+                val thisValue = stack.pull() as Value
+                val add = context.findProperty("value")!!
+                stack.push(thisValue.value as Int + add.value as Int)
+            }
+        )
     }
 }
 

@@ -51,11 +51,17 @@ class FriggaContext {
         return null
     }
 
-    internal fun findFunction(type: Type? = null, name: String): FunctionValue? {
+    internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): FunctionValue? {
         if (type != null) {
-            val inType = type.functions[name]
-            if (inType != null) {
-                return inType
+            val withName = type.getFunctions(name)
+            val found = withName.firstOrNull {
+                var index = 0
+                it.signature.input.values.all { parameterType ->
+                    parameterType.accepts(parameterTypes[index++])
+                }
+            }
+            if (found != null) {
+                return found
             }
         }
         for (scope in scope) {

@@ -18,23 +18,28 @@ class CommandFunctionCall(
         }
 
         val uponType = (callingUpon as? Value)?.type
-        val function = context.findFunction(uponType, calling)
+        val paramValues = params.map {
+            it.eval(stack, context)
+            stack.pull() as Value
+        }
+
+        val function = context.findFunction(uponType, calling, paramValues.map(Value::type))
 
         requireNotNull(function) {
             "No such function $calling"
         }
 
-        params.forEach {
-            it.eval(stack, context)
-        }
         context.enterScope(calling)
+        var index = 0
         function.signature.input.forEach { (paramName, paramType) ->
-            val paramValue = stack.pull() as Value
+            val paramValue = paramValues[index]
             if (!paramType.accepts(paramValue.type)) {
                 throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType for function $calling")
             }
             context.defineProperty(paramName, paramValue)
+            index++
         }
+
         if (callingUpon != null) {
             context.defineProperty("__upon", callingUpon as Value)
         }
