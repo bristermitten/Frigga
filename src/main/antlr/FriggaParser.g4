@@ -31,10 +31,12 @@ expression:
          | expression call #callExpression
          | expression referencedCall #referencedCallExpression
          | access #accessExpression
+         | paranthesizedExpression #paranthesisExpression
 
          | ID #varReference
         ;
 
+         paranthesizedExpression: LPAREN expression RPAREN;
          property: id=ID | (expression call) | (expression referencedCall) ;
 
          propertyModifiers:
@@ -53,7 +55,7 @@ expression:
 
          type: functionType | ID | NOTHING | tuple;
 
-         tuple: (LPAREN (tupleParam) (COMMA tupleParam)* RPAREN);
+         tuple: (LPAREN (tupleParam COMMA tupleParam)+ RPAREN);
          tupleParam : ID typeSpec;
 
 /*
@@ -90,5 +92,5 @@ literal:
     | BOOL #boolLiteral
     | STRING #stringLiteral
     | CHAR #charLiteral
-    | LPAREN expression (COMMA expression)* RPAREN #tupleLiteral;
+    | LPAREN (expression COMMA expression)+ RPAREN #tupleLiteral;
 

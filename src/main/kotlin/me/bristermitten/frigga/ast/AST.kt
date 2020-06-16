@@ -78,6 +78,9 @@ fun FriggaParser.ExpressionContext.toAST(name: String? = null, previous: Express
     is FriggaParser.BinaryLogicalOperatorContext -> {
         BinaryOperator(left.toAST(name, previous), this.operator.text, right.toAST(name, previous))
     }
+    is FriggaParser.ParanthesisExpressionContext -> {
+        this.paranthesizedExpression().expression().toAST(name, previous)
+    }
     else -> throw UnsupportedOperationException(javaClass.simpleName)
 }
 
