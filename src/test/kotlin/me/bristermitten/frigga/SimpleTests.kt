@@ -63,14 +63,14 @@ class SimpleTests : FriggaTest() {
     @Test
     fun `Test Property Definition and reassignment with different types`() {
         val code = """
-            mutable x = 3
-            x = 4.0
+            mutable x = 3.0
+            x = 4
             x + 1
         """.trimIndent()
         val result = runtime.execute(code, "simple")
 
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.shouldBeSingleton()
-        result.leftoverStack.first() shouldBe decValue(5.0)
+        result.leftoverStack.first() shouldBe intValue(5)
     }
 }

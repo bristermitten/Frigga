@@ -2,6 +2,7 @@ package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.ast.element.Modifier
 import me.bristermitten.frigga.ast.element.Property
+import me.bristermitten.frigga.ast.element.TypeRelationship
 import me.bristermitten.frigga.ast.element.expression.value.Assignment
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
@@ -16,12 +17,14 @@ internal class CommandPropertyDefine(
         val existing = context.findProperty(name)
 
         if (existing != null) {
-            val redefineTo = stack.pull() //Pull irrespective of mutability to ensure no leftover values on the stack
+            val redefineTo = stack.pull() as Value //Pull irrespective of mutability to ensure no leftover values on the stack
             require(Modifier.MUTABLE in existing.modifiers) {
                 "Attempting to redefine a non mutable property ${existing.name}"
             }
-
-            existing.value = redefineTo as Value
+            require(existing.value.type.accepts(redefineTo.type)) {
+                "Cannot reassign ${existing.name} of type ${existing.value.type} to value of type ${redefineTo.type}"
+            }
+            existing.value = redefineTo
             return
         }
 
