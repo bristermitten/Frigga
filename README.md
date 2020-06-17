@@ -80,3 +80,25 @@ getMyFavouriteNumber = {
 This allows the result of a function to be used elsewhere.
 Yielding also breaks execution, so any expressions after a `yield()`
 call will not be evaluated.
+
+We also have the option of using an **Expression Lambda**,
+which is a lambda that performs 1 expression only. The value
+is implicitly yielded.
+
+```
+getAnotherNumber = () -> 10
+```
+
+Finally, function calls can be transformed into functions themselves
+with **reference calls**. These look like normal function calls
+except with square brackets instead of normal ones.
+
+For example:
+```
+printHello = println["Hello"]
+printHello()
+```
+
+
+These language features give developers freedom to design code 
+as concisely or verbosely as they like, while maintaining clarity either way.
