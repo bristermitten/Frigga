@@ -1,5 +1,6 @@
 package me.bristermitten.frigga
 
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
@@ -63,7 +64,18 @@ class MathTests : FriggaTest() {
             x + 1
         """.trimIndent()
         val result = runtime.execute(code, "math")
-        handleExceptions(result)
+        result.exceptions.shouldBeEmpty()
+        result.leftoverStack.first() shouldBe decValue(4.0)
+    }
+    @Test
+    fun `Assert Simple Decimal Reassignment Functioning Correctly`() {
+        val code = """
+            mutable x = 3.0
+            x = 4
+            x
+        """.trimIndent()
+        val result = runtime.execute(code, "math")
+        result.exceptions.shouldBeEmpty()
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
 }

@@ -24,7 +24,7 @@ internal class CommandPropertyDefine(
             require(existing.value.type.accepts(redefineTo.type)) {
                 "Cannot reassign ${existing.name} of type ${existing.value.type} to value of type ${redefineTo.type}"
             }
-            existing.value = redefineTo
+            existing.value = redefineTo.type.coerceTo(redefineTo, existing.value.type)
             return
         }
 

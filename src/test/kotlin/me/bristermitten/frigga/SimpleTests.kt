@@ -71,6 +71,6 @@ class SimpleTests : FriggaTest() {
 
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.shouldBeSingleton()
-        result.leftoverStack.first() shouldBe intValue(5)
+        result.leftoverStack.first() shouldBe decValue(5.0)
     }
 }
