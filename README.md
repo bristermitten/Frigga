@@ -4,8 +4,8 @@ Frigga is a strongly, dynamically typed functional programming language.
 
 It follows a simple syntax that looks something like this: 
 ```
-x = 3 #Type inferred to Int
-pi::Dec = 3.141 #Explicit Type Specification
+x = 3
+pi::Dec = 3.141
 
 mutable y = x + pi
 y += 1
