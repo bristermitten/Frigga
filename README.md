@@ -134,6 +134,7 @@ that value. For example, `3` can be used in place of `() -> 3`. **This is subjec
 ## Planned Features
 
 * Static Analysis in place of a compiler
+* Different Backends? eg a JVM compiler for larger projects, an interpreter for scripting, etc
 * Annotations
 * Language Level function optimisations (eg tail recursion unrolling, same-input same-output caching, etc)
 * Extension Functions
