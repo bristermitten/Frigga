@@ -130,15 +130,3 @@ that value. For example, `3` can be used in place of `() -> 3`. **This is subjec
 * All operators can be overloaded for a Type (eg + - * etc)
 
 * Frigga features Tuples, which can be used to yield 2 or more values from a single function
-
-## Planned Features
-
-* Static Analysis in place of a compiler
-* Different Backends? eg a JVM compiler for larger projects, an interpreter for scripting, etc
-* Annotations
-* Language Level function optimisations (eg tail recursion unrolling, same-input same-output caching, etc)
-* Extension Functions
-* Structs
-* Named and Default Parameters
-* Fully implement the runtime!
-* Much more!

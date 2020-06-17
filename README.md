@@ -1,8 +1,8 @@
 # Frigga
 
-Frigga is a strongly, dynamically typed functional language
+Frigga is a strongly, dynamically typed functional programming language.
 
-Frigga follows a simple syntax that looks something like this 
+It follows a simple syntax that looks something like this: 
 ```
 x = 3 #Type inferred to Int
 pi::Dec = 3.141 #Explicit Type Specification
@@ -23,7 +23,6 @@ To find out more about Frigga's syntax and features, take a look at the [docs](/
 ## Planned Features
 
 - [ ] Static Analysis in place of a compiler
-- [ ] Different Backends? eg a JVM compiler for larger projects, an interpreter for scripting, etc
 - [ ] Annotations
 - [ ] Language Level function optimisations (eg tail recursion unrolling, same-input same-output caching, etc)
 - [ ] Extension Functions
@@ -31,3 +30,10 @@ To find out more about Frigga's syntax and features, take a look at the [docs](/
 - [ ] Named and Default Parameters
 - [ ] Fully implement the runtime!
 - [ ] Much more!
+
+
+## Potential Features
+* Function definition as a reference call. For example `printAValue = println[value::Any]`
+ would create a function equivalent to `printAValue = (value::Any) -> { println(value) }`. 
+*This could get very complicated, very quickly and isn't great for readability. It is unlikely to be implemented.*
+* Different Backends? eg a JVM compiler for larger projects, an interpreter for scripting, etc. *Potentially will happen, may be more trouble than it's worth.*
