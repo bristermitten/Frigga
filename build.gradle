@@ -67,7 +67,7 @@ pitest {
     testPlugin = "junit5"
     avoidCallsTo = ["kotlin.jvm.internal"]
     mutators = ["STRONGER"]
-//    pitestVersion = "1.4.0"   //current defined for Gradle plugin PIT version should be used
+    pitestVersion = "1.5.1"   //current defined for Gradle plugin PIT version should be used
     threads = Runtime.getRuntime().availableProcessors()
     outputFormats = ['XML', 'HTML']
 }

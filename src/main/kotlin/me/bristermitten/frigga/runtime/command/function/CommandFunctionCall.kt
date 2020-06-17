@@ -1,6 +1,5 @@
 package me.bristermitten.frigga.runtime.command.function
 
-import me.bristermitten.frigga.ast.element.BreakException
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.Value
@@ -12,12 +11,12 @@ class CommandFunctionCall(
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val callingUpon = stack.peek()
+        val callingUpon = stack.peek() as Value?
         if (callingUpon != null) {
             stack.pull()
         }
 
-        val uponType = (callingUpon as? Value)?.type
+        val uponType = callingUpon?.type
         val paramValues = params.map {
             it.eval(stack, context)
             stack.pull() as Value
@@ -29,32 +28,7 @@ class CommandFunctionCall(
             "No such function $calling"
         }
 
-        context.enterScope(calling)
-        var index = 0
-        function.signature.input.forEach { (paramName, paramType) ->
-            val paramValue = paramValues[index]
-            if (!paramType.accepts(paramValue.type)) {
-                throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType for function $calling")
-            }
-            context.defineProperty(paramName, paramValue)
-            index++
-        }
-
-        if (callingUpon != null) {
-            context.defineProperty("__upon", callingUpon as Value)
-        }
-
-        for (command in function.body) {
-            try {
-                command.eval(stack, context)
-            } catch (e: BreakException) {
-                if (this.calling != "yield" && this.calling != "break") {
-                    break
-                } else throw e
-            }
-        }
-        context.leaveScope()
-
+        function.call(calling, callingUpon,  stack, context, paramValues)
     }
 
     override fun toString(): String {

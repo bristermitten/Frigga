@@ -73,8 +73,8 @@ class FriggaContext {
         return null
     }
 
-    internal fun defineProperty(property: Property) {
-        if (property.name in reservedNames) {
+    internal fun defineProperty(property: Property, force: Boolean = false) {
+        if (property.name in reservedNames && !force) {
             throw IllegalArgumentException("Cannot define property with reserved name ${property.name}")
         }
         scope[0].properties[property.name] = property
@@ -84,9 +84,10 @@ class FriggaContext {
         }
     }
 
-    internal fun defineProperty(name: String, value: Value) {
+    internal fun defineProperty(name: String, value: Value, forceReservedName: Boolean = false) {
         return defineProperty(
-            Property(name, emptySet(), value)
+            Property(name, emptySet(), value),
+            forceReservedName
         )
     }
 

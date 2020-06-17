@@ -3,12 +3,12 @@ package me.bristermitten.frigga.ast.element
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import me.bristermitten.frigga.ast.element.function.Signature
-import me.bristermitten.frigga.runtime.FriggaContext
-import me.bristermitten.frigga.runtime.Stack
-import me.bristermitten.frigga.runtime.Value
+import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
+import me.bristermitten.frigga.runtime.command.operator.OPERATOR_ADD_NAME
 import me.bristermitten.frigga.runtime.command.singleCommand
+import me.bristermitten.frigga.runtime.error.BreakException
 import me.bristermitten.frigga.util.set
 
 sealed class Type(
@@ -39,6 +39,14 @@ sealed class Type(
         return TypeRelationship.NoRelationship
     }
 
+    fun distanceTo(other: Type): Int {
+        return when {
+            this === other -> 0
+            this.isSubtypeOf(other) || other.isSubtypeOf(this) -> 1
+            else -> Int.MAX_VALUE
+        }
+    }
+
     open fun accepts(other: Type): Boolean {
         val relationshipTo = relationshipTo(other)
         return relationshipTo == TypeRelationship.Same || relationshipTo == TypeRelationship.Supertype
@@ -54,6 +62,15 @@ sealed class Type(
         }
         return false
     }
+
+    fun coerceTo(value: Value, other: Type): Value {
+        require(other.accepts(value.type)) {
+            "Cannot coerce between incompatible types ${value.type} and $other"
+        }
+        return coerceValueTo(value, other)
+    }
+
+    protected open fun coerceValueTo(value: Value, other: Type): Value = Value(other, value.value)
 }
 
 object NumType : Type("Num", AnyType)
@@ -67,8 +84,15 @@ object IntType : Type("Int", NumType) {
         }
     }
 
+    override fun coerceValueTo(value: Value, other: Type): Value {
+        return when (other) {
+            is DecType -> Value(other, (value.value as Long).toDouble())
+            else -> super.coerceValueTo(value, other)
+        }
+    }
+
     init {
-        typeFunctions["add"] = FunctionValue(
+        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
             Signature(
                 input = mapOf("value" to IntType),
                 output = IntType
@@ -76,7 +100,18 @@ object IntType : Type("Int", NumType) {
             singleCommand { stack, context ->
                 val thisValue = stack.pull() as Value
                 val add = context.findProperty("value")!!
-                stack.push(thisValue.value as Int + add.value as Int)
+                stack.push(intValue(thisValue.value as Long + add.value.value as Long))
+            }
+        )
+        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
+            Signature(
+                input = mapOf("value" to DecType),
+                output = DecType
+            ),
+            singleCommand { stack, context ->
+                val thisValue = stack.pull() as Value
+                val add = context.findProperty("value")!!
+                stack.push(decValue(thisValue.value as Long + add.value.value as Double))
             }
         )
     }
@@ -93,6 +128,22 @@ object DecType : Type("Dec", NumType) {
     override fun accepts(other: Type): Boolean {
         return other == IntType || super.accepts(other)
     }
+
+    init {
+        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
+            Signature(
+                input = mapOf("value" to DecType),
+                output = DecType
+            ),
+            singleCommand { stack, context ->
+                val thisValue = stack.pull() as Value
+                val add = context.findProperty("value")!!
+                val asDouble = add.value.type.coerceTo(add.value, DecType)
+                stack.push(decValue(thisValue.value as Double + asDouble.value as Double))
+            }
+        )
+    }
+
 }
 
 object StringType : Type("String", AnyType)
@@ -120,9 +171,9 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                 ),
                 listOf(object : Command() {
                     override fun eval(stack: Stack, context: FriggaContext) {
-                        val upon = context.findProperty("__upon")!!.value
-                        it.invoke(upon.value, *it.parameters.map {
-                            val findProperty = context.findProperty(it.name)
+                        val upon = context.findProperty(UPON_NAME)!!.value
+                        it.invoke(upon.value, *it.parameters.map { param ->
+                            val findProperty = context.findProperty(param.name)
                             findProperty?.value
                         }.toTypedArray())
                     }
@@ -151,7 +202,6 @@ object CallerType : Type("__Caller") {
     }
 }
 
-object BreakException : Exception()
 
 object OutputType : Type("Output") {
     init {
