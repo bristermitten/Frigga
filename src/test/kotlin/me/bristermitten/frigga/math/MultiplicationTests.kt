@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
 class MultiplicationTests : FriggaTest() {
@@ -17,7 +18,7 @@ class MultiplicationTests : FriggaTest() {
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(3 * 2 )
+        result.leftoverStack.first() shouldBe intValue(3 * 2)
     }
 
     @Test
@@ -31,6 +32,7 @@ class MultiplicationTests : FriggaTest() {
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3 * 3 * (5 * 3 * -1))
     }
+
     @Test
     fun `Assert Simple Decimal Multiplication Functioning Correctly`() {
         val code = """
@@ -40,7 +42,7 @@ class MultiplicationTests : FriggaTest() {
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe decValue(3.5 * 2.9 )
+        result.leftoverStack.first() shouldBe decValue(3.5 * 2.9)
     }
 
     @Test
@@ -53,6 +55,22 @@ class MultiplicationTests : FriggaTest() {
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(3.52 * 3.52 * 5.1486 * 3.52 * -1.41875)
+    }
+
+    @RepeatedTest(50)
+    fun `Assert Random Decimal Multiplication Functioning Correctly`() {
+        val start = Math.random()
+        val param1 = Math.random()
+        val param2 = Math.random()
+
+        val code = """
+            x = $start
+            x * $param1 * $param2
+        """.trimIndent()
+        val result = runtime.execute(code, "math")
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe decValue(start * param1 * param2)
     }
 
 }

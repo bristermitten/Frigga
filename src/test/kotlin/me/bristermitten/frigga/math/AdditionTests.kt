@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
 class AdditionTests : FriggaTest() {
@@ -34,7 +35,6 @@ class AdditionTests : FriggaTest() {
     }
 
 
-
     @Test
     fun `Assert Simple Decimal Addition Functioning Correctly`() {
         val code = """
@@ -45,6 +45,7 @@ class AdditionTests : FriggaTest() {
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
+
     @Test
     fun `Assert Simple Decimal Reassignment Functioning Correctly`() {
         val code = """
@@ -55,5 +56,21 @@ class AdditionTests : FriggaTest() {
         val result = runtime.execute(code, "math")
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.first() shouldBe decValue(4.0)
+    }
+
+    @RepeatedTest(50)
+    fun `Assert Random Decimal Addition Functioning Correctly`() {
+        val start = Math.random()
+        val param1 = Math.random()
+        val param2 = Math.random()
+
+        val code = """
+            x = $start
+            x + $param1 + $param2
+        """.trimIndent()
+        val result = runtime.execute(code, "math")
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe decValue(start + param1 + param2)
     }
 }

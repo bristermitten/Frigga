@@ -7,69 +7,70 @@ import me.bristermitten.frigga.runtime.intValue
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
-class SubtractionTests : FriggaTest() {
+class DivisionTests : FriggaTest() {
+
     @Test
-    fun `Assert Simple Integer Subtraction Functioning Correctly`() {
+    fun `Assert Simple Integer Division Functioning Correctly`() {
         val code = """
-            x = 3
-            x - 1
+            x = 4
+            x / 2
         """.trimIndent()
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(2)
+        result.leftoverStack.first() shouldBe intValue(4 / 2)
     }
 
     @Test
-    fun `Assert More Complex Integer Subtraction Functioning Correctly`() {
+    fun `Assert More Complex Integer Division Functioning Correctly`() {
         val code = """
-            x = 3
-            x - x - 5 - (x - -1)
+            x = 4000
+            x / 400 / 5 / 2 
         """.trimIndent()
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(3 - 3 - 5 - (3 - -1))
+        result.leftoverStack.first() shouldBe intValue(1)
     }
 
     @Test
-    fun `Assert Simple Decimal Subtraction Functioning Correctly`() {
+    fun `Assert Simple Decimal Division Functioning Correctly`() {
         val code = """
-            x = 3.0
-            x - 1.5
+            x = 3.5
+            x / 2.9
         """.trimIndent()
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe decValue(1.5)
+        result.leftoverStack.first() shouldBe decValue(3.5 / 2.9)
     }
 
     @Test
-    fun `Assert More Complex Decimal Subtraction Functioning Correctly`() {
+    fun `Assert More Complex Decimal Division Functioning Correctly`() {
         val code = """
-            x = 15.9
-            x - x - 5.2 - (x - -1.3)
+            x = 36841.871
+            x / 5.1486 / -1.41875
         """.trimIndent()
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe decValue(15.9 - 15.9 - 5.2 - (15.9 - -1.3))
+        result.leftoverStack.first() shouldBe decValue(36841.871 / 5.1486 / -1.41875)
     }
-
 
     @RepeatedTest(50)
-    fun `Assert Random Decimal Subtraction Functioning Correctly`() {
+    fun `Assert Random Decimal Division Functioning Correctly`() {
         val start = Math.random()
         val param1 = Math.random()
         val param2 = Math.random()
 
         val code = """
             x = $start
-            x - $param1 - $param2
+            x / $param1 / $param2
         """.trimIndent()
         val result = runtime.execute(code, "math")
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe decValue(start - param1 - param2)
+        result.leftoverStack.first() shouldBe decValue(start / param1 / param2)
     }
+
 }
