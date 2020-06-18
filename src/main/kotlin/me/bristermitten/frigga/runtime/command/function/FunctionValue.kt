@@ -14,15 +14,18 @@ data class FunctionValue(
 ) {
     fun call(name: String, callingUpon: Value?, stack: Stack, context: FriggaContext, paramValues: List<Value>) {
         context.enterScope(name)
-        var index = 0
-        signature.input.forEach { (paramName, paramType) ->
-            val paramValue = paramValues[index]
-            if (!paramType.accepts(paramValue.type)) {
-                throw IllegalArgumentException("Cannot use ${paramValue.type} in place of $paramType for function $name")
+
+
+        signature.input.entries.withIndex().forEach { (index, param) ->
+            val parameterName = param.key
+            val parameterType = param.value
+            val providedValue = paramValues[index]
+            if (!parameterType.accepts(providedValue.type)) {
+                throw IllegalArgumentException("Cannot use ${providedValue.type} in place of $parameterType for function $name")
             }
-            context.defineProperty(paramName, paramValue)
-            index++
+            context.defineProperty(parameterName, providedValue)
         }
+
         if (callingUpon != null) {
             context.defineProperty(UPON_NAME, callingUpon, forceReservedName = true)
         }
@@ -30,11 +33,12 @@ data class FunctionValue(
             try {
                 command.eval(stack, context)
             } catch (e: BreakException) {
-                if (name != "yield" && name != "break") {
+                if (name != "yield" && name != "break") { //TODO replace with something a bit more extendable. annotations perhaps?
                     break
                 } else throw e
             }
         }
+
         context.leaveScope()
     }
 }
