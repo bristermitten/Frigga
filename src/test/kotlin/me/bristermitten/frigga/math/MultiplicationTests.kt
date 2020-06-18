@@ -31,5 +31,28 @@ class MultiplicationTests : FriggaTest() {
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3 * 3 * (5 * 3 * -1))
     }
+    @Test
+    fun `Assert Simple Decimal Multiplication Functioning Correctly`() {
+        val code = """
+            x = 3.5
+            x * 2.9
+        """.trimIndent()
+        val result = runtime.execute(code, "math")
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe decValue(3.5 * 2.9 )
+    }
+
+    @Test
+    fun `Assert More Complex Decimal Multiplication Functioning Correctly`() {
+        val code = """
+            x = 3.52
+            x * x * 5.1486 * x * -1.41875
+        """.trimIndent()
+        val result = runtime.execute(code, "math")
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe decValue(3.52 * 3.52 * 5.1486 * 3.52 * -1.41875)
+    }
 
 }
