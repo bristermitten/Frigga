@@ -6,12 +6,10 @@ import me.bristermitten.frigga.ast.element.function.*
 import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
-import me.bristermitten.frigga.runtime.command.operator.OPERATOR_ADD_NAME
-import me.bristermitten.frigga.runtime.command.operator.OPERATOR_DIVIDE_NAME
-import me.bristermitten.frigga.runtime.command.operator.OPERATOR_TAKE_NAME
-import me.bristermitten.frigga.runtime.command.operator.OPERATOR_TIMES_NAME
+import me.bristermitten.frigga.runtime.command.operator.*
 import me.bristermitten.frigga.runtime.error.BreakException
 import me.bristermitten.frigga.util.set
+import kotlin.math.pow
 
 sealed class Type(
     final override val name: String,
@@ -138,6 +136,9 @@ object IntType : Type("Int", NumType) {
         defineIntAndDecMathFunctions(OPERATOR_TAKE_NAME, Long::minus, Long::minus)
         defineIntAndDecMathFunctions(OPERATOR_TIMES_NAME, Long::times, Long::times)
         defineIntAndDecMathFunctions(OPERATOR_DIVIDE_NAME, Long::div, Long::div)
+        defineIntAndDecMathFunctions(OPERATOR_EXPONENT_NAME,
+            { a, b -> a.toDouble().pow(b.toDouble()).toLong() }
+        ) { a, b -> a.toDouble().pow(b) }
     }
 }
 
@@ -176,6 +177,7 @@ object DecType : Type("Dec", NumType) {
         defineMathFunction(OPERATOR_TAKE_NAME, Double::minus)
         defineMathFunction(OPERATOR_TIMES_NAME, Double::times)
         defineMathFunction(OPERATOR_DIVIDE_NAME, Double::div)
+        defineMathFunction(OPERATOR_EXPONENT_NAME, Double::pow)
     }
 
 }

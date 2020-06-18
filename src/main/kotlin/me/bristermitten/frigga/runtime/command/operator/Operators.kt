@@ -13,6 +13,9 @@ const val OPERATOR_TIMES = "*"
 const val OPERATOR_DIVIDE_NAME = "divide"
 const val OPERATOR_DIVIDE = "/"
 
+const val OPERATOR_EXPONENT_NAME = "exp"
+const val OPERATOR_EXPONENT = "^"
+
 
 fun operatorFromSymbol(symbol: String): String {
     return when (symbol) {
@@ -20,6 +23,7 @@ fun operatorFromSymbol(symbol: String): String {
         OPERATOR_TAKE -> OPERATOR_TAKE_NAME
         OPERATOR_TIMES -> OPERATOR_TIMES_NAME
         OPERATOR_DIVIDE -> OPERATOR_DIVIDE_NAME
+        OPERATOR_EXPONENT -> OPERATOR_EXPONENT_NAME
         else -> throw UnsupportedOperationException("No such operator $symbol")
     }
 }
