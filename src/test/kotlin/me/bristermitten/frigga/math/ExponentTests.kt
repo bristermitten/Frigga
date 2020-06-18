@@ -3,6 +3,7 @@ package me.bristermitten.frigga.math
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
+import me.bristermitten.frigga.RANDOM_TEST_COUNT
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
 import org.junit.jupiter.api.RepeatedTest
@@ -48,7 +49,7 @@ class ExponentTests : FriggaTest() {
         result.leftoverStack.first() shouldBe decValue(3.0.pow(3.2))
     }
 
-    @RepeatedTest(50)
+    @RepeatedTest(RANDOM_TEST_COUNT)
     fun `Assert Random Decimal Exponentiation Functioning Correctly`() {
         val start = Math.random()
         val param1 = Math.random()

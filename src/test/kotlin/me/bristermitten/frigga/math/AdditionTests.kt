@@ -3,6 +3,7 @@ package me.bristermitten.frigga.math
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
+import me.bristermitten.frigga.RANDOM_TEST_COUNT
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
 import org.junit.jupiter.api.RepeatedTest
@@ -58,7 +59,7 @@ class AdditionTests : FriggaTest() {
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
 
-    @RepeatedTest(50)
+    @RepeatedTest(RANDOM_TEST_COUNT)
     fun `Assert Random Decimal Addition Functioning Correctly`() {
         val start = Math.random()
         val param1 = Math.random()

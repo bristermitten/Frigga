@@ -2,6 +2,7 @@ package me.bristermitten.frigga.math
 
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
+import me.bristermitten.frigga.RANDOM_TEST_COUNT
 import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.intValue
 import org.junit.jupiter.api.RepeatedTest
@@ -57,7 +58,7 @@ class SubtractionTests : FriggaTest() {
     }
 
 
-    @RepeatedTest(50)
+    @RepeatedTest(RANDOM_TEST_COUNT)
     fun `Assert Random Decimal Subtraction Functioning Correctly`() {
         val start = Math.random()
         val param1 = Math.random()

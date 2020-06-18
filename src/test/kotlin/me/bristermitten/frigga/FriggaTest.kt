@@ -20,3 +20,5 @@ abstract class FriggaTest {
         }
     }
 }
+
+const val RANDOM_TEST_COUNT = 50
