@@ -16,15 +16,16 @@ data class CommandBinaryOperator(val left: Command, val right: Command, val oper
         val rightValue = stack.pull() as Value
 
         val operatorFunctions = leftValue.type.getFunctions(operator)
-        val addFunction =
-            operatorFunctions.minBy {
+
+        val operatorFun = operatorFunctions.minBy {
                 val parameterTypes = it.signature.input.values
                 if (parameterTypes.size != 1) -1
                 else parameterTypes.first().distanceTo(rightValue.type)
             } ?: throw NoSuchFunctionException(leftValue.type, operator, listOf(rightValue.type))
 
         stack.push(leftValue)
-        addFunction.call(operator, leftValue, stack, context, listOf(rightValue))
+
+        operatorFun.call(operator, leftValue, stack, context, listOf(rightValue))
 
         val result = stack.pull() as Value
         stack.push(result)

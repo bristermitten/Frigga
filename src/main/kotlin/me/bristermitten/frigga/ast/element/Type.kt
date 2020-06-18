@@ -3,11 +3,13 @@ package me.bristermitten.frigga.ast.element
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import me.bristermitten.frigga.ast.element.function.*
-import me.bristermitten.frigga.runtime.*
-import me.bristermitten.frigga.runtime.command.Command
+import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.Value
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
 import me.bristermitten.frigga.runtime.command.operator.*
+import me.bristermitten.frigga.runtime.decValue
 import me.bristermitten.frigga.runtime.error.BreakException
+import me.bristermitten.frigga.runtime.intValue
 import me.bristermitten.frigga.util.set
 import kotlin.math.pow
 
@@ -20,7 +22,7 @@ sealed class Type(
         types[name] = this
     }
 
-    protected val typeFunctions: Multimap<String, FunctionValue> = HashMultimap.create()
+    private val typeFunctions: Multimap<String, FunctionValue> = HashMultimap.create()
     fun getFunctions(name: String): Collection<FunctionValue> = typeFunctions[name]
 
     open infix fun union(other: Type): Type = AnyType
@@ -197,24 +199,22 @@ internal data class FunctionType(val signature: Signature) : Type(signature.toSt
 data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
     init {
         jvmClass.methods.forEach {
-            typeFunctions[it.name] = FunctionValue(
-                Signature(
-                    emptyMap(),
-                    it.parameters.map { param ->
-                        param.name to (types[name] ?: JVMType(param.type))
-                    }.toMap(),
-                    (types[it.returnType.simpleName] ?: JVMType(it.returnType))
-                ),
-                listOf(object : Command() {
-                    override fun eval(stack: Stack, context: FriggaContext) {
-                        val upon = context.findProperty(UPON_NAME)!!.value
-                        it.invoke(upon.value, *it.parameters.map { param ->
-                            val findProperty = context.findProperty(param.name)
-                            findProperty?.value
-                        }.toTypedArray())
-                    }
-                })
-            )
+            defineFunction {
+                name = it.name
+                signature {
+                    input = it.parameters.map { param ->
+                        param.name to getJVMType(param.type)
+                    }.toMap()
+                    output = getJVMType(it.returnType)
+                }
+                body { _, context ->
+                    val upon = context.findProperty(UPON_NAME)!!.value
+                    it.invoke(upon.value, *it.parameters.map { param ->
+                        val findProperty = context.findProperty(param.name)
+                        findProperty?.value
+                    }.toTypedArray())
+                }
+            }
         }
     }
 
@@ -225,36 +225,31 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
 
 object CallerType : Type("__Caller") {
     init {
-        typeFunctions["break"] = FunctionValue(
-            Signature(emptyMap(), emptyMap(), NothingType),
-            listOf(
-                object : Command() {
-                    override fun eval(stack: Stack, context: FriggaContext) {
-                        throw BreakException
-                    }
-                }
-            )
-        )
+        defineFunction {
+            name = "break"
+            body { _, _ ->
+                throw BreakException
+            }
+        }
     }
 }
 
 
 object OutputType : Type("Output") {
     init {
-        typeFunctions["println"] = FunctionValue(
-            Signature(emptyMap(), mapOf("value" to AnyType), NothingType),
-            listOf(
-                object : Command() {
-                    override fun eval(stack: Stack, context: FriggaContext) {
-                        val toPrint = context.findProperty("value")
-                        require(toPrint != null) {
-                            "Nothing provided for \"value\""
-                        }
-                        println(toPrint.value.value)
-                    }
+        defineFunction {
+            name = "println"
+            signature {
+                input = mapOf("value" to AnyType)
+            }
+            body { _, context ->
+                val toPrint = context.findProperty("value")
+                require(toPrint != null) {
+                    "Nothing provided for \"value\""
                 }
-            )
-        )
+                println(toPrint.value.value)
+            }
+        }
     }
 }
 
@@ -274,6 +269,10 @@ fun loadTypes() {
 
 fun getType(name: String) = types.getOrPut(name) {
     SimpleType(name)
+}
+
+fun getJVMType(jvmClass: Class<*>) = types.getOrPut(jvmClass.simpleName) {
+    JVMType(jvmClass)
 }
 
 enum class TypeRelationship {
