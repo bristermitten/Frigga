@@ -30,13 +30,13 @@ private fun List<FriggaParser.LineContext>.toAST(): List<Expression> {
 
 fun FriggaParser.LiteralContext.toAST() = when (this) {
     is FriggaParser.IntLiteralContext -> {
-        IntLiteral(INT().text.toLong())
+        IntLiteral(text.toLong())
     }
     is FriggaParser.DecLiteralContext -> {
-        DecLiteral(DEC().text.toDouble())
+        DecLiteral(text.toDouble())
     }
     is FriggaParser.StringLiteralContext -> {
-        StringLiteral(STRING().text.removeSurrounding("\""))
+        StringLiteral(text.removeSurrounding("\""))
     }
     else -> throw UnsupportedOperationException(javaClass.simpleName)
 }

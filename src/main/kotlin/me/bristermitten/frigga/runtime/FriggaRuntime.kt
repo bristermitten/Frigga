@@ -10,15 +10,14 @@ import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
 import me.bristermitten.frigga.ast.element.loadTypes
 import me.bristermitten.frigga.ast.toAST
-import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandLiteral
 import me.bristermitten.frigga.runtime.command.CommandPropertyDefine
 import me.bristermitten.frigga.runtime.command.CommandPropertyReference
 import me.bristermitten.frigga.runtime.command.function.CommandFunctionCall
 import me.bristermitten.frigga.runtime.command.function.CommandFunctionDefinition
-import me.bristermitten.frigga.runtime.command.operator.CommandBinaryAdd
-import me.bristermitten.frigga.runtime.command.operator.CommandBinarySubtract
+import me.bristermitten.frigga.runtime.command.operator.CommandBinaryOperator
+import me.bristermitten.frigga.runtime.command.operator.operatorFromSymbol
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
@@ -119,11 +118,11 @@ class FriggaRuntime {
                 CommandPropertyReference(expression.referencing)
             }
             is BinaryOperator -> {
-                when (expression.operator) {
-                    "+" -> CommandBinaryAdd(process(expression.left), process(expression.right))
-                    "-" -> CommandBinarySubtract(process(expression.left), process(expression.right))
-                    else -> throw UnsupportedOperationException(expression.operator)
-                }
+                return CommandBinaryOperator(
+                    process(expression.left),
+                    process(expression.right),
+                    operatorFromSymbol(expression.operator)
+                )
             }
             is Lambda -> {
                 CommandFunctionDefinition(

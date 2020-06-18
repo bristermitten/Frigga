@@ -2,12 +2,14 @@ package me.bristermitten.frigga.ast.element
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import me.bristermitten.frigga.ast.element.function.Signature
+import me.bristermitten.frigga.ast.element.function.*
 import me.bristermitten.frigga.runtime.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.function.FunctionValue
 import me.bristermitten.frigga.runtime.command.operator.OPERATOR_ADD_NAME
-import me.bristermitten.frigga.runtime.command.singleCommand
+import me.bristermitten.frigga.runtime.command.operator.OPERATOR_DIVIDE_NAME
+import me.bristermitten.frigga.runtime.command.operator.OPERATOR_TAKE_NAME
+import me.bristermitten.frigga.runtime.command.operator.OPERATOR_TIMES_NAME
 import me.bristermitten.frigga.runtime.error.BreakException
 import me.bristermitten.frigga.util.set
 
@@ -71,6 +73,15 @@ sealed class Type(
     }
 
     protected open fun coerceValueTo(value: Value, other: Type): Value = Value(other, value.value)
+
+    protected fun defineFunction(value: NamedFunctionValue) {
+        typeFunctions[value.name] = value.functionValue
+    }
+
+    protected inline fun defineFunction(closure: FunctionDefiner.() -> Unit) {
+        val value = function(closure)
+        defineFunction(value)
+    }
 }
 
 object NumType : Type("Num", AnyType)
@@ -92,28 +103,41 @@ object IntType : Type("Int", NumType) {
     }
 
     init {
-        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
-            Signature(
-                input = mapOf("value" to IntType),
-                output = IntType
-            ),
-            singleCommand { stack, context ->
-                val thisValue = stack.pull() as Value
-                val add = context.findProperty("value")!!
-                stack.push(intValue(thisValue.value as Long + add.value.value as Long))
+        fun defineIntAndDecMathFunctions(
+            name: String,
+            intOperator: (Long, Long) -> Long,
+            decOperator: (Long, Double) -> Double
+        ) {
+            defineFunction {
+                this.name = name
+                signature {
+                    input = mapOf("value" to IntType)
+                    output = IntType
+                }
+                body { stack, context ->
+                    val thisValue = stack.pull() as Value
+                    val addTo = context.findProperty("value")!!.value
+                    stack.push(intValue(intOperator(thisValue.value as Long, addTo.value as Long)))
+                }
             }
-        )
-        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
-            Signature(
-                input = mapOf("value" to DecType),
-                output = DecType
-            ),
-            singleCommand { stack, context ->
-                val thisValue = stack.pull() as Value
-                val add = context.findProperty("value")!!
-                stack.push(decValue(thisValue.value as Long + add.value.value as Double))
+            defineFunction {
+                this.name = name
+                signature {
+                    input = mapOf("value" to DecType)
+                    output = DecType
+                }
+                body { stack, context ->
+                    val thisValue = stack.pull() as Value
+                    val addTo = context.findProperty("value")!!.value
+                    stack.push(decValue(decOperator(thisValue.value as Long, addTo.value as Double)))
+                }
             }
-        )
+        }
+
+        defineIntAndDecMathFunctions(OPERATOR_ADD_NAME, Long::plus, Long::plus)
+        defineIntAndDecMathFunctions(OPERATOR_TAKE_NAME, Long::minus, Long::minus)
+        defineIntAndDecMathFunctions(OPERATOR_TIMES_NAME, Long::times, Long::times)
+        defineIntAndDecMathFunctions(OPERATOR_DIVIDE_NAME, Long::div, Long::div)
     }
 }
 
@@ -130,18 +154,28 @@ object DecType : Type("Dec", NumType) {
     }
 
     init {
-        typeFunctions[OPERATOR_ADD_NAME] = FunctionValue(
-            Signature(
-                input = mapOf("value" to DecType),
-                output = DecType
-            ),
-            singleCommand { stack, context ->
-                val thisValue = stack.pull() as Value
-                val add = context.findProperty("value")!!
-                val asDouble = add.value.type.coerceTo(add.value, DecType)
-                stack.push(decValue(thisValue.value as Double + asDouble.value as Double))
+        fun defineMathFunction(
+            name: String,
+            decOperator: (Double, Double) -> Double
+        ) {
+            defineFunction {
+                this.name = name
+                signature {
+                    input = mapOf("value" to DecType)
+                    output = DecType
+                }
+                body { stack, context ->
+                    val thisValue = stack.pull() as Value
+                    val addTo = context.findProperty("value")!!.value
+                    val addToAsDec = addTo.type.coerceTo(addTo, DecType)
+                    stack.push(decValue(decOperator(thisValue.value as Double, addToAsDec.value as Double)))
+                }
             }
-        )
+        }
+        defineMathFunction(OPERATOR_ADD_NAME, Double::plus)
+        defineMathFunction(OPERATOR_TAKE_NAME, Double::minus)
+        defineMathFunction(OPERATOR_TIMES_NAME, Double::times)
+        defineMathFunction(OPERATOR_DIVIDE_NAME, Double::div)
     }
 
 }
