@@ -24,7 +24,7 @@ line: expression NEWLINE*?;
 expression:
            assignment #assignmentExpression
          |  literal #literalExpression
-         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE ) right=expression #binaryOperator
+         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER) right=expression #binaryOperator
          | left=expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
          | function #functionExpression
          | lambda #lambdaExpression
