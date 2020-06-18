@@ -3,8 +3,13 @@ lexer grammar FriggaLexer;
 WHITESPACE: [ \t\r\n] -> skip;
 NEWLINE: ('\r'? '\n' | '\r') ;
 
+//Numbers
+fragment DIGIT: '0'..'9';
+fragment HEX_DIGIT: [0-9A-F];
+SCIENTIFIC: 'E' [+-];
+
 //Literals
-INT: [0-9]+;
+INT: DIGIT+ (SCIENTIFIC DIGIT+)?;
 DEC: INT '.' INT ;
 BOOL: 'true' | 'false';
 CHAR: '\'' (. | '\\' .) '\'';
