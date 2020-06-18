@@ -6,8 +6,9 @@ import me.bristermitten.frigga.runtime.command.function.FunctionValue
 class FriggaContext {
     val stack = Stack()
 
-    private val globalScope = loadGlobalScope()
-    val scope = ArrayDeque<FriggaScope>().apply {
+    private var globalScope = loadGlobalScope()
+
+    private val scope = ArrayDeque<FriggaScope>().apply {
         add(globalScope)
     }
 
@@ -65,9 +66,9 @@ class FriggaContext {
             }
         }
         for (scope in scope) {
-            val property = scope.functions[name]
-            if (property != null) {
-                return property
+            val function = scope.functions[name]
+            if (function != null) {
+                return function
             }
         }
         return null
@@ -101,11 +102,14 @@ class FriggaContext {
 
     fun reset() {
         stack.clear()
+
         scope.forEach {
             it.functions.clear()
             it.properties.clear()
             it.types.clear()
         }
+        globalScope = loadGlobalScope()
+        scope += globalScope
     }
 
 }

@@ -23,6 +23,9 @@ STATIC: 'static';
 USE: 'use';
 NAMESPACE: 'namespace';
 
+
+
+
 //Operators
 PLUS: '+';
 MINUS: '-';
@@ -55,7 +58,5 @@ NOTHING: '_';
 
 //Identifier
 ID: [a-zA-Z_0-9]+;
-NAMESPACE_TEXT: QUOTE [a-z/]+ QUOTE;
-
 
 ERROR_CHAR: .;

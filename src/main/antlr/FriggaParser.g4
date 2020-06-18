@@ -9,8 +9,8 @@ friggaFile:
     EOF;
 
 //Headers
-use: USE NAMESPACE_TEXT;
-namespace: NAMESPACE NAMESPACE_TEXT;
+use: USE STRING;
+namespace: NAMESPACE STRING;
 
 usingList:
     (use)*;
@@ -19,7 +19,6 @@ usingList:
 body: line+? | NEWLINE*;
 
 line: expression NEWLINE*?;
-
 
 expression:
            assignment #assignmentExpression
@@ -30,14 +29,12 @@ expression:
          | lambda #lambdaExpression
          | expression call #callExpression
          | expression referencedCall #referencedCallExpression
-         | access #accessExpression
+         | expression DOT ID #accessExpression
          | paranthesizedExpression #paranthesisExpression
-
          | ID #varReference
         ;
 
          paranthesizedExpression: LPAREN expression RPAREN;
-         property: id=ID | (expression call) | (expression referencedCall) ;
 
          propertyModifiers:
             MUTABLE?;
@@ -50,7 +47,6 @@ expression:
          referencedCall: LSPAREN args RSPAREN;
 
          args: expression? (COMMA expression)*;
-         access: DOT ID;
          typeSpec: DOUBLE_COLON type;
 
          type: functionType | ID | NOTHING | tuple;

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 class LambdaTests : FriggaTest() {
     @Test
     fun `Test correct handling of a Simple Lambda that yields a value`() {
-        runtime.loadStdLib()
         val code = """
             getValue = {
                 yield(3)
@@ -22,7 +21,6 @@ class LambdaTests : FriggaTest() {
     }
     @Test
     fun `Test correct handling of an expression lambda that yields a value`() {
-        runtime.loadStdLib()
         val code = """
             getValue = () -> 100
             x = getValue()

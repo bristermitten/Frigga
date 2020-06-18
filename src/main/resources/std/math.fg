@@ -1,0 +1,6 @@
+namespace "std"
+use "JVM:java.lang.Math"
+
+sqrt = (value::Dec) -> Dec {
+    yield(Math.sqrt(value))
+}

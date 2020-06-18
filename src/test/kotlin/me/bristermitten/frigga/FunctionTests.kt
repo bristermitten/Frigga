@@ -40,7 +40,6 @@ class FunctionTests : FriggaTest() {
 
     @Test
     fun `Test correct handling of a Simple Function that yields a value`() {
-        runtime.loadStdLib()
         val code = """
             getValue = () -> Int {
                 yield(3)
@@ -52,11 +51,26 @@ class FunctionTests : FriggaTest() {
         handleExceptions(result)
         result.leftoverStack shouldContain intValue(3)
     }
+    @Test
+    fun `Test correct handling of a nested call`() {
+        val code = """
+            getANumber = () -> Int {
+                yield(10)
+            }
+            getValue = () -> Int {
+                yield(getANumber())
+            }
+            getValue()
+        """.trimIndent()
+
+        val result = runtime.execute(code, "function")
+        handleExceptions(result)
+        result.leftoverStack shouldContain intValue(10)
+    }
 
     @ExperimentalStdlibApi
     @Test
     fun `Test yield function correctly breaking out of execution`() {
-        runtime.loadStdLib()
         val code = """
             getValue = () -> Int {
                 yield(3)

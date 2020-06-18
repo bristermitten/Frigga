@@ -29,9 +29,14 @@ import kotlin.time.measureTimedValue
 class FriggaRuntime {
     private val context = FriggaContext()
 
-    fun loadStdLib() {
-        val resource =
-            javaClass.classLoader.getResource("std") ?: throw NoSuchElementException("Could not get std folder.")
+
+    init {
+        loadStdLib()
+    }
+
+    private fun loadStdLib() {
+        val resource = javaClass.classLoader.getResource("std")
+            ?: throw NoSuchElementException("Could not get std folder.")
         File(resource.toURI()).listFiles()?.forEach {
             execute(it.readText(), it.name)
         }
@@ -79,7 +84,10 @@ class FriggaRuntime {
         )
     }
 
-    fun reset() = context.reset()
+    fun reset() {
+        context.reset()
+        loadStdLib() //TODO maybe don't remove the whole stdlib?
+    }
 
     private fun process(file: FriggaFile): ExecutionResult {
         val exceptions = mutableListOf<Exception>()
@@ -136,6 +144,7 @@ class FriggaRuntime {
             }
             is Call -> {
                 CommandFunctionCall(
+                    expression.upon?.let(this::process),
                     expression.calling, expression.args.map(this::process)
                 )
             }

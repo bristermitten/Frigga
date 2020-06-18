@@ -6,14 +6,16 @@ import me.bristermitten.frigga.runtime.Value
 import me.bristermitten.frigga.runtime.command.Command
 
 class CommandFunctionCall(
-    val calling: String,
-    val params: List<Command>
+    private val callingUpon: Command?,
+    private val calling: String,
+    private val params: List<Command>
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val callingUpon = stack.peek() as Value?
-        if (callingUpon != null) {
-            stack.pull()
+
+        val callingUpon = this.callingUpon?.let {
+            it.eval(stack, context)
+            stack.pull() as Value
         }
 
         val uponType = callingUpon?.type
@@ -25,10 +27,10 @@ class CommandFunctionCall(
         val function = context.findFunction(uponType, calling, paramValues.map(Value::type))
 
         requireNotNull(function) {
-            "No such function $calling"
+            "No such function $uponType#$calling"
         }
 
-        function.call(calling, callingUpon,  stack, context, paramValues)
+        function.call(calling, callingUpon, stack, context, paramValues)
     }
 
     override fun toString(): String {
