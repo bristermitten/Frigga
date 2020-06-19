@@ -7,7 +7,7 @@ main = {
    println("Hello, please enter a calculation in the format <number>$format<number>")
    calculation = readln(String).stripAll(" ")
    number1 = calculation.untilFirst(regex)
-   operand = calculation.first(regex)
+   operand = calculation.firstCharMatching(regex)
    number2 = calculation.afterFirst(regex)
 
    operator::(Int, Int) -> Int = operand.match(
