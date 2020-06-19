@@ -12,3 +12,12 @@ These situations involve:
 . However, a `() -> Int` cannot be coerced to an `Int`. *This may be improved upon in the future.*
 * All values can be coerced into a String when used in String concatenation. *This will probably involve types defining a `toString`  function*.
 
+## Built-in Types
+* Any - Every type is a subtype of Any. It is the highest point in the Type Hierarchy
+* Num - Num is the supertype of every number type
+* Int - Represents a 64-bit signed integer. Internally these are handled with Java longs
+* Dec - Represents a 64-bit signed floating-point number. Internally these are Java doubles
+* Char - A single character.
+* String - A String of Chars
+* Nothing - Nothing represents the absence of a value. Nothing is special in that it is a subtype of every other type
+i.e - every value can be Nothing
