@@ -12,7 +12,6 @@ class CommandFunctionCall(
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-
         val callingUpon = this.callingUpon?.let {
             it.eval(stack, context)
             stack.pull() as Value

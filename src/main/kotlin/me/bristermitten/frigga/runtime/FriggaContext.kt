@@ -52,6 +52,16 @@ class FriggaContext {
         return null
     }
 
+    internal fun findType(name: String): Type? {
+        for (scope in scope) {
+            val type = scope.types[name]
+            if (type != null) {
+                return type
+            }
+        }
+        return null
+    }
+
     internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): FunctionValue? {
         if (type != null) {
             val withName = type.getFunctions(name)
@@ -110,6 +120,10 @@ class FriggaContext {
         }
         globalScope = loadGlobalScope()
         scope += globalScope
+    }
+
+    fun defineType(type: Type) {
+        scope[0].types[type.name] = type
     }
 
 }

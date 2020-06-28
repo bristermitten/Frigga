@@ -6,10 +6,15 @@ import me.bristermitten.frigga.runtime.Stack
 class CommandPropertyReference(private val referencing: String) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val found = context.findProperty(referencing)
+        var found = context.findProperty(referencing)
 
-        requireNotNull(found) {
-            "No such property $referencing"
+        if (found == null) {
+            val type = context.findType(referencing)
+            requireNotNull(type) {
+                "No such property or type $referencing"
+            }
+
+            found = type.staticProperty
         }
         stack.push(found.value)
     }

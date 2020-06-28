@@ -22,6 +22,8 @@ sealed class Type(
         types[name] = this
     }
 
+    val staticProperty = Property(name, emptySet(), Value(this, Unit))
+
     private val typeFunctions: Multimap<String, FunctionValue> = HashMultimap.create()
     fun getFunctions(name: String): Collection<FunctionValue> = typeFunctions[name]
 
@@ -186,7 +188,10 @@ object DecType : Type("Dec", NumType) {
 
 object StringType : Type("String", AnyType)
 
-object AnyType : Type("Any", null)
+object AnyType : Type("Any", null) {
+    override fun accepts(other: Type) = true
+}
+
 object NothingType : Type("Nothing", null) {
     override fun isSubtypeOf(other: Type): Boolean {
         return true
@@ -207,12 +212,24 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                     }.toMap()
                     output = getJVMType(it.returnType)
                 }
-                body { _, context ->
+                body { stack, context ->
                     val upon = context.findProperty(UPON_NAME)!!.value
-                    it.invoke(upon.value, *it.parameters.map { param ->
+                    val params = it.parameters.map { param ->
                         val findProperty = context.findProperty(param.name)
-                        findProperty?.value
-                    }.toTypedArray())
+                        if(param.type == Value::class.java) {
+                            findProperty?.value
+                        }
+                        else {
+                            findProperty?.value?.value
+                        }
+                    }.toTypedArray()
+                    val returned = it.invoke(upon.value, *params)
+                    if (returned != null) {
+                        val jvmReturnType = getJVMType(it.returnType)
+                        val returnType = JVM_EQUIVALENTS[jvmReturnType] ?: jvmReturnType
+                        val data = Value(returnType, returned)
+                        stack.push(data)
+                    }
                 }
             }
         }
@@ -274,6 +291,13 @@ fun getType(name: String) = types.getOrPut(name) {
 fun getJVMType(jvmClass: Class<*>) = types.getOrPut(jvmClass.simpleName) {
     JVMType(jvmClass)
 }
+
+val JVM_EQUIVALENTS = mapOf(
+    getJVMType(Int::class.java) to IntType,
+    getJVMType(Long::class.java) to IntType,
+    getJVMType(Double::class.java) to DecType,
+    getJVMType(Float::class.java) to DecType
+)
 
 enum class TypeRelationship {
     Same,

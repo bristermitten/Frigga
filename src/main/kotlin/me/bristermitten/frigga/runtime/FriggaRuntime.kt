@@ -2,13 +2,12 @@ package me.bristermitten.frigga.runtime
 
 import FriggaLexer
 import FriggaParser
-import me.bristermitten.frigga.ast.element.AnyType
+import me.bristermitten.frigga.ast.element.*
 import me.bristermitten.frigga.ast.element.FriggaFile
 import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.*
 import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
-import me.bristermitten.frigga.ast.element.loadTypes
 import me.bristermitten.frigga.ast.toAST
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandLiteral
@@ -91,6 +90,11 @@ class FriggaRuntime {
 
     private fun process(file: FriggaFile): ExecutionResult {
         val exceptions = mutableListOf<Exception>()
+        file.using.forEach {
+            if (it is JVMNamespace) {
+                context.defineType(JVMType(it.jvmClass))
+            }
+        }
         file.contents.forEach {
             val command = process(it)
             try {

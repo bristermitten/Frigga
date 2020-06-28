@@ -1,5 +1,8 @@
 package me.bristermitten.frigga.ast.element
 
-data class Namespace(override val name: String) : Named
+sealed class Namespace(override val name: String) : Named
+class SimpleNamespace(name: String) : Namespace(name)
+data class JVMNamespace(val jvmClass: Class<*>) : Namespace(jvmClass.name)
 
-val NAMESPACE_FORMAT = "((JVM:)?[a-zA-Z0-9.]+)|([a-zA-Z0-9/]+)".toRegex()
+val JVM_NAMESPACE_FORMAT = "JVM:[a-zA-Z0-9.]+".toRegex()
+val NAMESPACE_FORMAT = "[a-zA-Z0-9/]+".toRegex()

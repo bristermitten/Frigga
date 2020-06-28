@@ -29,13 +29,16 @@ data class FunctionValue(
         if (callingUpon != null) {
             context.defineProperty(UPON_NAME, callingUpon, forceReservedName = true)
         }
+
         for (command in body) {
             try {
                 command.eval(stack, context)
             } catch (e: BreakException) {
                 if (name != "yield" && name != "break") { //TODO replace with something a bit more extendable. annotations perhaps?
                     break
-                } else throw e
+                } else {
+                    throw e
+                }
             }
         }
 

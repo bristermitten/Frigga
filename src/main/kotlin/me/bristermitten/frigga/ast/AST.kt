@@ -147,9 +147,12 @@ internal fun FriggaParser.FunctionContext.toAST(name: String): Function {
 fun FriggaParser.UsingListContext.toAST(): Set<Namespace> {
     return use().map {
         val namespace = it.STRING().text.removeSurrounding("\"")
-        if (!NAMESPACE_FORMAT.matches(namespace)) {
-            throw IllegalArgumentException("Invalid Namespace format $namespace")
+        when {
+            JVM_NAMESPACE_FORMAT.matches(namespace) -> {
+                JVMNamespace(Class.forName(namespace.removePrefix("JVM:")))
+            }
+            NAMESPACE_FORMAT.matches(namespace) -> SimpleNamespace(namespace)
+            else -> throw IllegalArgumentException("Invalid Namespace format $namespace")
         }
-        Namespace(namespace)
     }.toSet()
 }
