@@ -52,6 +52,16 @@ class FriggaContext {
         return null
     }
 
+    internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>? {
+        for (scope in scope) {
+            val property = scope.properties[name]
+            if (property != null) {
+                return scope to property
+            }
+        }
+        return null
+    }
+
     internal fun findType(name: String): Type? {
         for (scope in scope) {
             val type = scope.types[name]
@@ -110,6 +120,9 @@ class FriggaContext {
         return scope.removeFirst()
     }
 
+    val deepestScope
+        get() = scope.first()
+
     fun reset() {
         stack.clear()
 
@@ -118,6 +131,7 @@ class FriggaContext {
             it.properties.clear()
             it.types.clear()
         }
+        scope.clear()
         globalScope = loadGlobalScope()
         scope += globalScope
     }

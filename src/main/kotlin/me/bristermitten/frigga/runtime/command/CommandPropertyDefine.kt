@@ -13,23 +13,27 @@ internal class CommandPropertyDefine(
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val existing = context.findProperty(name)
+        val existing = context.findPropertyScope(name)
+
+
+        value.eval(stack, context)
+        //Pull irrespective of mutability to ensure no leftover values on the stack
+        val propertyValue = stack.pull() as Value
+
 
         if (existing != null) {
-            value.eval(stack, context)
-            val redefineTo = stack.pull() as Value //Pull irrespective of mutability to ensure no leftover values on the stack
-
-            require(Modifier.MUTABLE in existing.modifiers) {
-                "Attempting to redefine a non mutable property ${existing.name}"
+            val existingProperty = existing.second
+            if (existing.first == context.deepestScope) { //allow property shadowing
+                require(Modifier.MUTABLE in existingProperty.modifiers) {
+                    "Cannot redefine a non mutable property ${existingProperty.name}"
+                }
+                require(existingProperty.value.type.accepts(propertyValue.type)) {
+                    "Cannot reassign ${existingProperty.name} of type ${existingProperty.value.type} to value of type ${propertyValue.type}"
+                }
+                existingProperty.value = propertyValue.type.coerceTo(propertyValue, existingProperty.value.type)
+                return
             }
-            require(existing.value.type.accepts(redefineTo.type)) {
-                "Cannot reassign ${existing.name} of type ${existing.value.type} to value of type ${redefineTo.type}"
-            }
-            existing.value = redefineTo.type.coerceTo(redefineTo, existing.value.type)
-            return
         }
-        value.eval(stack, context)
-        val propertyValue = stack.pull() as Value
 
         val property = Property(
             name,

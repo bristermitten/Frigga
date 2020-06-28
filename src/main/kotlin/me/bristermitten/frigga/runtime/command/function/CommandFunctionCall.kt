@@ -5,7 +5,7 @@ import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.Value
 import me.bristermitten.frigga.runtime.command.Command
 
-class CommandFunctionCall(
+data class CommandFunctionCall(
     private val callingUpon: Command?,
     private val calling: String,
     private val params: List<Command>
@@ -32,7 +32,4 @@ class CommandFunctionCall(
         function.call(calling, callingUpon, stack, context, paramValues)
     }
 
-    override fun toString(): String {
-        return "CommandFunctionCall(calling='$calling', params=$params)"
-    }
 }
