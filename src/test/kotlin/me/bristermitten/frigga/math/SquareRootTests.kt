@@ -12,7 +12,7 @@ class SquareRootTests : FriggaTest() {
         val code = """
             use "std"
             x = 16
-            square_root(x)
+            sqrt(x)
         """.trimIndent()
 
         val result = runtime.execute(code, "math")
