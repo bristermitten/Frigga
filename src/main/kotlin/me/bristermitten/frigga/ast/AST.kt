@@ -36,6 +36,9 @@ fun FriggaParser.LiteralContext.toAST() = when (this) {
     is FriggaParser.StringLiteralContext -> {
         StringLiteral(text.removeSurrounding("\""))
     }
+    is FriggaParser.CharLiteralContext -> {
+        CharLiteral(CHAR().text.first())
+    }
     else -> throw UnsupportedOperationException(javaClass.simpleName)
 }
 

@@ -187,6 +187,7 @@ object DecType : Type("Dec", NumType) {
 }
 
 object StringType : Type("String", AnyType)
+object CharType : Type("CharType", AnyType)
 
 object AnyType : Type("Any", null) {
     override fun accepts(other: Type) = true
