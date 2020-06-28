@@ -9,7 +9,6 @@ import me.bristermitten.frigga.ast.element.function.Function
 import me.bristermitten.frigga.ast.element.function.Signature
 import me.bristermitten.frigga.ast.toAST
 import me.bristermitten.frigga.runtime.command.Command
-import me.bristermitten.frigga.runtime.command.CommandLiteral
 import me.bristermitten.frigga.runtime.command.CommandPropertyDefine
 import me.bristermitten.frigga.runtime.command.CommandPropertyReference
 import me.bristermitten.frigga.runtime.command.function.CommandFunctionCall
@@ -120,9 +119,7 @@ class FriggaRuntime {
                 defineCommand
             }
             is Literal<*> -> {
-                CommandLiteral(
-                    Value(expression.type, expression.value)
-                )
+                expression
             }
             is PropertyReference -> {
                 CommandPropertyReference(expression.referencing)
