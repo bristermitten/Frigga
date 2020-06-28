@@ -18,7 +18,5 @@ class SquareRootTests : FriggaTest() {
         val result = runtime.execute(code, "math")
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(4.0)
-
-        //TODO implement
     }
 }

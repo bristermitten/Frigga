@@ -7,12 +7,4 @@ data class Assignment(
     val assignTo: String,
     val modifiers: Set<Modifier>,
     val value: Expression
-) : Expression {
-    override fun toString(): String {
-        return buildString {
-            append(assignTo)
-                .append(" = ")
-                .append(value)
-        }
-    }
-}
+) : Expression

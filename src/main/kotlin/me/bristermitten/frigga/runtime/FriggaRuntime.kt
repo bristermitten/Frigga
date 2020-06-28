@@ -3,7 +3,6 @@ package me.bristermitten.frigga.runtime
 import FriggaLexer
 import FriggaParser
 import me.bristermitten.frigga.ast.element.*
-import me.bristermitten.frigga.ast.element.FriggaFile
 import me.bristermitten.frigga.ast.element.expression.Expression
 import me.bristermitten.frigga.ast.element.expression.value.*
 import me.bristermitten.frigga.ast.element.function.Function
@@ -114,10 +113,9 @@ class FriggaRuntime {
             is Assignment -> {
                 val defineCommand = CommandPropertyDefine(
                     expression.assignTo,
-                    expression
+                    expression.modifiers,
+                    process(expression.value)
                 )
-                val value = process(expression.value)
-                value.eval(context.stack, context)
 
                 defineCommand
             }

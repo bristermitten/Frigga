@@ -3,9 +3,9 @@
   This is done by pushing a value onto the stack, which is exposed via the property `__stack`
   This function can only be called from another function
 ##
-yield = (value::Any) -> _ {
+yield = (toYield::Any) -> _ {
 #    __caller.ensureInsideFunction()
-    __stack.push(value)
+    __stack.push(toYield)
     __caller.break()
 }
 ##
