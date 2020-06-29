@@ -1,7 +1,7 @@
-namespace "std"
-use "JVM:java.lang.Math"
-
-sqrt = (value::Dec) -> Dec {
-    sqrt = Math.sqrt(value)
-    yield(sqrt)
-}
+#namespace "std"
+#use "JVM:java.lang.Math"
+#
+#sqrt = (value::Dec) -> Dec {
+#    sqrt = Math.sqrt(value)
+#    yield(sqrt)
+#}

@@ -1,76 +1,25 @@
 package me.bristermitten.frigga
 
-import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldBeSingleton
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.shouldBe
-import me.bristermitten.frigga.runtime.decValue
-import me.bristermitten.frigga.runtime.intValue
+import me.bristermitten.frigga.runtime.FriggaRuntime
 import org.junit.jupiter.api.Test
 
-class SimpleTests : FriggaTest() {
+class SimpleTest {
 
     @Test
-    fun `Test Simple Property Declaration`() {
+    fun `Test`() {
         val code = """
-            x = 3
-            x
+            x = 3.0
+            someFun = () -> _ { println(x + 1) }
+            someFun()
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
 
-        result.leftoverStack shouldContain intValue(3)
-        result.leftoverStack.shouldBeSingleton()
+        val result = FriggaRuntime().execute(code, "tests")
+        for (exception in result.exceptions) {
+            throw exception
+        }
+        result.leftoverStack.forEach {
+            println(it)
+        }
 
-    }
-
-    @Test
-    fun `Test Simple Property With Explicit Type`() {
-        val code = """
-            x::Int = 3
-            x
-        """.trimIndent()
-        val result = runtime.execute(code, "simple")
-
-        result.leftoverStack shouldContain intValue(3)
-        result.leftoverStack.shouldBeSingleton()
-
-    }
-
-    @Test
-    fun `Test Immutable Property Redefinition throws Exception`() {
-        val code = """
-            x = 3
-            x = 4
-        """.trimIndent()
-        val result = runtime.execute(code, "simple")
-
-        result.exceptions.shouldBeSingleton()
-        result.leftoverStack.shouldBeEmpty()
-    }
-
-    @Test
-    fun `Test Mutable Property Redefinition does not throw Exception`() {
-        val code = """
-            mutable x = 3
-            x = 4
-        """.trimIndent()
-        val result = runtime.execute(code, "simple")
-
-        result.exceptions.shouldBeEmpty()
-        result.leftoverStack.shouldBeEmpty()
-    }
-
-    @Test
-    fun `Test Property Definition and reassignment with different types`() {
-        val code = """
-            mutable x = 3.0
-            x = 4
-            x + 1
-        """.trimIndent()
-        val result = runtime.execute(code, "simple")
-
-        result.exceptions.shouldBeEmpty()
-        result.leftoverStack.shouldBeSingleton()
-        result.leftoverStack.first() shouldBe decValue(5.0)
     }
 }

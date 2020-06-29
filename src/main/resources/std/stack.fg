@@ -3,15 +3,15 @@
   This is done by pushing a value onto the stack, which is exposed via the property `__stack`
   This function can only be called from another function
 ##
-yield = (toYield::Any) -> _ {
+#yield = (toYield::Any) -> _ {
+##    __caller.ensureInsideFunction()
+#    __stack.push(toYield)
+#    __caller.break()
+#}
+###
+#  Yielding can also simply break execution in the case of a function that does not return a value
+###
+#yield = () -> _ {
 #    __caller.ensureInsideFunction()
-    __stack.push(toYield)
-    __caller.break()
-}
-##
-  Yielding can also simply break execution in the case of a function that does not return a value
-##
-yield = () -> _ {
-#    __caller.ensureInsideFunction()
-    __caller.break()
-}
+#    __caller.break()
+#}

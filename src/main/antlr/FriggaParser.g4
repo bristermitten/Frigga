@@ -27,19 +27,22 @@ expression:
          | left=expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
          | function #functionExpression
          | lambda #lambdaExpression
-         | expression call #callExpression
+         | expression call #callExpression //something()
          | expression referencedCall #referencedCallExpression
-         | expression DOT ID #accessExpression
+         | expression DOT ID #accessExpression //something.property
          | paranthesizedExpression #paranthesisExpression
-         | ID #varReference
+         | ID #propertyReference
         ;
 
          paranthesizedExpression: LPAREN expression RPAREN;
 
-         propertyModifiers:
-            MUTABLE?;
+         propertyModifier:
+              MUTABLE
+            | STATEFUL
+            | SECRET
+            | STATIC;
 
-         assignment: propertyModifiers ID typeSpec? ASSIGN expression;
+         assignment: propertyModifier* ID typeSpec? ASSIGN expression;
          block: LCPAREN body RCPAREN;
 
          call:  LPAREN args RPAREN;

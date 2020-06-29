@@ -1,7 +1,11 @@
 package me.bristermitten.frigga.runtime
 
-import me.bristermitten.frigga.ast.element.*
-import me.bristermitten.frigga.runtime.command.function.FunctionValue
+import me.bristermitten.frigga.runtime.data.*
+import me.bristermitten.frigga.runtime.data.Function
+import me.bristermitten.frigga.runtime.type.CallerType
+import me.bristermitten.frigga.runtime.type.JVMType
+import me.bristermitten.frigga.runtime.type.OutputType
+import me.bristermitten.frigga.runtime.type.Type
 
 class FriggaContext {
     val stack = Stack()
@@ -72,12 +76,12 @@ class FriggaContext {
         return null
     }
 
-    internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): FunctionValue? {
+    internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function? {
         if (type != null) {
             val withName = type.getFunctions(name)
             val found = withName.firstOrNull {
                 var index = 0
-                it.signature.input.values.all { parameterType ->
+                it.signature.params.values.all { parameterType ->
                     parameterType.accepts(parameterTypes[index++])
                 }
             }
@@ -100,7 +104,7 @@ class FriggaContext {
         }
         scope[0].properties[property.name] = property
         val value = property.value.value
-        if (value is FunctionValue) {
+        if (value is Function) {
             scope[0].functions[property.name] = value
         }
     }
@@ -116,7 +120,7 @@ class FriggaContext {
         scope.addFirst(FriggaScope(name))
     }
 
-    fun leaveScope(): FriggaScope {
+    fun exitScope(): FriggaScope {
         return scope.removeFirst()
     }
 
@@ -127,7 +131,7 @@ class FriggaContext {
         stack.clear()
 
         scope.forEach {
-            it.functions.clear()
+//            it.functions.clear()
             it.properties.clear()
             it.types.clear()
         }

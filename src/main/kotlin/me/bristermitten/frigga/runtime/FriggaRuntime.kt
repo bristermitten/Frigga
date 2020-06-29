@@ -2,24 +2,16 @@ package me.bristermitten.frigga.runtime
 
 import FriggaLexer
 import FriggaParser
-import me.bristermitten.frigga.ast.element.*
-import me.bristermitten.frigga.ast.element.expression.Expression
-import me.bristermitten.frigga.ast.element.expression.value.*
-import me.bristermitten.frigga.ast.element.function.Function
-import me.bristermitten.frigga.ast.element.function.Signature
-import me.bristermitten.frigga.ast.toAST
-import me.bristermitten.frigga.runtime.command.Command
-import me.bristermitten.frigga.runtime.command.CommandPropertyDefine
-import me.bristermitten.frigga.runtime.command.CommandPropertyReference
-import me.bristermitten.frigga.runtime.command.function.CommandFunctionCall
-import me.bristermitten.frigga.runtime.command.function.CommandFunctionDefinition
-import me.bristermitten.frigga.runtime.command.operator.CommandBinaryOperator
-import me.bristermitten.frigga.runtime.command.operator.operatorFromSymbol
+import me.bristermitten.frigga.runtime.data.FriggaFile
+import me.bristermitten.frigga.runtime.data.JVMNamespace
+import me.bristermitten.frigga.runtime.type.JVMType
+import me.bristermitten.frigga.runtime.type.loadTypes
+import me.bristermitten.frigga.runtime.error.ExecutionException
+import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
 import java.io.File
-import java.util.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -62,7 +54,7 @@ class FriggaRuntime {
         }
 
         val (ast, runtimeLoadingTime) = measureTimedValue {
-            friggaFile.toAST(name)
+            friggaFile.load()
         }
 
         val (result, processTime) = measureTimedValue {
@@ -93,12 +85,11 @@ class FriggaRuntime {
                 context.defineType(JVMType(it.jvmClass))
             }
         }
-        file.contents.forEach {
-            val command = process(it)
+        file.content.forEach {
             try {
-                command.eval(context.stack, context)
+                it.command.eval(context.stack, context)
             } catch (e: Exception) {
-                exceptions += e
+                exceptions += ExecutionException(e, it.position)
             }
         }
         return ExecutionResult(
@@ -107,53 +98,4 @@ class FriggaRuntime {
         )
     }
 
-    private fun process(expression: Expression): Command {
-        return when (expression) {
-            is Assignment -> {
-                val defineCommand = CommandPropertyDefine(
-                    expression.assignTo,
-                    expression.modifiers,
-                    process(expression.value)
-                )
-
-                defineCommand
-            }
-            is Literal<*> -> {
-                expression
-            }
-            is PropertyReference -> {
-                CommandPropertyReference(expression.referencing)
-            }
-            is BinaryOperator -> {
-                return CommandBinaryOperator(
-                    process(expression.left),
-                    process(expression.right),
-                    operatorFromSymbol(expression.operator)
-                )
-            }
-            is Lambda -> {
-                CommandFunctionDefinition(
-                    Signature(
-                        emptyMap(),
-                        expression.params.mapNotNull { it.key to (it.value.type ?: return@mapNotNull null) }.toMap(),
-                        AnyType //TODO
-                    ),
-                    expression.body.map { process(it) }
-                )
-            }
-            is Call -> {
-                CommandFunctionCall(
-                    expression.upon?.let(this::process),
-                    expression.calling, expression.args.map(this::process)
-                )
-            }
-            is Function -> {
-                CommandFunctionDefinition(
-                    expression.signature,
-                    expression.contents.map { process(it) }
-                )
-            }
-            else -> throw UnsupportedOperationException(expression.javaClass.simpleName + " " + expression)
-        }
-    }
 }

@@ -1,11 +1,12 @@
 package me.bristermitten.frigga.runtime
 
+import me.bristermitten.frigga.runtime.data.Value
 import java.util.*
 
-class Stack(private val stack: Deque<Any> = ArrayDeque()) {
+class Stack(private val stack: Deque<Value> = ArrayDeque()) {
 
-    fun peek(): Any? = stack.peek()
-    fun pull(): Any = stack.poll()
+    fun peek(): Value? = stack.peek()
+    fun pull(): Value = stack.poll()
     fun push(data: Value) {
         stack.push(data)
     }
