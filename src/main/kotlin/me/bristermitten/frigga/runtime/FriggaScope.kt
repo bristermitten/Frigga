@@ -1,6 +1,6 @@
 package me.bristermitten.frigga.runtime
 
-import me.bristermitten.frigga.runtime.data.Function
+import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.type.Type
 

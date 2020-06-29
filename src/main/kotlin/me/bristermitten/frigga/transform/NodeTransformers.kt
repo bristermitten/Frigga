@@ -21,7 +21,12 @@ object NodeTransformers {
 
         CallExpressionContext::class.java to CallTransformer,
 
-        AccessExpressionContext::class.java to AccessTransformer
+        AccessExpressionContext::class.java to AccessTransformer,
+
+        BinaryOperatorExpressionContext::class.java to BinaryOperatorTransformer,
+        InfixFunctionContext::class.java to InfixFunctionTransformer,
+
+        ParenthesisExpressionContext::class.java to ParenthesisExpressionTransformer
     )
 
     private fun <T : ParserRuleContext> transformerFor(node: T): NodeTransformer<T> {

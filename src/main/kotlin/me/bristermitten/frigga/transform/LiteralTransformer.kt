@@ -15,10 +15,10 @@ object LiteralTransformer : NodeTransformer<LiteralContext>() {
             return CommandValue(
                 when (this) {
                     is IntLiteralContext -> {
-                        intValue(this.INT().text.toLong())
+                        intValue(text.toLong())
                     }
                     is DecLiteralContext -> {
-                        decValue(this.DEC().text.toDouble())
+                        decValue(text.toDouble())
                     }
                     is StringLiteralContext -> {
                         stringValue(this.STRING().text.removeSurrounding("\""))

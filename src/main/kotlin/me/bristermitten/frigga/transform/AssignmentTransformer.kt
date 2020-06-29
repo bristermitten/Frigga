@@ -18,9 +18,11 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpression
                     }
                 }.toSet()
 
+
             val name = this.ID().text
 
             val expression = this.expression()
+
             val value = NodeTransformers.transform(expression)
 
             return CommandAssignment(name, modifiers, value)

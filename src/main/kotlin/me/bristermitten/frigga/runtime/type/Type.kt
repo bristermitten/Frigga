@@ -5,8 +5,12 @@ import com.google.common.collect.Multimap
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.command.Command
-import me.bristermitten.frigga.runtime.data.*
-import me.bristermitten.frigga.runtime.data.Function
+import me.bristermitten.frigga.runtime.data.Property
+import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.function.Function
+import me.bristermitten.frigga.runtime.data.function.FunctionDefiner
+import me.bristermitten.frigga.runtime.data.function.Signature
+import me.bristermitten.frigga.runtime.data.function.function
 import me.bristermitten.frigga.util.set
 import kotlin.collections.set
 
@@ -27,6 +31,20 @@ open class Type(
 
     private val typeFunctions: Multimap<String, Function> = HashMultimap.create()
     fun getFunctions(name: String): Collection<Function> = typeFunctions[name]
+
+    fun getFunction(name: String, signature: Signature): Function {
+        val byName = getFunctions(name)
+            .filter { it.signature.matches(signature) }
+        return byName.minBy { func ->
+            val itParams = func.signature.params.values.toList()
+            val checkParams = signature.params.values.toList()
+            val paramDistance = itParams.withIndex().sumBy { it.value.distanceTo(checkParams[it.index]) }
+            paramDistance
+        }
+            ?: throw NoSuchElementException(
+                name + signature
+            )
+    }
 
     open infix fun union(other: Type): Type =
         AnyType
@@ -83,50 +101,10 @@ open class Type(
     protected fun defineFunction(function: Function) {
         this.typeFunctions[function.name] = function
     }
-}
 
-object NumType : Type(
-    "Num",
-    AnyType
-)
-
-object IntType : Type(
-    "Int",
-    NumType
-) {
-    override fun union(other: Type): Type {
-        return when (other) {
-            is DecType -> DecType
-            is IntType -> IntType
-            else -> super.union(other)
-        }
-    }
-
-    override fun coerceValueTo(value: Value, other: Type): Value {
-        return when (other) {
-            is DecType -> Value(
-                other,
-                (value.value as Long).toDouble()
-            )
-            else -> super.coerceValueTo(value, other)
-        }
-    }
-
-}
-
-object DecType : Type(
-    "Dec",
-    NumType
-) {
-    override fun union(other: Type): Type {
-        return when (other) {
-            is IntType, is DecType -> DecType
-            else -> super.union(other)
-        }
-    }
-
-    override fun accepts(other: Type): Boolean {
-        return other == IntType || super.accepts(other)
+    protected inline fun defineFunction(closure: FunctionDefiner.() -> Unit) {
+        val value = function(closure)
+        defineFunction(value)
     }
 }
 
@@ -171,13 +149,11 @@ object OutputType : Type("Output") {
                     emptyMap(), mapOf("value" to AnyType), NothingType
                 ),
                 listOf(
-                    CommandNode(object : Command() {
+                    object : Command() {
                         override fun eval(stack: Stack, context: FriggaContext) {
                             println(context.findProperty("value")?.value?.value)
                         }
-
-                    }, Position(0, 0))
-                )
+                    })
             )
         )
     }

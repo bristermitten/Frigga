@@ -34,13 +34,7 @@ data class CommandCall(
             "No such function $uponType#$calling"
         }
 
-        val namedParams = function.signature.params.entries.mapIndexed {index, entry ->
-            entry.key to paramValues[index]
-        }.toMap()
-
-
-
-        function.call(stack, context, namedParams)
+        function.call(stack, context, paramValues)
 
     }
 }

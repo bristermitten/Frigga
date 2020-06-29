@@ -1,6 +1,6 @@
 package me.bristermitten.frigga.runtime.type
 
-import me.bristermitten.frigga.runtime.data.Signature
+import me.bristermitten.frigga.runtime.data.function.Signature
 
 class FunctionType(
     signature: Signature

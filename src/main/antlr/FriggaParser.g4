@@ -23,18 +23,19 @@ line: expression NEWLINE*?;
 expression:
            assignment #assignmentExpression
          |  literal #literalExpression
-         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER) right=expression #binaryOperator
-         | left=expression operator=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
+//         | left=expression infixFunction=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
          | function #functionExpression
          | lambda #lambdaExpression
          | expression call #callExpression //something()
+         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER) right=expression #binaryOperatorExpression
+         | left=expression WHITESPACE infixFunction=ID WHITESPACE right=expression #infixFunction
          | expression referencedCall #referencedCallExpression
          | expression DOT ID #accessExpression //something.property
-         | paranthesizedExpression #paranthesisExpression
+         | parenthesizedExpression #parenthesisExpression
          | ID #propertyReference
         ;
 
-         paranthesizedExpression: LPAREN expression RPAREN;
+         parenthesizedExpression: LPAREN expression RPAREN;
 
          propertyModifier:
               MUTABLE
