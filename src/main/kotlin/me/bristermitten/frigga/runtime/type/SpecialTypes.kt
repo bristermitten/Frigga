@@ -2,6 +2,7 @@ package me.bristermitten.frigga.runtime.type
 
 import getJVMType
 import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
 import me.bristermitten.frigga.runtime.error.BreakException
@@ -28,12 +29,14 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                         }.toMap()
                         output = getJVMType(it.returnType)
                     }
-                    body { _, context ->
+                    body { stack, context ->
                         val upon = context.findProperty(UPON_NAME)!!.value
-                        it.invoke(upon.value, *it.parameters.map { param ->
+                        val result = it.invoke(upon.value, *it.parameters.map { param ->
                             val findProperty = context.findProperty(param.name)
-                            findProperty?.value
+                            findProperty?.value?.value
                         }.toTypedArray())
+
+                        stack.push(Value(signature.returned, result))
                     }
                 }
             }

@@ -1,11 +1,9 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser
+import FriggaParser.UseContext
 import getType
-import me.bristermitten.frigga.runtime.data.FriggaFile
-import me.bristermitten.frigga.runtime.data.NAMESPACE_FORMAT
-import me.bristermitten.frigga.runtime.data.Namespace
-import me.bristermitten.frigga.runtime.data.SimpleNamespace
+import me.bristermitten.frigga.runtime.data.*
 import me.bristermitten.frigga.runtime.data.function.Signature
 import me.bristermitten.frigga.runtime.type.FunctionType
 import me.bristermitten.frigga.runtime.type.NothingType
@@ -16,7 +14,7 @@ import java.util.stream.Collectors.toList
 fun FriggaParser.FriggaFileContext.load(): FriggaFile {
     return FriggaFile(
         this.namespace()?.transform(),
-        this.usingList()?.use()?.transform() ?: emptySet(),
+        this.usingList()?.use()?.map(UseContext::transform)?.toSet() ?: emptySet(),
         this.body().line().stream().map {
             val exp = it.expression()
             transform(exp)
@@ -33,8 +31,15 @@ fun FriggaParser.NamespaceContext.transform(): SimpleNamespace {
     return SimpleNamespace(namespace)
 }
 
-fun List<FriggaParser.UseContext>.transform(): Set<Namespace> {
-    return emptySet()
+fun UseContext.transform(): Namespace {
+    val namespace = this.STRING().text.removeSurrounding("\"")
+    if (NAMESPACE_FORMAT.matches(namespace)) {
+        return SimpleNamespace(namespace)
+    }
+    if (JVM_NAMESPACE_FORMAT.matches(namespace)) {
+        return JVMNamespace(Class.forName(namespace.removePrefix("JVM:")))
+    }
+    throw IllegalArgumentException("Illegal namespace format $namespace")
 }
 
 fun FriggaParser.TypeContext.toType(): Type {

@@ -6,7 +6,6 @@ import getJVMType
 import loadTypes
 import me.bristermitten.frigga.runtime.data.FriggaFile
 import me.bristermitten.frigga.runtime.data.JVMNamespace
-import me.bristermitten.frigga.runtime.type.JVMType
 import me.bristermitten.frigga.runtime.error.ExecutionException
 import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams

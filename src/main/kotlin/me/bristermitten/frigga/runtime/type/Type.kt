@@ -36,9 +36,7 @@ abstract class Type(
 
         return byName.minBy { func ->
             val itParams = (func.type as FunctionType).signature.params.values.toList()
-            println(itParams)
             val paramDistance = itParams.withIndex().sumBy { it.value.distanceTo(params[it.index]) }
-            println(paramDistance)
             paramDistance
         }
     }
