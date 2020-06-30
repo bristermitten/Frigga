@@ -74,8 +74,25 @@ class StructTests : FriggaTest() {
 
         val result = runtime.execute(code, "structs")
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(3)
 
+        result.leftoverStack.first() shouldBe intValue(3)
+    }
+    @Test
+    fun `Test Struct Function Functionality of a Function using a property`() {
+        val code = """
+        struct TestStruct {
+            age::Int
+            getANumber::() -> Int
+        }
+        
+        type = TestStruct(3, () -> __upon.age)
+        type.getANumber()
+        """.trimIndent()
+
+        val result = runtime.execute(code, "structs")
+        handleExceptions(result)
+
+        result.leftoverStack.first() shouldBe intValue(3)
     }
 
 }
