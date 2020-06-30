@@ -3,6 +3,7 @@ package me.bristermitten.frigga.struct
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
+import me.bristermitten.frigga.runtime.data.intValue
 import me.bristermitten.frigga.runtime.data.stringValue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -59,4 +60,22 @@ class StructTests : FriggaTest() {
 
         out.toString() shouldBe "Test2\n"
     }
+
+    @Test
+    fun `Test Basic Struct Function Functionality Returning a Value`() {
+        val code = """
+        struct TestStruct { 
+            getANumber::() -> Int
+        }
+        
+        type = TestStruct(() -> 3)
+        type.getANumber()
+        """.trimIndent()
+
+        val result = runtime.execute(code, "structs")
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe intValue(3)
+
+    }
+
 }

@@ -15,21 +15,29 @@ object LambdaTransformer : NodeTransformer<FriggaParser.LambdaExpressionContext>
 
     override fun transformNode(node: FriggaParser.LambdaExpressionContext): Command {
         with(node.lambda()) {
-            val block = block()
-            if (block != null) {
-                val content = block().body().line()
-                    .map(LineContext::expression)
-                    .map(NodeTransformers::transform)
-                    .map(CommandNode::command)
-                val signature = Signature(
-                    emptyMap(),
-                    emptyMap(),
-                    AnyType
-                )
-                val function = Function("Anonymous", signature, content)
-                return CommandValue(Value(FunctionType(signature), function))
-            }
+            val params = this.lambdaParams()?.lamdaParam()
+                ?.map {
+                    val functionParam = it.functionParam()
+                    if (functionParam == null) {
+                        it.ID().text to AnyType
+                    } else {
+                        functionParam.ID().text to functionParam.typeSpec().type().toType()
+                    }
+                }?.toMap() ?: emptyMap()
+
+            val block = block()?.body()?.line()?.map(LineContext::expression) ?: listOf(expression())
+
+            val content = block
+                .map(NodeTransformers::transform)
+                .map(CommandNode::command)
+            val signature = Signature(
+                emptyMap(),
+                params,
+                AnyType
+            )
+            val function = Function("Anonymous", signature, content)
+
+            return CommandValue(Value(FunctionType(signature), function))
         }
-        throw UnsupportedOperationException(node.text)
     }
 }
