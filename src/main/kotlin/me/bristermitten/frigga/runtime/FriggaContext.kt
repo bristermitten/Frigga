@@ -1,11 +1,13 @@
 package me.bristermitten.frigga.runtime
 
-import me.bristermitten.frigga.runtime.data.*
+import OutputType
+import me.bristermitten.frigga.runtime.data.Property
+import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.type.CallerType
-import me.bristermitten.frigga.runtime.type.JVMType
-import me.bristermitten.frigga.runtime.type.OutputType
+import me.bristermitten.frigga.runtime.type.StackType
 import me.bristermitten.frigga.runtime.type.Type
+import me.bristermitten.frigga.runtime.type.TypeInstance
 
 class FriggaContext {
     val stack = Stack()
@@ -22,7 +24,7 @@ class FriggaContext {
             STACK_NAME,
             emptySet(),
             Value(
-                JVMType(Stack::class.java),
+                StackType,
                 stack
             )
         )
@@ -76,26 +78,32 @@ class FriggaContext {
         return null
     }
 
+    fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function? {
+        val function = type.getFunction(name, parameterTypes) ?: return null
+        return value.properties[function]?.value as Function
+    }
+
     internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function? {
+
         if (type != null) {
-            val withName = type.getFunctions(name)
-            val found = withName.firstOrNull {
-                var index = 0
-                it.signature.params.values.all { parameterType ->
-                    parameterType.accepts(parameterTypes[index++])
-                }
-            }
-            if (found != null) {
-                return found
-            }
+            val value = type.getFunction(name, parameterTypes)?.value
+            return value as Function?
         }
+
         for (scope in scope) {
             val function = scope.functions[name]
             if (function != null) {
                 return function
             }
         }
-        return null
+
+        //Constructors
+        val type = findType(name)
+
+        requireNotNull(type) {
+            "No such type $name"
+        }
+        return findFunction(type, CONSTRUCTOR, parameterTypes)
     }
 
     internal fun defineProperty(property: Property, force: Boolean = false) {
@@ -118,6 +126,10 @@ class FriggaContext {
 
     fun enterScope(name: String) {
         scope.addFirst(FriggaScope(name))
+    }
+
+    fun enterFunctionScope(name: String) {
+        scope.addFirst(FriggaScope(name, true))
     }
 
     fun exitScope(): FriggaScope {

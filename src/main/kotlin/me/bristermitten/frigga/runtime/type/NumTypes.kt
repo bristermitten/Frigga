@@ -9,31 +9,27 @@ import me.bristermitten.frigga.runtime.data.intValue
 import kotlin.math.pow
 
 object NumType : Type(
-    "Num",
-    AnyType
+    "Num"
 )
 
-object IntType : Type(
-    "Int",
-    NumType
-) {
-    override fun union(other: Type): Type {
-        return when (other) {
-            is DecType -> DecType
-            is IntType -> IntType
-            else -> super.union(other)
-        }
-    }
-
-    override fun coerceValueTo(value: Value, other: Type): Value {
-        return when (other) {
-            is DecType -> Value(
-                other,
-                (value.value as Long).toDouble()
-            )
-            else -> super.coerceValueTo(value, other)
-        }
-    }
+object IntType : Type("Int") {
+//    override fun union(other: Type): Type {
+//        return when (other) {
+//            is DecType -> DecType
+//            is IntType -> IntType
+//            else -> super.union(other)
+//        }
+//    }
+//
+//    override fun coerceValueTo(value: Value, other: Type): Value {
+//        return when (other) {
+//            is DecType -> Value(
+//                other,
+//                (value.value as Long).toDouble()
+//            )
+//            else -> super.coerceValueTo(value, other)
+//        }
+//    }
 
     init {
         fun defineIntAndDecMathFunctions(
@@ -76,22 +72,20 @@ object IntType : Type(
         ) { a, b -> a.toDouble().pow(b) }
     }
 
+    override fun coerceValueTo(value: Value, other: Type): Value {
+        return when (other) {
+            is DecType -> Value(other, (value.value as Long).toDouble())
+            else -> super.coerceValueTo(value, other)
+        }
+    }
+
 }
 
 object DecType : Type(
     "Dec",
     NumType
 ) {
-    override fun union(other: Type): Type {
-        return when (other) {
-            is IntType, is DecType -> DecType
-            else -> super.union(other)
-        }
-    }
 
-    override fun accepts(other: Type): Boolean {
-        return other == IntType || super.accepts(other)
-    }
     init {
         fun defineMathFunction(
             name: String,
@@ -104,7 +98,7 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = stack.pull() as Value
+                    val thisValue = stack.pull()
                     val addTo = context.findProperty("value")!!.value
                     val addToAsDec = addTo.type.coerceTo(addTo, DecType)
                     stack.push(decValue(decOperator(thisValue.value as Double, addToAsDec.value as Double)))
@@ -116,5 +110,9 @@ object DecType : Type(
         defineMathFunction(OPERATOR_TIMES_NAME, Double::times)
         defineMathFunction(OPERATOR_DIVIDE_NAME, Double::div)
         defineMathFunction(OPERATOR_EXPONENT_NAME, Double::pow)
+    }
+
+    override fun accepts(other: Type): Boolean {
+        return other == IntType || super.accepts(other)
     }
 }

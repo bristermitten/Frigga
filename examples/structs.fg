@@ -1,0 +1,15 @@
+trait Named {
+    name::String
+}
+#
+#struct User::Named {
+#    name::String
+#    mutable age::Int
+#
+#    name = () -> name.split(" ")
+#}
+#
+#struct Int : Num {
+#    add::(Int) -> Int
+#    add::(Dec) -> Dec
+#}

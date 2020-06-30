@@ -22,8 +22,8 @@ SECRET: 'secret';
 STATIC: 'static';
 USE: 'use';
 NAMESPACE: 'namespace';
-
-
+TRAIT: 'trait';
+STRUCT: 'struct';
 
 
 //Operators

@@ -1,0 +1,9 @@
+struct Stack {
+    push::(Any) -> _
+    pull::() -> Any
+}
+
+struct User {
+    name::String
+    mutable age::Int
+}

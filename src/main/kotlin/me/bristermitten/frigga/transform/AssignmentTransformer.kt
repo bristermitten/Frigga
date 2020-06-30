@@ -9,8 +9,8 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpression
 
     override fun transformNode(node: FriggaParser.AssignmentExpressionContext): Command {
         with(node.assignment()) {
-
-            val modifiers = this.propertyModifier()
+            val declaration = this.declaration()
+            val modifiers = declaration.propertyModifier()
                 .mapNotNull {
                     val mutable = it.MUTABLE()
                     mutable?.let {
@@ -19,7 +19,7 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpression
                 }.toSet()
 
 
-            val name = this.ID().text
+            val name = declaration.ID().text
 
             val expression = this.expression()
 

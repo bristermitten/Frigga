@@ -33,30 +33,47 @@ expression:
          | expression DOT ID #accessExpression //something.property
          | parenthesizedExpression #parenthesisExpression
          | ID #propertyReference
+         | structureDef #structureDefinition
+
         ;
 
-         parenthesizedExpression: LPAREN expression RPAREN;
+parenthesizedExpression: LPAREN expression RPAREN;
 
-         propertyModifier:
-              MUTABLE
-            | STATEFUL
-            | SECRET
-            | STATIC;
+propertyModifier:
+     MUTABLE
+   | STATEFUL
+   | SECRET
+   | STATIC;
 
-         assignment: propertyModifier* ID typeSpec? ASSIGN expression;
-         block: LCPAREN body RCPAREN;
+fullDeclaration: propertyModifier* ID typeSpec;
+declaration: propertyModifier* ID typeSpec?;
+assignment: declaration ASSIGN expression;
+block: LCPAREN body RCPAREN;
 
-         call:  LPAREN args RPAREN;
+call:  LPAREN args RPAREN;
 
-         referencedCall: LSPAREN args RSPAREN;
+referencedCall: LSPAREN args RSPAREN;
 
-         args: expression? (COMMA expression)*;
-         typeSpec: DOUBLE_COLON type;
+args: expression? (COMMA expression)*;
+typeSpec: DOUBLE_COLON type;
 
-         type: functionType | ID | NOTHING | tuple;
+type: functionType | ID | NOTHING | tuple;
 
-         tuple: (LPAREN (tupleParam COMMA tupleParam)+ RPAREN);
-         tupleParam : ID typeSpec;
+tuple: LPAREN (tupleParam COMMA tupleParam)+ RPAREN;
+tupleParam : ID typeSpec;
+
+/*
+Structures
+*/
+structureDef:
+      structDef #structDefinition
+    | traitDef #traitDefinition;
+
+traitDef: TRAIT ID parents? structureBody?;
+structDef: STRUCT ID parents? structureBody?;
+parents: DOUBLE_COLON ID (COMMA ID)*;
+structureBody: LCPAREN structureLine* RCPAREN;
+structureLine: fullDeclaration #declarationLine | line #normalLine;
 
 /*
 Generics
@@ -84,7 +101,7 @@ lamdaParam: functionParam | ID; //a::Int OR a
 Function Types
 */
 functionType: (functionParamTypes) ARROW type;
-functionParamTypes: (LPAREN type? (COMMA type)* RPAREN);
+functionParamTypes: LPAREN type? (COMMA type)* RPAREN;
 
 literal:
       MINUS? INT #intLiteral

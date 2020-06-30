@@ -8,10 +8,10 @@ data class CommandPropertyReference(
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val prop = context.findProperty(referencing)
+        val prop = context.findProperty(referencing) ?: context.findType(referencing)?.staticProperty
 
         requireNotNull(prop) {
-            "No such property $referencing"
+            "No such property or type $referencing"
         }
 
         stack.push(prop.value)

@@ -1,6 +1,7 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser.*
+import getType
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandValue
 import me.bristermitten.frigga.runtime.data.CommandNode
@@ -8,7 +9,6 @@ import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.data.function.Signature
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.type.FunctionType
-import me.bristermitten.frigga.runtime.type.getType
 
 object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
 
@@ -16,7 +16,7 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
         val parent = node.parent
         val name: String
         name = if (parent is AssignmentContext) {
-            parent.ID().text
+            parent.declaration().ID().text
         } else {
             "Anonymous"
         }

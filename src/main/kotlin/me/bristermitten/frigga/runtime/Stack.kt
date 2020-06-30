@@ -15,6 +15,7 @@ class Stack(private val stack: Deque<Value> = ArrayDeque()) {
         return stack.toString()
     }
 
+    @JvmSynthetic //Workaround for JVMType
     fun toList() = stack.toList()
     fun clear() = stack.clear()
 }

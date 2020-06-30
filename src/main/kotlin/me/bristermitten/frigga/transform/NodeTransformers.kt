@@ -26,12 +26,23 @@ object NodeTransformers {
         BinaryOperatorExpressionContext::class.java to BinaryOperatorTransformer,
         InfixFunctionContext::class.java to InfixFunctionTransformer,
 
-        ParenthesisExpressionContext::class.java to ParenthesisExpressionTransformer
+        ParenthesisExpressionContext::class.java to ParenthesisExpressionTransformer,
+
+        //Structures
+        StructureDefinitionContext::class.java to delegateTransformer(
+            StructureDefinitionTransformer,
+            StructureDefinitionContext::structureDef
+        ),
+
+        LambdaExpressionContext::class.java to LambdaTransformer,
+
+        ReferencedCallExpressionContext::class.java to ReferencedCallTransformer
     )
 
     private fun <T : ParserRuleContext> transformerFor(node: T): NodeTransformer<T> {
         val valueFor = getValueFor(node.javaClass)
-        return valueFor as NodeTransformer<T>? ?: throw IllegalArgumentException("No Transformer for ${node.javaClass}")
+        return valueFor as NodeTransformer<T>?
+            ?: throw IllegalArgumentException("No Transformer for ${node.javaClass} ${node.text}")
     }
 
     private fun getValueFor(key: Class<*>): NodeTransformer<*>? {

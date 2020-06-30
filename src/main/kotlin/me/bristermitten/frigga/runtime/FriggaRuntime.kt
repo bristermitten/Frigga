@@ -2,10 +2,11 @@ package me.bristermitten.frigga.runtime
 
 import FriggaLexer
 import FriggaParser
+import getJVMType
+import loadTypes
 import me.bristermitten.frigga.runtime.data.FriggaFile
 import me.bristermitten.frigga.runtime.data.JVMNamespace
 import me.bristermitten.frigga.runtime.type.JVMType
-import me.bristermitten.frigga.runtime.type.loadTypes
 import me.bristermitten.frigga.runtime.error.ExecutionException
 import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams
@@ -82,7 +83,7 @@ class FriggaRuntime {
         val exceptions = mutableListOf<Exception>()
         file.using.forEach {
             if (it is JVMNamespace) {
-                context.defineType(JVMType(it.jvmClass))
+                context.defineType(getJVMType(it.jvmClass))
             }
         }
         file.content.forEach {
