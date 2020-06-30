@@ -16,24 +16,27 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 class FriggaRuntime {
-    private val context = FriggaContext()
+    private val namespaces = mutableMapOf<String, FriggaContext>()
+    private val globalContext = FriggaContext("")
 
 
     init {
+        namespaces[""] = globalContext
+        loadTypes()
         loadStdLib()
     }
 
     private fun loadStdLib() {
-        val resource = javaClass.classLoader.getResource("std")
-            ?: throw NoSuchElementException("Could not get std folder.")
+        val resource =
+            javaClass.classLoader.getResource("std") ?: throw NoSuchElementException("Could not get std folder.")
         File(resource.toURI()).listFiles()?.forEach {
-            execute(it.readText(), it.name)
+            execute(it.readText())
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    fun execute(friggaCode: String, name: String): FullExecutionResult {
-        loadTypes()
+    fun execute(friggaCode: String): FullExecutionResult {
+
         val (lexer, lexTime) = measureTimedValue {
             FriggaLexer(CharStreams.fromString(friggaCode))
         }
@@ -74,15 +77,27 @@ class FriggaRuntime {
     }
 
     fun reset() {
-        context.reset()
+        globalContext.reset()
         loadStdLib() //TODO maybe don't remove the whole stdlib?
     }
 
+    private fun getNamespace(namespace: String) = namespaces.getOrPut(namespace) { FriggaContext(namespace) }
+
     private fun process(file: FriggaFile): ExecutionResult {
         val exceptions = mutableListOf<Exception>()
+        val namespace = file.namespace
+
+        val context = if (namespace != null) {
+            getNamespace(namespace.name)
+        } else {
+            this.globalContext
+        }
+
         file.using.forEach {
             if (it is JVMNamespace) {
                 context.defineType(getJVMType(it.jvmClass))
+            } else {
+                context.use(getNamespace(it.name))
             }
         }
         file.content.forEach {

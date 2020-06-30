@@ -1,7 +1,6 @@
 package me.bristermitten.frigga
 
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldNotContain
 import me.bristermitten.frigga.runtime.data.intValue
 import org.junit.jupiter.api.Test
 
@@ -15,7 +14,7 @@ class LambdaTests : FriggaTest() {
             getValue()
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack shouldContain intValue(3)
     }
@@ -27,7 +26,7 @@ class LambdaTests : FriggaTest() {
             x
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack shouldContain intValue(100)

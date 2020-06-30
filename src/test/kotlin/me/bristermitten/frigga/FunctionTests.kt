@@ -19,7 +19,7 @@ class FunctionTests : FriggaTest() {
             doNothing()
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.shouldBeEmpty()
     }
@@ -33,7 +33,7 @@ class FunctionTests : FriggaTest() {
             doNothing()
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.shouldBeEmpty()
     }
@@ -47,7 +47,7 @@ class FunctionTests : FriggaTest() {
             getValue()
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack shouldContain intValue(3)
     }
@@ -63,7 +63,7 @@ class FunctionTests : FriggaTest() {
             getValue()
         """.trimIndent()
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack shouldContain intValue(10)
     }
@@ -83,7 +83,7 @@ class FunctionTests : FriggaTest() {
         val out = ByteArrayOutputStream()
         System.setOut(PrintStream(out))
 
-        val result = runtime.execute(code, "function")
+        val result = runtime.execute(code)
         handleExceptions(result)
         System.setOut(originalOut)
 

@@ -16,7 +16,7 @@ class SimpleTests : FriggaTest() {
             x = 3
             x
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
+        val result = runtime.execute(code)
 
         result.leftoverStack shouldContain intValue(3)
         result.leftoverStack.shouldBeSingleton()
@@ -29,7 +29,7 @@ class SimpleTests : FriggaTest() {
             x::Int = 3
             x
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
+        val result = runtime.execute(code)
 
         result.leftoverStack shouldContain intValue(3)
         result.leftoverStack.shouldBeSingleton()
@@ -42,7 +42,7 @@ class SimpleTests : FriggaTest() {
             x = 3
             x = 4
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
+        val result = runtime.execute(code)
 
         result.exceptions.shouldBeSingleton()
         result.leftoverStack.shouldBeEmpty()
@@ -54,7 +54,7 @@ class SimpleTests : FriggaTest() {
             mutable x = 3
             x = 4
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
+        val result = runtime.execute(code)
 
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.shouldBeEmpty()
@@ -67,7 +67,7 @@ class SimpleTests : FriggaTest() {
             x = 4
             x + 1
         """.trimIndent()
-        val result = runtime.execute(code, "simple")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.shouldBeSingleton()

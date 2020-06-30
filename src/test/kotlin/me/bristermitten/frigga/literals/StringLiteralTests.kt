@@ -14,7 +14,7 @@ class StringLiteralTests : FriggaTest() {
             string
         """.trimIndent()
 
-        val result = runtime.execute(code, "strings")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe stringValue("Hello")
@@ -27,7 +27,7 @@ class StringLiteralTests : FriggaTest() {
             string + " World"
         """.trimIndent()
 
-        val result = runtime.execute(code, "strings")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe stringValue("Hello World")

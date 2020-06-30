@@ -1,10 +1,8 @@
 package me.bristermitten.frigga
 
-import org.junit.jupiter.api.Test
-
 class SimpleBenchmark : FriggaTest() {
 
-    @Test
+//    @Test
     fun `Perform 1_000 tests and get average parse time`() {
         val code = """
             x = 3
@@ -16,7 +14,7 @@ class SimpleBenchmark : FriggaTest() {
         var totalExecutionTime = 0.0
 
         repeat(times) {
-            val result = runtime.execute(code, "benchmark")
+            val result = runtime.execute(code)
             totalParseTime += result.timings.parseTime
             totalExecutionTime += result.timings.totalTime
             runtime.reset()

@@ -9,21 +9,20 @@ import me.bristermitten.frigga.runtime.type.FunctionType
 import me.bristermitten.frigga.runtime.type.NothingType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.transform.NodeTransformers.transform
-import java.util.stream.Collectors.toList
 
 fun FriggaParser.FriggaFileContext.load(): FriggaFile {
     return FriggaFile(
         this.namespace()?.transform(),
         this.usingList()?.use()?.map(UseContext::transform)?.toSet() ?: emptySet(),
-        this.body().line().stream().map {
+        this.body().line().map {
             val exp = it.expression()
             transform(exp)
-        }.collect(toList())
+        }
     )
 }
 
 fun FriggaParser.NamespaceContext.transform(): SimpleNamespace {
-    val namespace = this.NAMESPACE().text
+    val namespace = STRING().text.removeSurrounding("\"")
     require(NAMESPACE_FORMAT.matches(namespace)) {
         "Illegal Namespace Format $namespace"
     }

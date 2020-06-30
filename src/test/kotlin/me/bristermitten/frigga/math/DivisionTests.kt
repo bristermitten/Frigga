@@ -16,7 +16,7 @@ class DivisionTests : FriggaTest() {
             x = 4
             x / 2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(4 / 2)
@@ -28,7 +28,7 @@ class DivisionTests : FriggaTest() {
             x = 4000
             x / 400 / 5 / 2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(1)
@@ -40,7 +40,7 @@ class DivisionTests : FriggaTest() {
             x = 3.5
             x / 2.9
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(3.5 / 2.9)
@@ -52,7 +52,7 @@ class DivisionTests : FriggaTest() {
             x = 36841.871
             x / 5.1486 / -1.41875
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(36841.871 / 5.1486 / -1.41875)
@@ -68,7 +68,7 @@ class DivisionTests : FriggaTest() {
             x = $start
             x / $param1 / $param2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start / param1 / param2)

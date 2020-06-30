@@ -16,7 +16,7 @@ class StrongTypingTests : FriggaTest() {
             takeInt("Hello")
         """.trimIndent()
 
-        val result = runtime.execute(code, "strong-typing")
+        val result = runtime.execute(code)
         result.exceptions.shouldNotBeEmpty()
     }
     @Test
@@ -28,7 +28,7 @@ class StrongTypingTests : FriggaTest() {
             takeInt(3.0)
         """.trimIndent()
 
-        val result = runtime.execute(code, "strong-typing")
+        val result = runtime.execute(code)
         result.exceptions.shouldNotBeEmpty()
     }
     @Test
@@ -40,7 +40,7 @@ class StrongTypingTests : FriggaTest() {
             takeInt(3)
         """.trimIndent()
 
-        val result = runtime.execute(code, "strong-typing")
+        val result = runtime.execute(code)
         result.exceptions.shouldBeEmpty()
     }
 }

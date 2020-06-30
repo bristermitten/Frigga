@@ -9,14 +9,17 @@ import me.bristermitten.frigga.runtime.type.StackType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
 
-class FriggaContext {
+class FriggaContext(val name: String) {
     val stack = Stack()
+
 
     private var globalScope = loadGlobalScope()
 
     private val scope = ArrayDeque<FriggaScope>().apply {
         add(globalScope)
     }
+
+    private val using = mutableSetOf<FriggaContext>()
 
     private fun loadGlobalScope(): FriggaScope {
         val globalScope = FriggaScope("global")
@@ -55,7 +58,7 @@ class FriggaContext {
                 return property
             }
         }
-        return null
+        return using.asSequence().mapNotNull { it.findProperty(name) }.firstOrNull()
     }
 
     internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>? {
@@ -65,7 +68,7 @@ class FriggaContext {
                 return scope to property
             }
         }
-        return null
+        return using.asSequence().mapNotNull { it.findPropertyScope(name) }.firstOrNull()
     }
 
     internal fun findType(name: String): Type? {
@@ -75,12 +78,16 @@ class FriggaContext {
                 return type
             }
         }
-        return null
+        return using.asSequence().mapNotNull { it.findType(name) }.firstOrNull()
     }
 
     fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function? {
         val function = type.getFunction(name, parameterTypes) ?: return null
-        return value.properties[function]?.value as Function
+        return value.properties[function]?.value as Function? ?: using.asSequence().mapNotNull {
+            it.findTypeFunction(
+                type, value, name, parameterTypes
+            )
+        }.firstOrNull()
     }
 
     internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function? {
@@ -100,10 +107,13 @@ class FriggaContext {
         //Constructors
         val type = findType(name)
 
-        requireNotNull(type) {
-            "No such type $name"
+        return if (type != null) {
+            findFunction(type, CONSTRUCTOR, parameterTypes)
+        } else {
+            using.asSequence().mapNotNull {
+                it.findFunction(type, name, parameterTypes)
+            }.firstOrNull()
         }
-        return findFunction(type, CONSTRUCTOR, parameterTypes)
     }
 
     internal fun defineProperty(property: Property, force: Boolean = false) {
@@ -154,6 +164,11 @@ class FriggaContext {
 
     fun defineType(type: Type) {
         scope[0].types[type.name] = type
+    }
+
+
+    fun use(namespace: FriggaContext) {
+        using += namespace
     }
 
 }

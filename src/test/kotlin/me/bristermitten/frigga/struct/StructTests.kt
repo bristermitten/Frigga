@@ -18,7 +18,7 @@ class StructTests : FriggaTest() {
         type.name
         """.trimIndent()
 
-        val result = runtime.execute(code, "structs")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe stringValue("Alex")
     }
@@ -34,7 +34,7 @@ class StructTests : FriggaTest() {
         type.someFunction()
         """.trimIndent()
 
-        val result = runtime.execute(code, "structs")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.shouldBeEmpty()
     }
@@ -54,7 +54,7 @@ class StructTests : FriggaTest() {
         val out = ByteArrayOutputStream()
         System.setOut(PrintStream(out))
 
-        val result = runtime.execute(code, "structs")
+        val result = runtime.execute(code)
         handleExceptions(result)
         System.setOut(originalOut)
 
@@ -72,7 +72,7 @@ class StructTests : FriggaTest() {
         type.getANumber()
         """.trimIndent()
 
-        val result = runtime.execute(code, "structs")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe intValue(3)
@@ -89,7 +89,7 @@ class StructTests : FriggaTest() {
         type.getANumber()
         """.trimIndent()
 
-        val result = runtime.execute(code, "structs")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe intValue(3)

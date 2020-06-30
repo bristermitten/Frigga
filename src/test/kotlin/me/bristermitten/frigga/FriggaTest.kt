@@ -33,4 +33,4 @@ abstract class FriggaTest {
     }
 }
 
-const val RANDOM_TEST_COUNT = 50
+const val RANDOM_TEST_COUNT = 1

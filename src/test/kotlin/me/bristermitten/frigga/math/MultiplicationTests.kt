@@ -16,7 +16,7 @@ class MultiplicationTests : FriggaTest() {
             x = 3
             x * 2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3 * 2)
@@ -28,7 +28,7 @@ class MultiplicationTests : FriggaTest() {
             x = 3
             x * x * 5 * x * -1
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3 * 3 * (5 * 3 * -1))
@@ -40,7 +40,7 @@ class MultiplicationTests : FriggaTest() {
             x = 3.5
             x * 2.9
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(3.5 * 2.9)
@@ -52,7 +52,7 @@ class MultiplicationTests : FriggaTest() {
             x = 3.52
             x * x * 5.1486 * x * -1.41875
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(3.52 * 3.52 * 5.1486 * 3.52 * -1.41875)
@@ -68,7 +68,7 @@ class MultiplicationTests : FriggaTest() {
             x = $start
             x * $param1 * $param2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start * param1 * param2)

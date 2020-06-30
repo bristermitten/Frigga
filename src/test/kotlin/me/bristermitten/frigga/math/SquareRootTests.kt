@@ -10,11 +10,12 @@ class SquareRootTests : FriggaTest() {
     @Test
     fun `Assert Simple Integer sqrt Functioning Correctly`() {
         val code = """
+            use "std"
             x = 16
             sqrt(x)
         """.trimIndent()
 
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(4.0)
     }

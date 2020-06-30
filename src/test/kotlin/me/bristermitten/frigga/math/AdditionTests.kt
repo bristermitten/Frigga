@@ -18,7 +18,7 @@ class AdditionTests : FriggaTest() {
             x + 1
         """.trimIndent()
 
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(4)
     }
@@ -29,7 +29,7 @@ class AdditionTests : FriggaTest() {
             x = 3
             x + x + 5 + (x + 1)
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(15)
@@ -42,7 +42,7 @@ class AdditionTests : FriggaTest() {
             x = 3.0
             x + 1
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
@@ -55,7 +55,7 @@ class AdditionTests : FriggaTest() {
             x
         """.trimIndent()
 
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
@@ -70,7 +70,7 @@ class AdditionTests : FriggaTest() {
             x = $start
             x + $param1 + $param2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start + param1 + param2)

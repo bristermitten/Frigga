@@ -20,7 +20,7 @@ class ExponentTests : FriggaTest() {
             x ^ 2
         """.trimIndent()
 
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3.0.pow(2.0).roundToLong())
     }
@@ -31,7 +31,7 @@ class ExponentTests : FriggaTest() {
             x = 3
             x ^ x ^ 5 ^ (x ^ 1)
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3.0.pow(3.0).pow(5.0).pow(4.0).roundToLong())
@@ -44,7 +44,7 @@ class ExponentTests : FriggaTest() {
             x = 3.0
             x ^ 3.2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
         result.exceptions.shouldBeEmpty()
         result.leftoverStack.first() shouldBe decValue(3.0.pow(3.2))
     }
@@ -59,7 +59,7 @@ class ExponentTests : FriggaTest() {
             x = $start
             x ^ $param1 ^ $param2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start.pow(param1).pow(param2))

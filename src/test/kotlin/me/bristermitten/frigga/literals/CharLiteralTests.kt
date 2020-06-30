@@ -15,7 +15,7 @@ class CharLiteralTests : FriggaTest() {
             char
         """.trimIndent()
 
-        val result = runtime.execute(code, "chars")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe charValue('A')
@@ -28,7 +28,7 @@ class CharLiteralTests : FriggaTest() {
             someChar + 'B'
         """.trimIndent()
 
-        val result = runtime.execute(code, "chars")
+        val result = runtime.execute(code)
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe stringValue("AB")

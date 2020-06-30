@@ -15,7 +15,7 @@ class SubtractionTests : FriggaTest() {
             x = 3
             x - 1
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(2)
@@ -27,7 +27,7 @@ class SubtractionTests : FriggaTest() {
             x = 3
             x - x - 5 - (x - -1)
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe intValue(3 - 3 - 5 - (3 - -1))
@@ -39,7 +39,7 @@ class SubtractionTests : FriggaTest() {
             x = 3.0
             x - 1.5
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(1.5)
@@ -51,7 +51,7 @@ class SubtractionTests : FriggaTest() {
             x = 15.9
             x - x - 5.2 - (x - -1.3)
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(15.9 - 15.9 - 5.2 - (15.9 - -1.3))
@@ -68,7 +68,7 @@ class SubtractionTests : FriggaTest() {
             x = $start
             x - $param1 - $param2
         """.trimIndent()
-        val result = runtime.execute(code, "math")
+        val result = runtime.execute(code)
 
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start - param1 - param2)
