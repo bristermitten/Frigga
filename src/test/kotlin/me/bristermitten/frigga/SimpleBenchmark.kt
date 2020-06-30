@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test
 class SimpleBenchmark : FriggaTest() {
 
     @Test
-    fun `Perform 1_000 tests and get average parse time`() {
+    fun `Perform 1_000_0 tests and get average parse time`() {
         val code = """
             x = 3
             x
         """.trimIndent()
 
-        val times = 1_000
+        val times = 1_000_0
         var totalParseTime = 0.0
         var totalExecutionTime = 0.0
 
