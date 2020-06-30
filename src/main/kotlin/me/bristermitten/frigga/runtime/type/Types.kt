@@ -94,17 +94,9 @@ object CharType : Type(
     "CharType",
     AnyType
 )
-//
-//object AnyType : Type("Any", null) {
-//    override fun accepts(other: Type) = true
-//}
-//
 
-//
-internal class SimpleType(name: String) : Type(name)
+private class SimpleType(name: String) : Type(name)
 
-//
-//
 object OutputType : Type("Output") {
     init {
         defineFunction {
@@ -119,7 +111,7 @@ object OutputType : Type("Output") {
     }
 }
 
-//
+
 private val types = mutableMapOf<String, Type>()
 
 fun loadTypes() {
