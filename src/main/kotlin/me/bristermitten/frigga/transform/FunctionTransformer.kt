@@ -1,13 +1,12 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser.*
-import getType
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandValue
 import me.bristermitten.frigga.runtime.data.CommandNode
+import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.data.function.Signature
-import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.type.FunctionType
 
 object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
@@ -25,11 +24,9 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
             this.generic() //TODO
             val signature = this.functionSignature()
             val params = signature.functionParams().functionParam().map {
-                it.ID().text to getType(
-                    it.typeSpec().type().text
-                )
+                it.ID().text to it.typeSpec().type().toType()
             }.toMap()
-            val returnType = getType(signature.type().text)
+            val returnType = signature.type().toType()
 
             val functionSignature = Signature(
                 emptyMap(),

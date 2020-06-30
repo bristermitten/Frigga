@@ -24,6 +24,7 @@ USE: 'use';
 NAMESPACE: 'namespace';
 TRAIT: 'trait';
 STRUCT: 'struct';
+NATIVE: 'native';
 
 
 //Operators

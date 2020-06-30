@@ -1,0 +1,11 @@
+namespace "std"
+
+if = (condition::Bool, run::() -> _ ) -> _ {
+    __logic.runIf(condition, run)
+}
+
+struct Logic {
+    runIf::(Bool, () -> _) -> _
+}
+
+native __logic::Logic

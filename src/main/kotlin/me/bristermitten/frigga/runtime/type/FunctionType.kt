@@ -11,7 +11,10 @@ data class FunctionType(
         if (other is FunctionType) {
             return signature.matches(other.signature)
         }
+
         return super.accepts(other)
     }
+
+    override fun toString() = name
 
 }

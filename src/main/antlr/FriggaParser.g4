@@ -34,6 +34,7 @@ expression:
          | ID #propertyReference
          | structureDef #structureDefinition
          | inverse #booleanNot
+         | fullDeclaration #declarationExpression
 
         ;
 
@@ -43,7 +44,8 @@ propertyModifier:
      MUTABLE
    | STATEFUL
    | SECRET
-   | STATIC;
+   | STATIC
+   | NATIVE;
 
 fullDeclaration: propertyModifier* ID typeSpec;
 declaration: propertyModifier* ID typeSpec?;

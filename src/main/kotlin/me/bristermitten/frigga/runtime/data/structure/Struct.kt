@@ -31,6 +31,8 @@ class Struct(
             }
         }
 
+        println(name)
+        println(elements)
         elements.forEach(this::defineProperty)
     }
 }

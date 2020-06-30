@@ -87,6 +87,7 @@ object CallerType : Type("__Caller") {
 
 
 object NothingType : Type("Nothing", null) {
+    val INSTANCE = Unit
     override fun isSubtypeOf(other: Type): Boolean {
         return true
     }

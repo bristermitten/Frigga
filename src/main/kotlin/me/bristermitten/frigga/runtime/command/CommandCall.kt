@@ -38,7 +38,7 @@ data class CommandCall(
         }
 
         requireNotNull(function) {
-            "No such function $uponType#$calling($paramTypes)"
+            "No such function $uponType#$calling(${paramTypes.joinToString(prefix = "", postfix = "")})"
         }
 
         if (callingUpon != null) {

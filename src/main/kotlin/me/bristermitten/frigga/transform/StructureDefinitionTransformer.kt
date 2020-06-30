@@ -7,6 +7,7 @@ import me.bristermitten.frigga.runtime.data.PropertyDeclaration
 import me.bristermitten.frigga.runtime.data.structure.Struct
 import me.bristermitten.frigga.runtime.data.structure.Trait
 import me.bristermitten.frigga.runtime.type.TypeProperty
+import me.bristermitten.frigga.transform.AssignmentTransformer.toModifier
 
 object StructureDefinitionTransformer : NodeTransformer<FriggaParser.StructureDefContext>() {
 
@@ -19,10 +20,12 @@ object StructureDefinitionTransformer : NodeTransformer<FriggaParser.StructureDe
                         emptyList(),
                         node.traitDef().structureBody().structureLine()
                             .filterIsInstance<FriggaParser.DeclarationLineContext>()
-                            .map {
+                            .map { line ->
+                                val fullDeclaration = line.fullDeclaration()
                                 PropertyDeclaration(
-                                    it.fullDeclaration().ID().text,
-                                    it.fullDeclaration().typeSpec().type().toType()
+                                    fullDeclaration.propertyModifier().map { it.toModifier() }.toSet(),
+                                    fullDeclaration.ID().text,
+                                    fullDeclaration.typeSpec().type().toType()
                                 )
                             })
                 }

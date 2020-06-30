@@ -92,6 +92,7 @@ fun loadTypes() {
     DecType.load()
     StringType.load()
     CharType.load()
+    BoolType.load()
     AnyType.load()
     NothingType.load()
     CallerType.load()

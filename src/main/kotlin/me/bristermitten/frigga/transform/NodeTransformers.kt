@@ -38,7 +38,9 @@ object NodeTransformers {
 
         ReferencedCallExpressionContext::class.java to ReferencedCallTransformer,
 
-        BooleanNotContext::class.java to BooleanNotTransformer
+        BooleanNotContext::class.java to BooleanNotTransformer,
+
+        DeclarationExpressionContext::class.java to DeclarationTransformer
     )
 
     private fun <T : ParserRuleContext> transformerFor(node: T): NodeTransformer<T> {

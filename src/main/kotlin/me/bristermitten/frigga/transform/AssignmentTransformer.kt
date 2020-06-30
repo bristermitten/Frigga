@@ -12,10 +12,7 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpression
             val declaration = this.declaration()
             val modifiers = declaration.propertyModifier()
                 .mapNotNull {
-                    val mutable = it.MUTABLE()
-                    mutable?.let {
-                        Modifier.MUTABLE
-                    }
+                    it.toModifier()
                 }.toSet()
 
 
@@ -27,5 +24,16 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpression
 
             return CommandAssignment(name, modifiers, value)
         }
+    }
+
+    fun FriggaParser.PropertyModifierContext.toModifier(): Modifier {
+        if (MUTABLE() != null) {
+            return Modifier.MUTABLE
+        }
+        if (NATIVE() != null) {
+            return Modifier.NATIVE
+        }
+
+        throw UnsupportedOperationException("No such modifier $text")
     }
 }

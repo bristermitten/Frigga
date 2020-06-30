@@ -7,6 +7,7 @@ import me.bristermitten.frigga.runtime.data.*
 import me.bristermitten.frigga.runtime.data.function.Signature
 import me.bristermitten.frigga.runtime.type.FunctionType
 import me.bristermitten.frigga.runtime.type.NothingType
+import me.bristermitten.frigga.runtime.type.TupleType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.transform.NodeTransformers.transform
 
@@ -44,6 +45,7 @@ fun UseContext.transform(): Namespace {
 fun FriggaParser.TypeContext.toType(): Type {
     val simpleType = ID()
     if (simpleType != null) {
+        println("Simple Type: ${simpleType.text}")
         return getType(simpleType.text)
     }
 
@@ -65,5 +67,13 @@ fun FriggaParser.TypeContext.toType(): Type {
             )
         )
     }
-    throw UnsupportedOperationException(javaClass.name)
+    val tupleType = this.tuple()
+    if (tupleType != null) {
+        val tupleTypes = tupleType.tupleParam().map {
+            it.ID().text to it.typeSpec().type().toType()
+        }.toMap()
+
+        return TupleType(tupleTypes)
+    }
+    throw UnsupportedOperationException(javaClass.name + " " + text)
 }
