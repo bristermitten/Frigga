@@ -15,22 +15,22 @@ class CharLiteralTests : FriggaTest() {
             char
         """.trimIndent()
 
-        val result = runtime.execute(code, "strings")
+        val result = runtime.execute(code, "chars")
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe charValue('A')
     }
 
     @Test
-    fun `Assert Correct Functionality of String Concatenation`() {
+    fun `Assert Correct Functionality of Char Literal Concatenation`() {
         val code = """
-            string = "Hello"
-            string + " World"
+            someChar = 'A'
+            someChar + 'B'
         """.trimIndent()
 
-        val result = runtime.execute(code, "strings")
+        val result = runtime.execute(code, "chars")
         handleExceptions(result)
 
-        result.leftoverStack.first() shouldBe stringValue("Hello World")
+        result.leftoverStack.first() shouldBe stringValue("AB")
     }
 }
