@@ -1,5 +1,7 @@
+import me.bristermitten.frigga.runtime.command.OPERATOR_ADD_NAME
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
+import me.bristermitten.frigga.runtime.data.stringValue
 import me.bristermitten.frigga.runtime.type.*
 
 //package me.bristermitten.frigga.runtime.type
@@ -71,7 +73,22 @@ import me.bristermitten.frigga.runtime.type.*
 object StringType : Type(
     "String",
     AnyType
-)
+) {
+    init {
+        defineFunction {
+            name = OPERATOR_ADD_NAME
+            signature {
+                input = mapOf("value" to AnyType)
+                output = IntType
+            }
+            body { stack, context ->
+                val thisValue = stack.pull()
+                val addTo = context.findProperty("value")!!.value
+                stack.push(stringValue((thisValue.value as String) + addTo.value))
+            }
+        }
+    }
+}
 
 object CharType : Type(
     "CharType",
