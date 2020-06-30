@@ -31,6 +31,7 @@ infix fun Type.relationshipTo(other: Type): TypeRelationship {
     if (isSubtype) {
         return TypeRelationship.Subtype
     }
+
     val isSupertype = other.isSubtypeOf(this)
     if (isSupertype) {
         return TypeRelationship.Supertype

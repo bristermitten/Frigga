@@ -12,7 +12,7 @@ object NumType : Type(
     "Num"
 )
 
-object IntType : Type("Int") {
+object IntType : Type("Int", NumType) {
 
     init {
         fun defineIntAndDecMathFunctions(
