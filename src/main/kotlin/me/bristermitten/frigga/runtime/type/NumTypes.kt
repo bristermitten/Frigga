@@ -88,6 +88,7 @@ object IntType : Type("Int", NumType) {
         ) { a, b -> a.toDouble().pow(b) }
 
         defineIntAndDecMathLogicFunctions(OPERATOR_GREATER_NAME, { a, b -> a > b }, { a, b -> a > b })
+        defineIntAndDecMathLogicFunctions(OPERATOR_GREATER_OR_EQUAL_NAME, { a, b -> a >= b }, { a, b -> a >= b })
     }
 
     override fun coerceValueTo(value: Value, other: Type): Value {
@@ -150,6 +151,7 @@ object DecType : Type(
         defineMathFunction(OPERATOR_EXPONENT_NAME, Double::pow)
 
         defineLogicalMathFunction(OPERATOR_GREATER_NAME) { a, b -> a > b }
+        defineLogicalMathFunction(OPERATOR_GREATER_OR_EQUAL_NAME) { a, b -> a >= b }
     }
 
     override fun accepts(other: Type): Boolean {
