@@ -42,9 +42,7 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
             }
     }
 
-//    override fun accepts(other: Type): Boolean {
-//        return true //JVM type will accept any value, actual validation is done by the JVM via reflection
-//    }
+
 }
 
 object CallerType : Type("__Caller") {
