@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 class SimpleBenchmark : FriggaTest() {
 
-//    @Test
+    @Test
     fun `Perform 1_000 tests and get average parse time`() {
         val code = """
             x = 3
