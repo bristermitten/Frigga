@@ -14,6 +14,10 @@ class StructTests : FriggaTest() {
     @Test
     fun `Test Basic Struct Property Access Functionality`() {
         val code = """
+        struct User {
+            name::String
+            mutable age::Int
+        }
         type = User("Alex", 16)
         type.name
         """.trimIndent()
@@ -77,6 +81,7 @@ class StructTests : FriggaTest() {
 
         result.leftoverStack.first() shouldBe intValue(3)
     }
+
     @Test
     fun `Test Struct Function Functionality of a Function using a property`() {
         val code = """
