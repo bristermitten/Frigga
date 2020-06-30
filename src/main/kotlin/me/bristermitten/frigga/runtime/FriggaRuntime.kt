@@ -77,7 +77,8 @@ class FriggaRuntime {
     }
 
     fun reset() {
-        globalContext.reset()
+        namespaces.values.filter { it.name != STD_NAMESPACE }
+            .forEach(FriggaContext::reset)
     }
 
     private fun getNamespace(namespace: String) = namespaces.getOrPut(namespace) { FriggaContext(namespace) }

@@ -6,6 +6,7 @@ const val STACK_NAME = "__stack"
 const val CALLER_NAME = "__caller"
 const val UPON_NAME = "__upon"
 const val CONSTRUCTOR = "constructor"
+const val STD_NAMESPACE = "std"
 
 val reservedNames = setOf(
     STDOUT_NAME,
