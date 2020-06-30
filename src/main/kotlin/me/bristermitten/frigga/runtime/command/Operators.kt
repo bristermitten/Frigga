@@ -16,6 +16,9 @@ const val OPERATOR_DIVIDE = "/"
 const val OPERATOR_EXPONENT_NAME = "exp"
 const val OPERATOR_EXPONENT = "^"
 
+const val OPERATOR_NOT_NAME = "not"
+const val OPERATOR_NOT = "!"
+
 
 fun operatorFromSymbol(symbol: String): String? {
     return when (symbol) {

@@ -36,7 +36,9 @@ object NodeTransformers {
 
         LambdaExpressionContext::class.java to LambdaTransformer,
 
-        ReferencedCallExpressionContext::class.java to ReferencedCallTransformer
+        ReferencedCallExpressionContext::class.java to ReferencedCallTransformer,
+
+        BooleanNotContext::class.java to BooleanNotTransformer
     )
 
     private fun <T : ParserRuleContext> transformerFor(node: T): NodeTransformer<T> {

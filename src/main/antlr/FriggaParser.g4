@@ -34,6 +34,7 @@ expression:
          | parenthesizedExpression #parenthesisExpression
          | ID #propertyReference
          | structureDef #structureDefinition
+         | inverse #booleanNot
 
         ;
 
@@ -110,4 +111,7 @@ literal:
     | STRING #stringLiteral
     | CHAR #charLiteral
     | LPAREN (expression COMMA expression)+ RPAREN #tupleLiteral;
+
+
+inverse: INVERSE expression; //!hello == 3
 

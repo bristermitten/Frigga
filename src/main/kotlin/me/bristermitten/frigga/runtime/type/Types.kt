@@ -1,4 +1,7 @@
+import me.bristermitten.frigga.runtime.UPON_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_ADD_NAME
+import me.bristermitten.frigga.runtime.command.OPERATOR_NOT_NAME
+import me.bristermitten.frigga.runtime.data.boolValue
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
 import me.bristermitten.frigga.runtime.data.stringValue
@@ -26,8 +29,7 @@ object StringType : Type(
 }
 
 object CharType : Type(
-    "CharType",
-    AnyType
+    "Char"
 ) {
     init {
         defineFunction {
@@ -40,6 +42,25 @@ object CharType : Type(
                 val thisValue = stack.pull()
                 val addTo = context.findProperty("value")!!.value
                 stack.push(stringValue((thisValue.value as Char).toString() + addTo.value))
+            }
+        }
+    }
+}
+
+object BoolType : Type(
+    "Bool"
+) {
+    init {
+        defineFunction {
+            name = OPERATOR_NOT_NAME
+            signature {
+                output = BoolType
+            }
+            body { stack, friggaContext ->
+                val upon = friggaContext.findProperty(UPON_NAME)!!.value
+                val value = upon.value as Boolean
+
+                stack.push(boolValue(value.not()))
             }
         }
     }

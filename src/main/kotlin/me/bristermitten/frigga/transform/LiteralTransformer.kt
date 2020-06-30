@@ -3,10 +3,7 @@ package me.bristermitten.frigga.transform
 import FriggaParser.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandValue
-import me.bristermitten.frigga.runtime.data.charValue
-import me.bristermitten.frigga.runtime.data.decValue
-import me.bristermitten.frigga.runtime.data.intValue
-import me.bristermitten.frigga.runtime.data.stringValue
+import me.bristermitten.frigga.runtime.data.*
 
 object LiteralTransformer : NodeTransformer<LiteralContext>() {
 
@@ -25,6 +22,9 @@ object LiteralTransformer : NodeTransformer<LiteralContext>() {
                     }
                     is CharLiteralContext -> {
                         charValue(this.CHAR().text[1])
+                    }
+                    is BoolLiteralContext -> {
+                        boolValue(this.BOOL().text!!.toBoolean())
                     }
                     else -> throw IllegalArgumentException("Unknown Literal Type $javaClass")
                 }
