@@ -24,7 +24,7 @@ object LiteralTransformer : NodeTransformer<LiteralContext>() {
                         stringValue(this.STRING().text.removeSurrounding("\""))
                     }
                     is CharLiteralContext -> {
-                        charValue(this.CHAR().text.first())
+                        charValue(this.CHAR().text[1])
                     }
                     else -> throw IllegalArgumentException("Unknown Literal Type $javaClass")
                 }
