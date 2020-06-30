@@ -34,4 +34,16 @@ class BoolLiteralTests : FriggaTest() {
 
         result.leftoverStack.first() shouldBe boolValue(true)
     }
+    @Test
+    fun `Assert Correct Functionality of Repeated Negation`() {
+        val code = """
+            bool = false
+            !!!!!!!!!!!!!!!!!!!!!bool
+        """.trimIndent()
+
+        val result = runtime.execute(code)
+        handleExceptions(result)
+
+        result.leftoverStack.first() shouldBe boolValue(true)
+    }
 }
