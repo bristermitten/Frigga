@@ -13,23 +13,6 @@ object NumType : Type(
 )
 
 object IntType : Type("Int") {
-//    override fun union(other: Type): Type {
-//        return when (other) {
-//            is DecType -> DecType
-//            is IntType -> IntType
-//            else -> super.union(other)
-//        }
-//    }
-//
-//    override fun coerceValueTo(value: Value, other: Type): Value {
-//        return when (other) {
-//            is DecType -> Value(
-//                other,
-//                (value.value as Long).toDouble()
-//            )
-//            else -> super.coerceValueTo(value, other)
-//        }
-//    }
 
     init {
         fun defineIntAndDecMathFunctions(
