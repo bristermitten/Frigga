@@ -1,3 +1,5 @@
+namespace "std"
+
 struct Stack {
     push::(Any) -> _
     pull::() -> Any

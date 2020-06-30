@@ -1,3 +1,4 @@
+namespace "std"
 ##
   Yielding is the process of returning a value from a function
   This is done by pushing a value onto the stack, which is exposed via the property `__stack`

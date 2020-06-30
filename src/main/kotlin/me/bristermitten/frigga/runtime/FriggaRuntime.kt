@@ -78,7 +78,6 @@ class FriggaRuntime {
 
     fun reset() {
         globalContext.reset()
-        loadStdLib() //TODO maybe don't remove the whole stdlib?
     }
 
     private fun getNamespace(namespace: String) = namespaces.getOrPut(namespace) { FriggaContext(namespace) }

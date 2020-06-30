@@ -105,10 +105,10 @@ class FriggaContext(val name: String) {
         }
 
         //Constructors
-        val type = findType(name)
+        val constructorType = findType(name)
 
-        return if (type != null) {
-            findFunction(type, CONSTRUCTOR, parameterTypes)
+        return if (constructorType != null) {
+            findFunction(constructorType, CONSTRUCTOR, parameterTypes)
         } else {
             using.asSequence().mapNotNull {
                 it.findFunction(type, name, parameterTypes)
@@ -153,10 +153,11 @@ class FriggaContext(val name: String) {
         stack.clear()
 
         scope.forEach {
-//            it.functions.clear()
+            it.functions.clear()
             it.properties.clear()
             it.types.clear()
         }
+
         scope.clear()
         globalScope = loadGlobalScope()
         scope += globalScope
@@ -165,7 +166,6 @@ class FriggaContext(val name: String) {
     fun defineType(type: Type) {
         scope[0].types[type.name] = type
     }
-
 
     fun use(namespace: FriggaContext) {
         using += namespace
