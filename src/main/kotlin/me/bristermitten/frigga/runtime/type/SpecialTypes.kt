@@ -1,8 +1,11 @@
 package me.bristermitten.frigga.runtime.type
 
+import BoolType
 import getJVMType
 import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.command.OPERATOR_EQUAL_NAME
 import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.boolValue
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
 import me.bristermitten.frigga.runtime.error.BreakException
@@ -13,6 +16,23 @@ object AnyType : Type(
 ) {
     override fun accepts(other: Type): Boolean {
         return true
+    }
+
+    init {
+        defineFunction {
+            name = OPERATOR_EQUAL_NAME
+            signature {
+                input = mapOf("compareWith" to AnyType)
+                output = BoolType
+            }
+            body { stack, friggaContext ->
+                val compareWith = friggaContext.findProperty("compareWith")!!
+                val upon = friggaContext.findProperty(UPON_NAME)!!
+                val equals = upon.value == compareWith.value
+
+                stack.push(boolValue(equals))
+            }
+        }
     }
 }
 

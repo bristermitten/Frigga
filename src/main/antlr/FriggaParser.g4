@@ -23,11 +23,10 @@ line: expression NEWLINE*?;
 expression:
            assignment #assignmentExpression
          |  literal #literalExpression
-//         | left=expression infixFunction=(EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN ) right=expression #binaryLogicalOperator
          | function #functionExpression
          | lambda #lambdaExpression
          | expression call #callExpression //something()
-         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER) right=expression #binaryOperatorExpression
+         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN) right=expression #binaryOperatorExpression
          | left=expression WHITESPACE infixFunction=ID WHITESPACE right=expression #infixFunction
          | expression referencedCall #referencedCallExpression
          | expression DOT ID #accessExpression //something.property

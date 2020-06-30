@@ -20,7 +20,7 @@ object StringType : Type(
                 output = StringType
             }
             body { stack, context ->
-                val thisValue = stack.pull()
+                val thisValue = context.findProperty(UPON_NAME)!!.value
                 val addTo = context.findProperty("value")!!.value
                 stack.push(stringValue((thisValue.value as String) + addTo.value))
             }
@@ -39,7 +39,7 @@ object CharType : Type(
                 output = StringType
             }
             body { stack, context ->
-                val thisValue = stack.pull()
+                val thisValue = context.findProperty(UPON_NAME)!!.value
                 val addTo = context.findProperty("value")!!.value
                 stack.push(stringValue((thisValue.value as Char).toString() + addTo.value))
             }

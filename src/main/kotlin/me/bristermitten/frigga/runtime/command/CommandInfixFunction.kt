@@ -2,6 +2,7 @@ package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
+import me.bristermitten.frigga.runtime.UPON_NAME
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.type.TypeInstance
 
@@ -27,14 +28,15 @@ class CommandInfixFunction(
         }
 
         requireNotNull(functionName) {
-            "No such function $function"
+            "No such function ${leftValue.type}#$function"
         }
 
-        stack.push(leftValue)
+        context.defineProperty(UPON_NAME, leftValue, true)
 
         functionName.call(stack, context, listOf(rightValue))
 
         val result = stack.pull()
+
         stack.push(result)
     }
 

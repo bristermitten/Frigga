@@ -25,7 +25,7 @@ abstract class Type(
     }
 
     fun getFunctions(name: String): List<TypeProperty> {
-        return properties[name].filter { it.type is FunctionType }
+        return properties[name].filter { it.type is FunctionType } + (parent?.getFunctions(name) ?: emptyList())
     }
 
     fun getFunction(name: String, params: List<Type>): TypeProperty? {

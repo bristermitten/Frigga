@@ -19,6 +19,9 @@ const val OPERATOR_EXPONENT = "^"
 const val OPERATOR_NOT_NAME = "not"
 const val OPERATOR_NOT = "!"
 
+const val OPERATOR_EQUAL_NAME = "equals"
+const val OPERATOR_EQUAL = "=="
+
 
 fun operatorFromSymbol(symbol: String): String? {
     return when (symbol) {
@@ -27,6 +30,7 @@ fun operatorFromSymbol(symbol: String): String? {
         OPERATOR_TIMES -> OPERATOR_TIMES_NAME
         OPERATOR_DIVIDE -> OPERATOR_DIVIDE_NAME
         OPERATOR_EXPONENT -> OPERATOR_EXPONENT_NAME
+        OPERATOR_EQUAL -> OPERATOR_EQUAL_NAME
         else -> null
     }
 }

@@ -1,5 +1,6 @@
 package me.bristermitten.frigga.runtime.type
 
+import me.bristermitten.frigga.runtime.UPON_NAME
 import me.bristermitten.frigga.runtime.command.*
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.decValue
@@ -27,9 +28,9 @@ object IntType : Type("Int", NumType) {
                     output = IntType
                 }
                 body { stack, context ->
-                    val thisValue = stack.pull()
-                    val addTo = context.findProperty("value")!!.value
-                    stack.push(intValue(intOperator(thisValue.value as Long, addTo.value as Long)))
+                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val other = context.findProperty("value")!!.value
+                    stack.push(intValue(intOperator(thisValue.value as Long, other.value as Long)))
                 }
             }
             defineFunction {
@@ -40,8 +41,8 @@ object IntType : Type("Int", NumType) {
                 }
                 body { stack, context ->
                     val thisValue = stack.pull()
-                    val addTo = context.findProperty("value")!!.value
-                    stack.push(decValue(decOperator(thisValue.value as Long, addTo.value as Double)))
+                    val other = context.findProperty("value")!!.value
+                    stack.push(decValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
             }
         }
@@ -81,10 +82,10 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = stack.pull()
-                    val addTo = context.findProperty("value")!!.value
-                    val addToAsDec = addTo.type.coerceTo(addTo, DecType)
-                    stack.push(decValue(decOperator(thisValue.value as Double, addToAsDec.value as Double)))
+                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val other = context.findProperty("value")!!.value
+                    val otherCoerced = other.type.coerceTo(other, DecType)
+                    stack.push(decValue(decOperator(thisValue.value as Double, otherCoerced.value as Double)))
                 }
             }
         }
