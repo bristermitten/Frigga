@@ -1,6 +1,6 @@
 lexer grammar FriggaLexer;
 
-WHITESPACE: [ \t\r\n] -> skip;
+WHITESPACE: [ \t\r\n]+ -> skip;
 NEWLINE: ('\r'? '\n' | '\r') ;
 
 //Numbers
