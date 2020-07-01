@@ -4,7 +4,7 @@ package me.bristermitten.frigga.runtime.command
 const val OPERATOR_ADD_NAME = "add"
 const val OPERATOR_ADD = "+"
 
-const val OPERATOR_TAKE_NAME = "take"
+const val OPERATOR_TAKE_NAME = "subtract"
 const val OPERATOR_TAKE = "-"
 
 const val OPERATOR_TIMES_NAME = "times"

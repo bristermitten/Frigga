@@ -12,7 +12,7 @@ import me.bristermitten.frigga.runtime.error.BreakException
 import java.lang.reflect.Modifier
 
 object AnyType : Type(
-    "Any"
+    "Any", null
 ) {
     override fun accepts(other: Type): Boolean {
         return true

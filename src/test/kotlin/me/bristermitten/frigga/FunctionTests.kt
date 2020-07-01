@@ -51,6 +51,7 @@ class FunctionTests : FriggaTest() {
         handleExceptions(result)
         result.leftoverStack shouldContain intValue(3)
     }
+
     @Test
     fun `Test correct handling of a nested call`() {
         val code = """
@@ -88,5 +89,24 @@ class FunctionTests : FriggaTest() {
         System.setOut(originalOut)
 
         out.size() shouldBe 0
+    }
+
+    @ExperimentalStdlibApi
+    @Test
+    fun `Test Referenced Call correctly functioning`() {
+        val code = """
+            printHello = println["Hello"]
+            printHello()
+        """.trimIndent()
+
+        val originalOut = System.out
+        val out = ByteArrayOutputStream()
+        System.setOut(PrintStream(out))
+
+        val result = runtime.execute(code)
+        handleExceptions(result)
+        System.setOut(originalOut)
+
+        out.toString() shouldBe "Hello" + System.lineSeparator()
     }
 }

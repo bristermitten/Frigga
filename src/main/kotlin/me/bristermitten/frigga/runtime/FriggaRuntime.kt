@@ -49,22 +49,20 @@ class FriggaRuntime {
             emptyMap(),
             mapOf(
                 "test" to BoolType,
-                "run" to FunctionType(Signature(emptyMap(), emptyMap(), AnyType))
+                "run" to FunctionType(Signature(emptyMap(), emptyMap(), NothingType))
             ),
             NothingType
         )
         val instance = TypeInstance(
             type, mapOf(
                 type.getFunctions("runIf").first() to Value(
-                    FunctionType(
-                        runIfSignature
-                    ),
+                    FunctionType(runIfSignature),
                     Function("runIf", runIfSignature, listOf(
                         singleCommand { stack, friggaContext ->
                             val condition = friggaContext.findProperty("test")!!.value
+                            val run = friggaContext.findProperty("run")!!.value
                             require(condition.type is BoolType)
                             if (condition.value as Boolean) {
-                                val run = friggaContext.findProperty("run")!!.value
                                 (run.value as Function).call(stack, friggaContext, emptyList())
                             }
                         }
