@@ -1,6 +1,5 @@
 package me.bristermitten.frigga.struct
 
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import me.bristermitten.frigga.FriggaTest
 import me.bristermitten.frigga.runtime.data.intValue
@@ -38,9 +37,16 @@ class StructTests : FriggaTest() {
         type.someFunction()
         """.trimIndent()
 
+        val originalOut = System.out
+        val out = ByteArrayOutputStream()
+        System.setOut(PrintStream(out))
+
         val result = runtime.execute(code)
         handleExceptions(result)
-        result.leftoverStack.shouldBeEmpty()
+
+        System.setOut(originalOut)
+
+        out.toString() shouldBe "Hi" + System.lineSeparator()
     }
 
     @Test
@@ -62,7 +68,7 @@ class StructTests : FriggaTest() {
         handleExceptions(result)
         System.setOut(originalOut)
 
-        out.toString() shouldBe "Test2\n"
+        out.toString() shouldBe "Test2" + System.lineSeparator()
     }
 
     @Test

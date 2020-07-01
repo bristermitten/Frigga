@@ -2,6 +2,7 @@ package me.bristermitten.frigga.runtime.type
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
@@ -95,6 +96,9 @@ abstract class Type(
     override fun hashCode(): Int {
         return name.hashCode()
     }
+
+    open fun reestablish(context: FriggaContext): Type = this
+
 //
 //    override fun toString(): String {
 //        return name

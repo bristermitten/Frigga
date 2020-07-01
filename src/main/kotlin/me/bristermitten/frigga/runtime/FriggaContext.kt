@@ -1,13 +1,14 @@
 package me.bristermitten.frigga.runtime
 
+import BoolType
 import OutputType
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
-import me.bristermitten.frigga.runtime.type.CallerType
-import me.bristermitten.frigga.runtime.type.StackType
-import me.bristermitten.frigga.runtime.type.Type
-import me.bristermitten.frigga.runtime.type.TypeInstance
+import me.bristermitten.frigga.runtime.data.function.Signature
+import me.bristermitten.frigga.runtime.data.function.singleCommand
+import me.bristermitten.frigga.runtime.data.structure.Struct
+import me.bristermitten.frigga.runtime.type.*
 
 class FriggaContext(val name: String) {
     val stack = Stack()

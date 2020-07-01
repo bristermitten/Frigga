@@ -1,12 +1,22 @@
 package me.bristermitten.frigga.runtime
 
+import BoolType
 import FriggaLexer
 import FriggaParser
 import getJVMType
 import loadTypes
 import me.bristermitten.frigga.runtime.data.FriggaFile
 import me.bristermitten.frigga.runtime.data.JVMNamespace
+import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.function.Function
+import me.bristermitten.frigga.runtime.data.function.Signature
+import me.bristermitten.frigga.runtime.data.function.singleCommand
+import me.bristermitten.frigga.runtime.data.structure.Struct
 import me.bristermitten.frigga.runtime.error.ExecutionException
+import me.bristermitten.frigga.runtime.type.AnyType
+import me.bristermitten.frigga.runtime.type.FunctionType
+import me.bristermitten.frigga.runtime.type.NothingType
+import me.bristermitten.frigga.runtime.type.TypeInstance
 import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -32,6 +42,36 @@ class FriggaRuntime {
         File(resource.toURI()).listFiles()?.forEach {
             execute(it.readText())
         }
+
+        val logicProperty = namespaces[STD_NAMESPACE]!!.findProperty(LOGIC_NAME)!!
+        val type = logicProperty.value.type as Struct
+        val runIfSignature = Signature(
+            emptyMap(),
+            mapOf(
+                "test" to BoolType,
+                "run" to FunctionType(Signature(emptyMap(), emptyMap(), AnyType))
+            ),
+            NothingType
+        )
+        val instance = TypeInstance(
+            type, mapOf(
+                type.getFunctions("runIf").first() to Value(
+                    FunctionType(
+                        runIfSignature
+                    ),
+                    Function("runIf", runIfSignature, listOf(
+                        singleCommand { stack, friggaContext ->
+                            val condition = friggaContext.findProperty("test")!!.value
+                            require(condition.type is BoolType)
+                            if (condition.value as Boolean) {
+                                val run = friggaContext.findProperty("run")!!.value
+                                (run.value as Function).call(stack, friggaContext, emptyList())
+                            }
+                        }
+                    ))
+                )
+            ))
+        logicProperty.value = Value(type, instance)
     }
 
     @OptIn(ExperimentalTime::class)

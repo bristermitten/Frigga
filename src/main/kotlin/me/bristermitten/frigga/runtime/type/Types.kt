@@ -1,3 +1,4 @@
+import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.UPON_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_ADD_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_NOT_NAME
@@ -66,7 +67,11 @@ object BoolType : Type(
     }
 }
 
-private class SimpleType(name: String) : Type(name)
+private class SimpleType(name: String) : Type(name) {
+    override fun reestablish(context: FriggaContext): Type {
+        return context.findType(name) ?: this
+    }
+}
 
 object OutputType : Type("Output") {
     init {

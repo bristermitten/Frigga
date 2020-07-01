@@ -45,7 +45,6 @@ fun UseContext.transform(): Namespace {
 fun FriggaParser.TypeContext.toType(): Type {
     val simpleType = ID()
     if (simpleType != null) {
-        println("Simple Type: ${simpleType.text}")
         return getType(simpleType.text)
     }
 

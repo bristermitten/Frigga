@@ -14,8 +14,9 @@ data class CommandBooleanNot(
 
         val toInvert = stack.pull()
 
-        val notFunction = if (toInvert.value is TypeInstance) {
-            context.findTypeFunction(toInvert.type, toInvert.value, OPERATOR_NOT_NAME, emptyList())
+        val value = toInvert.value
+        val notFunction = if (value is TypeInstance) {
+            context.findTypeFunction(toInvert.type, value, OPERATOR_NOT_NAME, emptyList())
         } else {
             context.findFunction(toInvert.type, OPERATOR_NOT_NAME, emptyList())
         }

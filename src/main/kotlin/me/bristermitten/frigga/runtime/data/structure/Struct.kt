@@ -1,9 +1,11 @@
 package me.bristermitten.frigga.runtime.data.structure
 
 import me.bristermitten.frigga.runtime.CONSTRUCTOR
+import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
+import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
 import me.bristermitten.frigga.runtime.type.TypeProperty
 
@@ -31,8 +33,7 @@ class Struct(
             }
         }
 
-        println(name)
-        println(elements)
         elements.forEach(this::defineProperty)
     }
+
 }
