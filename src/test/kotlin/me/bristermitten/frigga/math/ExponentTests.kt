@@ -29,12 +29,13 @@ class ExponentTests : FriggaTest() {
     fun `Assert More Complex Integer Exponentiation Functioning Correctly`() {
         val code = """
             x = 3
-            x ^ x ^ 5 ^ (x ^ 1)
+            
+            (x ^ x) ^ 5
         """.trimIndent()
         val result = runtime.execute(code)
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(3.0.pow(3.0).pow(5.0).pow(4.0).roundToLong())
+        result.leftoverStack.first() shouldBe intValue(3.0.pow(3.0).pow(5.0).roundToLong())
     }
 
 

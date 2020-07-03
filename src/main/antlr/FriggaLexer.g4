@@ -1,7 +1,7 @@
 lexer grammar FriggaLexer;
 
-WHITESPACE: [ \t\r\n]+ -> skip;
-NEWLINE: ('\r'? '\n' | '\r') ;
+WHITESPACE: ([ ] | NEWLINE)+ -> skip;
+NEWLINE: ('\r'? '\n' | '\r') +;
 
 //Numbers
 fragment DIGIT: '0'..'9';

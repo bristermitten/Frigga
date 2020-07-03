@@ -1,14 +1,13 @@
 package me.bristermitten.frigga.runtime
 
-import BoolType
 import OutputType
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
-import me.bristermitten.frigga.runtime.data.function.Signature
-import me.bristermitten.frigga.runtime.data.function.singleCommand
-import me.bristermitten.frigga.runtime.data.structure.Struct
-import me.bristermitten.frigga.runtime.type.*
+import me.bristermitten.frigga.runtime.type.CallerType
+import me.bristermitten.frigga.runtime.type.StackType
+import me.bristermitten.frigga.runtime.type.Type
+import me.bristermitten.frigga.runtime.type.TypeInstance
 
 class FriggaContext(val name: String) {
     val stack = Stack()
@@ -53,13 +52,7 @@ class FriggaContext(val name: String) {
     }
 
     internal fun findProperty(name: String): Property? {
-        for (scope in scope) {
-            val property = scope.properties[name]
-            if (property != null) {
-                return property
-            }
-        }
-        return using.asSequence().mapNotNull { it.findProperty(name) }.firstOrNull()
+        return findPropertyScope(name)?.second
     }
 
     internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>? {
@@ -69,7 +62,13 @@ class FriggaContext(val name: String) {
                 return scope to property
             }
         }
-        return using.asSequence().mapNotNull { it.findPropertyScope(name) }.firstOrNull()
+        for (other in using) {
+            val property = other.findPropertyScope(name)
+            if (property != null) {
+                return property
+            }
+        }
+        return null
     }
 
     internal fun findType(name: String): Type? {
@@ -79,16 +78,29 @@ class FriggaContext(val name: String) {
                 return type
             }
         }
-        return using.asSequence().mapNotNull { it.findType(name) }.firstOrNull()
+
+        for (other in using) {
+            val type = other.findType(name)
+            if (type != null) {
+                return type
+            }
+        }
+        return null
     }
 
     fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function? {
         val function = type.getFunction(name, parameterTypes) ?: return null
-        return value.properties[function]?.value as Function? ?: using.asSequence().mapNotNull {
-            it.findTypeFunction(
-                type, value, name, parameterTypes
-            )
-        }.firstOrNull()
+        var functionValue = value.properties[function]?.value as Function?
+        if (functionValue != null) {
+            return functionValue
+        }
+        for (other in using) {
+            functionValue = other.findTypeFunction(type, value, name, parameterTypes)
+            if (functionValue != null) {
+                return functionValue
+            }
+        }
+        return null
     }
 
     internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function? {
@@ -99,7 +111,7 @@ class FriggaContext(val name: String) {
         }
 
         for (scope in scope) {
-            val function = scope.functions[name]
+            val function = scope.properties[name]?.value?.value as? Function?
             if (function != null) {
                 return function
             }
@@ -108,13 +120,16 @@ class FriggaContext(val name: String) {
         //Constructors
         val constructorType = findType(name)
 
-        return if (constructorType != null) {
-            findFunction(constructorType, CONSTRUCTOR, parameterTypes)
-        } else {
-            using.asSequence().mapNotNull {
-                it.findFunction(type, name, parameterTypes)
-            }.firstOrNull()
+        if (constructorType != null) {
+            return findFunction(constructorType, CONSTRUCTOR, parameterTypes)
         }
+        for (other in using) {
+            val function = other.findFunction(type, name, parameterTypes)
+            if (function != null) {
+                return function
+            }
+        }
+        return null
     }
 
     internal fun defineProperty(property: Property, force: Boolean = false) {
@@ -122,10 +137,6 @@ class FriggaContext(val name: String) {
             throw IllegalArgumentException("Cannot define property with reserved name ${property.name}")
         }
         scope[0].properties[property.name] = property
-        val value = property.value.value
-        if (value is Function) {
-            scope[0].functions[property.name] = value
-        }
     }
 
     internal fun defineProperty(name: String, value: Value, forceReservedName: Boolean = false) {
@@ -154,7 +165,6 @@ class FriggaContext(val name: String) {
         stack.clear()
 
         scope.forEach {
-            it.functions.clear()
             it.properties.clear()
             it.types.clear()
         }

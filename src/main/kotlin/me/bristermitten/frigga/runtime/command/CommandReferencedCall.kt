@@ -5,7 +5,6 @@ import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
-import me.bristermitten.frigga.runtime.data.function.singleCommand
 import me.bristermitten.frigga.runtime.type.FunctionType
 import me.bristermitten.frigga.runtime.type.TypeInstance
 
@@ -44,9 +43,7 @@ data class CommandReferencedCall(
 
         val callFunction = Function(
             function.name, function.signature.copy(params = emptyMap()),
-            listOf(singleCommand { stack, friggaContext ->
-                function.call(stack, friggaContext, paramValues)
-            })
+            listOf(CommandCall(upon, calling, params))
         )
 
         stack.push(Value(FunctionType(callFunction.signature), callFunction))

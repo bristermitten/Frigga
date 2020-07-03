@@ -8,7 +8,7 @@ import me.bristermitten.frigga.runtime.command.CommandCall
 object CallTransformer : NodeTransformer<FriggaParser.CallExpressionContext>() {
 
     override fun transformNode(node: FriggaParser.CallExpressionContext): Command {
-        val expression = node.expression()
+        val expression = node.callableExpression()
         val access = NodeTransformers.transform(expression).command as? CommandAccess
         val calling = access?.property ?: expression.text
 

@@ -78,8 +78,8 @@ abstract class Type(
     }
 
     open fun accepts(other: Type): Boolean {
-        val relationshipTo = relationshipTo(other)
-        return relationshipTo == TypeRelationship.Same || relationshipTo == TypeRelationship.Supertype
+        val relationship = relationshipTo(other)
+        return relationship == TypeRelationship.Same || relationship == TypeRelationship.Subtype
     }
 
     protected open fun coerceValueTo(value: Value, other: Type) = Value(other, value.value)

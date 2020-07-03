@@ -20,21 +20,24 @@ body: line+? | NEWLINE*;
 
 line: expression NEWLINE*?;
 
+callableExpression:
+         ID #propertyReference
+       | callableExpression DOT ID #accessExpression //something.property
+    ;
 expression:
            assignment #assignmentExpression
-         |  literal #literalExpression
+         | literal #literalExpression
          | function #functionExpression
          | lambda #lambdaExpression
-         | expression call #callExpression //something()
-         | left=expression operator=(PLUS | MINUS | TIMES | DIVIDE | POWER | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN) right=expression #binaryOperatorExpression
+         | parenthesizedExpression #parenthesisExpression
+         | left=expression operator=(POWER | DIVIDE | TIMES | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN) right=expression #binaryOperatorExpression
          | left=expression WHITESPACE infixFunction=ID WHITESPACE right=expression #infixFunction
          | expression referencedCall #referencedCallExpression
-         | expression DOT ID #accessExpression //something.property
-         | parenthesizedExpression #parenthesisExpression
-         | ID #propertyReference
          | structureDef #structureDefinition
          | inverse #booleanNot
+         | callableExpression call #callExpression //something()
          | fullDeclaration #declarationExpression
+         | callableExpression #callable
 
         ;
 

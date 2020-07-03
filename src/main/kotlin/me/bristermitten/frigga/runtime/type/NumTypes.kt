@@ -31,7 +31,8 @@ object IntType : Type("Int", NumType) {
                 body { stack, context ->
                     val thisValue = context.findProperty(UPON_NAME)!!.value
                     val other = context.findProperty("value")!!.value
-                    stack.push(intValue(intOperator(thisValue.value as Long, other.value as Long)))
+                    val result = intValue(intOperator(thisValue.value as Long, other.value as Long))
+                    stack.push(result)
                 }
             }
             defineFunction {

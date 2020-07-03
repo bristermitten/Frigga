@@ -5,6 +5,7 @@ import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.UPON_NAME
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.type.TypeInstance
 
 data class CommandCall(
@@ -13,6 +14,7 @@ data class CommandCall(
     val params: List<CommandNode>
 ) : Command() {
 
+    private var function: Function? = null
     override fun eval(stack: Stack, context: FriggaContext) {
 
         val callingUpon = upon?.let {
@@ -23,26 +25,34 @@ data class CommandCall(
             }
         }
 
-        val uponType = callingUpon?.type
 
         val paramValues = params.map {
             it.command.eval(stack, context)
             stack.pull()
         }
 
+        if (callingUpon != null) {
+            context.defineProperty(UPON_NAME, callingUpon, true)
+        }
+
+        if (function != null) {
+            function?.call(stack, context, paramValues)
+            return
+        }
+
         val paramTypes = paramValues.map(Value::type)
-        val function = if (callingUpon?.value is TypeInstance) {
-            context.findTypeFunction(callingUpon.type, callingUpon.value as TypeInstance, calling, paramTypes)
+        val uponType = callingUpon?.type
+
+        val typeInstance = callingUpon?.value as? TypeInstance
+        val function = if (typeInstance != null) {
+            context.findTypeFunction(callingUpon.type, typeInstance, calling, paramTypes)
         } else {
             context.findFunction(uponType, calling, paramTypes)
         }
+        this.function = function
 
         requireNotNull(function) {
             "No such function $uponType#$calling(${paramTypes.joinToString(prefix = "", postfix = "")})"
-        }
-
-        if (callingUpon != null) {
-            context.defineProperty(UPON_NAME, callingUpon, true)
         }
 
         function.call(stack, context, paramValues)

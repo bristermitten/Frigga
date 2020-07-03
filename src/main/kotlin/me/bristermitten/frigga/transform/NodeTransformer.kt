@@ -13,7 +13,8 @@ abstract class NodeTransformer<F : ParserRuleContext> {
                 this,
                 Position(
                     node.start.line, node.start.charPositionInLine
-                )
+                ),
+                node.text
             )
         }
 

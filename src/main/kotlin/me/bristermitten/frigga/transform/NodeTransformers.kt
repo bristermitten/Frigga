@@ -1,6 +1,7 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser.*
+import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.data.CommandNode
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -40,7 +41,14 @@ object NodeTransformers {
 
         BooleanNotContext::class.java to BooleanNotTransformer,
 
-        DeclarationExpressionContext::class.java to DeclarationTransformer
+        DeclarationExpressionContext::class.java to DeclarationTransformer,
+
+        CallableContext::class.java to object : NodeTransformer<CallableContext>() {
+            override fun transformNode(node: CallableContext): Command {
+                return transform(node.callableExpression()).command
+            }
+
+        }
     )
 
     private fun <T : ParserRuleContext> transformerFor(node: T): NodeTransformer<T> {

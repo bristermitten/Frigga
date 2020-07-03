@@ -27,6 +27,7 @@ class SimpleBenchmark : FriggaTest() {
 
         repeat(times) {
             val result = runtime.execute(code)
+            handleExceptions(result)
             totalParseTime += result.timings.parseTime.toBigDecimal()
             totalExecutionTime += result.timings.runtimeTime.toBigDecimal()
             totalTime += result.timings.totalTime.toBigDecimal()

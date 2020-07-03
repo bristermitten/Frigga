@@ -26,7 +26,6 @@ fun Type.distanceTo(other: Type): Int {
 
 infix fun Type.relationshipTo(other: Type): TypeRelationship {
     if (this == other) return TypeRelationship.Same
-    if (this.parent === other.parent) return TypeRelationship.Sibling
     val isSubtype = isSubtypeOf(other)
     if (isSubtype) {
         return TypeRelationship.Subtype
@@ -36,6 +35,7 @@ infix fun Type.relationshipTo(other: Type): TypeRelationship {
     if (isSupertype) {
         return TypeRelationship.Supertype
     }
+    if (this.parent === other.parent) return TypeRelationship.Sibling
     return TypeRelationship.NoRelationship
 }
 

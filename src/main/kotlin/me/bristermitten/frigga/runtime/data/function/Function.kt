@@ -44,7 +44,7 @@ data class Function(
             try {
                 it.eval(stack, context)
             } catch (breakException: BreakException) {
-                if (name != "yield" && name != "break" && name != "runIf" && name != "if") { //TODO replace with something a bit more extendable. annotations perhaps?
+                if (name != "yield" && name != "break" && name != "if") { //TODO replace with something a bit more extendable. annotations perhaps?
                     break
                 }
                 throw breakException

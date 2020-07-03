@@ -32,7 +32,7 @@ class AdditionTests : FriggaTest() {
         val result = runtime.execute(code)
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(15)
+        result.leftoverStack.first() shouldBe intValue(3 + 3 + 5 + (3 + 1))
     }
 
 
