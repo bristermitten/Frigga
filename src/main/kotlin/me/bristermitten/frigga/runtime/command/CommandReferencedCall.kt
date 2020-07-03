@@ -13,8 +13,12 @@ data class CommandReferencedCall(
     val calling: String,
     val params: List<CommandNode>
 ) : Command() {
+    private var function: Function? = null
 
-    override fun eval(stack: Stack, context: FriggaContext) {
+    private fun fetchFunction(stack: Stack, context: FriggaContext): Function {
+        if (function != null) {
+            return function!!
+        }
         val callingUpon = upon?.let {
             it.command.eval(stack, context)
 
@@ -37,9 +41,17 @@ data class CommandReferencedCall(
             context.findFunction(uponType, calling, paramTypes)
         }
 
+        this.function = function
+
         requireNotNull(function) {
             "No such function to reference $uponType#$calling($paramTypes)"
         }
+        return function
+    }
+
+    override fun eval(stack: Stack, context: FriggaContext) {
+
+        val function = fetchFunction(stack, context)
 
         val callFunction = Function(
             function.name, function.signature.copy(params = emptyMap()),
