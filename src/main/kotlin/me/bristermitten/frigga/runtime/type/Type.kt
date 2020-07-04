@@ -70,19 +70,25 @@ abstract class Type(
     }
 
     fun coerceTo(value: Value, other: Type): Value {
+        if (value.type.isSubtypeOf(other)) {
+            return value //avoid unnecessary coercion between things like Int and Any
+        }
         require(other.accepts(value.type)) {
             "Cannot coerce between incompatible types ${value.type} and $other"
         }
+
         if (other is FunctionType) {
-            if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
-                return Value(other, function {
-                    signature {
-                        output = this@Type
-                    }
-                    body { stack, _ ->
-                        stack.push(value)
-                    }
-                }) //allow coercion between things like Int and () -> Int
+            if (!this.accepts(other)) { //No coercion necessary if they are the same type
+                if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
+                    return Value(other, function {
+                        signature {
+                            output = this@Type
+                        }
+                        body { stack, _ ->
+                            stack.push(value)
+                        }
+                    }) //allow coercion between things like Int and () -> Int
+                }
             }
         }
         return coerceValueTo(value, other)
@@ -115,8 +121,4 @@ abstract class Type(
 
     open fun reestablish(context: FriggaContext): Type = this
 
-//
-//    override fun toString(): String {
-//        return name
-//    }
 }
