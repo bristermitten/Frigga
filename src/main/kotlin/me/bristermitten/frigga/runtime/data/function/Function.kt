@@ -33,7 +33,8 @@ data class Function(
             require(it.value.accepts(param.type)) {
                 "Cannot use value of Type ${param.type} in place of ${it.value} for parameter ${it.key}"
             }
-            param
+
+            param.type.coerceTo(param, it.value)
         }
 
         params.forEach {

@@ -5,9 +5,8 @@ import com.google.common.collect.Multimap
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.function.*
 import me.bristermitten.frigga.runtime.data.function.Function
-import me.bristermitten.frigga.runtime.data.function.FunctionDefiner
-import me.bristermitten.frigga.runtime.data.function.function
 import me.bristermitten.frigga.util.set
 
 abstract class Type(
@@ -74,10 +73,27 @@ abstract class Type(
         require(other.accepts(value.type)) {
             "Cannot coerce between incompatible types ${value.type} and $other"
         }
+        if (other is FunctionType) {
+            if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
+                return Value(other, function {
+                    signature {
+                        output = this@Type
+                    }
+                    body { stack, _ ->
+                        stack.push(value)
+                    }
+                }) //allow coercion between things like Int and () -> Int
+            }
+        }
         return coerceValueTo(value, other)
     }
 
     open fun accepts(other: Type): Boolean {
+        if (this is FunctionType) {
+            if (signature.params.isEmpty() && signature.returned.accepts(other)) {
+                return true //allow coercion between things like Int and () -> Int
+            }
+        }
         val relationship = relationshipTo(other)
         return relationship == TypeRelationship.Same || relationship == TypeRelationship.Subtype
     }

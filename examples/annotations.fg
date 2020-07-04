@@ -11,9 +11,9 @@ struct SISO : Annotation {
     }
 
     afterCall = (fun::Function, parameters::List<Any>, returned::Any) -> {
-        synchronized(values) {
+        synchronized(values, {
             values.put(parameters, returned)
-        }
+        })
     }
 }
 

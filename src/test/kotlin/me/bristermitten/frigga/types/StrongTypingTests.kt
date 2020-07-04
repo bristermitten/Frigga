@@ -31,6 +31,7 @@ class StrongTypingTests : FriggaTest() {
         val result = runtime.execute(code)
         result.exceptions.shouldNotBeEmpty()
     }
+
     @Test
     fun `Assert that Int can be substituted for Dec`() {
         val code = """

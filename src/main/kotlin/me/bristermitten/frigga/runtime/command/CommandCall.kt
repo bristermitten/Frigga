@@ -49,6 +49,7 @@ data class CommandCall(
         } else {
             context.findFunction(uponType, calling, paramTypes)
         }
+
         this.function = function
 
         requireNotNull(function) {

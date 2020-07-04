@@ -56,6 +56,7 @@ COMMENT: '#' ~('\r'|'\n')* -> skip;
 MULTI_COMMENT: '##' .*? '##' -> skip;
 BACKSLASH: '\\';
 NOTHING: '_';
+AT: '@';
 
 //Identifier
 ID: [a-zA-Z_0-9]+;
