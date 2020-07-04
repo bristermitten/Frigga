@@ -77,18 +77,16 @@ abstract class Type(
             "Cannot coerce between incompatible types ${value.type} and $other"
         }
 
-        if (other is FunctionType) {
-            if (!this.accepts(other)) { //No coercion necessary if they are the same type
-                if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
-                    return Value(other, function {
-                        signature {
-                            output = this@Type
-                        }
-                        body { stack, _ ->
-                            stack.push(value)
-                        }
-                    }) //allow coercion between things like Int and () -> Int
-                }
+        if (other is FunctionType && !this.accepts(other)) { //No coercion necessary if the 2 function types are the same
+            if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
+                return Value(other, function {
+                    signature {
+                        output = this@Type
+                    }
+                    body { stack, _ ->
+                        stack.push(value)
+                    }
+                }) //allow coercion between things like Int and () -> Int
             }
         }
         return coerceValueTo(value, other)
