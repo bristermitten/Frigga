@@ -96,7 +96,7 @@ class StructTests : FriggaTest() {
             getANumber::() -> Int
         }
         
-        type = TestStruct(3, () -> __upon.age)
+        type = TestStruct(3, () -> this.age)
         type.getANumber()
         """.trimIndent()
 

@@ -1,6 +1,6 @@
 package me.bristermitten.frigga.runtime.type
 
-import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.command.*
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.boolValue
@@ -29,7 +29,7 @@ object IntType : Type("Int", NumType) {
                     output = IntType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     val result = intValue(intOperator(thisValue.value as Long, other.value as Long))
                     stack.push(result)
@@ -42,7 +42,7 @@ object IntType : Type("Int", NumType) {
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     stack.push(decValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
@@ -61,7 +61,7 @@ object IntType : Type("Int", NumType) {
                     output = IntType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     stack.push(boolValue(intOperator(thisValue.value as Long, other.value as Long)))
                 }
@@ -73,7 +73,7 @@ object IntType : Type("Int", NumType) {
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     stack.push(boolValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
@@ -118,7 +118,7 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     val otherCoerced = other.type.coerceTo(other, DecType)
                     stack.push(decValue(decOperator(thisValue.value as Double, otherCoerced.value as Double)))
@@ -137,7 +137,7 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(UPON_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findProperty("value")!!.value
                     val otherCoerced = other.type.coerceTo(other, DecType)
                     stack.push(boolValue(operator(thisValue.value as Double, otherCoerced.value as Double)))

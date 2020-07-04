@@ -2,7 +2,7 @@ package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
-import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.type.TypeInstance
 
 data class CommandBooleanNot(
@@ -25,7 +25,7 @@ data class CommandBooleanNot(
             "Type ${toInvert.type} does not define a function named 'not', cannot be inverted."
         }
 
-        context.defineProperty(UPON_NAME, toInvert, true)
+        context.defineProperty(THIS_NAME, toInvert, true)
 
         notFunction.call(stack, context, emptyList())
     }

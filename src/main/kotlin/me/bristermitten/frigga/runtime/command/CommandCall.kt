@@ -2,7 +2,7 @@ package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
-import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
@@ -32,7 +32,7 @@ data class CommandCall(
         }
 
         if (callingUpon != null) {
-            context.defineProperty(UPON_NAME, callingUpon, true)
+            context.defineProperty(THIS_NAME, callingUpon, true)
         }
 
         if (function != null) {

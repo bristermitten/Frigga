@@ -1,0 +1,24 @@
+struct SISO : Annotation {
+    secret values = MutableMap<Any, Any>()
+
+    onCall = (fun::Function, parameters::List<Any>) -> {
+        synchronized(values, {
+            existing = values.get(parameters)
+            if(existing != _) {
+                fun.yield(existing)
+            }
+        })
+    }
+
+    afterCall = (fun::Function, parameters::List<Any>, returned::Any) -> {
+        synchronized(values) {
+            values.put(parameters, returned)
+        }
+    }
+}
+
+@SISO
+factorial = (value::Int) -> {
+    if(value == 1, yield[1])
+    yield(value * factorial(value - 1))
+}

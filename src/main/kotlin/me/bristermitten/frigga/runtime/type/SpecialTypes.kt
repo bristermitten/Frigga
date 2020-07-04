@@ -2,7 +2,7 @@ package me.bristermitten.frigga.runtime.type
 
 import BoolType
 import getJVMType
-import me.bristermitten.frigga.runtime.UPON_NAME
+import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_EQUAL_NAME
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.boolValue
@@ -27,7 +27,7 @@ object AnyType : Type(
             }
             body { stack, friggaContext ->
                 val compareWith = friggaContext.findProperty("compareWith")!!
-                val upon = friggaContext.findProperty(UPON_NAME)!!
+                val upon = friggaContext.findProperty(THIS_NAME)!!
                 val equals = upon.value == compareWith.value
 
                 stack.push(boolValue(equals))
@@ -50,7 +50,7 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                         output = getJVMType(it.returnType)
                     }
                     body { stack, context ->
-                        val upon = context.findProperty(UPON_NAME)!!.value
+                        val upon = context.findProperty(THIS_NAME)!!.value
                         val result = it.invoke(upon.value, *it.parameters.map { param ->
                             val findProperty = context.findProperty(param.name)
                             findProperty?.value?.value
