@@ -3,6 +3,7 @@ package me.bristermitten.frigga.runtime.data.function
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.command.Command
+import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.type.NothingType
 import me.bristermitten.frigga.runtime.type.Type
 
@@ -28,11 +29,11 @@ inline fun FunctionDefiner.signature(closure: FunctionSignature.() -> Unit) {
     )
 }
 
-fun FunctionDefiner.body(body: List<Command>) {
+fun FunctionDefiner.body(body: List<CommandNode>) {
     this.body = body
 }
 
-fun FunctionDefiner.body(single: Command) {
+fun FunctionDefiner.body(single: CommandNode) {
     this.body = listOf(single)
 }
 
@@ -48,7 +49,9 @@ private class SingleCommand(
     }
 }
 
-fun singleCommand(onProcess: (Stack, FriggaContext) -> Unit): Command = SingleCommand(onProcess)
+fun singleCommand(onProcess: (Stack, FriggaContext) -> Unit): CommandNode = CommandNode(
+    SingleCommand(onProcess)
+)
 
 
 class FunctionDefiner {
@@ -56,7 +59,7 @@ class FunctionDefiner {
     var signature: Signature = Signature(
         emptyMap(), emptyMap(), NothingType
     )
-    var body: List<Command> = emptyList()
+    var body: List<CommandNode> = emptyList()
 }
 
 class FunctionSignature {

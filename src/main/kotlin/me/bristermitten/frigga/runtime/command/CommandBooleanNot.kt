@@ -27,6 +27,6 @@ data class CommandBooleanNot(
 
         context.defineProperty(THIS_NAME, toInvert, true)
 
-        notFunction.call(stack, context, emptyList())
+        notFunction.call(stack,context, emptyList())
     }
 }

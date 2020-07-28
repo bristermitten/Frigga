@@ -89,6 +89,7 @@ abstract class Type(
                 }) //allow coercion between things like Int and () -> Int
             }
         }
+
         return coerceValueTo(value, other)
     }
 

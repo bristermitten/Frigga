@@ -15,6 +15,7 @@ data class CommandCall(
 ) : Command() {
 
     private var function: Function? = null
+
     override fun eval(stack: Stack, context: FriggaContext) {
 
         val callingUpon = upon?.let {

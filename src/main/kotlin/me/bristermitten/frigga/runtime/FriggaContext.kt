@@ -8,10 +8,10 @@ import me.bristermitten.frigga.runtime.type.CallerType
 import me.bristermitten.frigga.runtime.type.StackType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
+import me.bristermitten.frigga.util.set
 
 class FriggaContext(val name: String) {
     val stack = Stack()
-
 
     private var globalScope = loadGlobalScope()
 
@@ -20,6 +20,17 @@ class FriggaContext(val name: String) {
     }
 
     private val using = mutableSetOf<FriggaContext>()
+
+    fun copy(): FriggaContext {
+        return FriggaContext(name).also {
+            it.globalScope = this.globalScope
+            it.scope.clear()
+            it.scope.addAll(this.scope)
+
+            it.using.clear()
+            it.using.addAll(this.using)
+        }
+    }
 
     private fun loadGlobalScope(): FriggaScope {
         val globalScope = FriggaScope("global")
@@ -57,11 +68,12 @@ class FriggaContext(val name: String) {
 
     internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>? {
         for (scope in scope) {
-            val property = scope.properties[name]
+            val property = scope.properties[name].firstOrNull()
             if (property != null) {
                 return scope to property
             }
         }
+
         for (other in using) {
             val property = other.findPropertyScope(name)
             if (property != null) {
@@ -91,9 +103,11 @@ class FriggaContext(val name: String) {
     fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function? {
         val function = type.getFunction(name, parameterTypes) ?: return null
         var functionValue = value.properties[function]?.value as Function?
+
         if (functionValue != null) {
             return functionValue
         }
+
         for (other in using) {
             functionValue = other.findTypeFunction(type, value, name, parameterTypes)
             if (functionValue != null) {
@@ -110,11 +124,13 @@ class FriggaContext(val name: String) {
             return value as Function?
         }
 
-        for (scope in scope) {
-            val function = scope.properties[name]?.value?.value as? Function?
-            if (function != null) {
-                return function
-            }
+        val functionParameter = findParameter(name)?.value as? Function
+        if (functionParameter != null) {
+            return functionParameter
+        }
+        val functionProperty = findProperty(name)?.value?.value as? Function
+        if (functionProperty != null) {
+            return functionProperty
         }
 
         //Constructors
@@ -144,6 +160,20 @@ class FriggaContext(val name: String) {
             Property(name, emptySet(), value),
             forceReservedName
         )
+    }
+
+    internal fun defineParameter(name: String, value: Value) {
+        scope[0].parameters[name] = value
+    }
+
+    fun findParameter(name: String): Value? {
+        for (scope in scope) {
+            val param = scope.parameters[name]
+            if (param != null) {
+                return param
+            }
+        }
+        return null
     }
 
     fun enterScope(name: String) {

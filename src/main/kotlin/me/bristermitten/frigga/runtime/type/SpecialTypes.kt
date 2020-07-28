@@ -26,9 +26,9 @@ object AnyType : Type(
                 output = BoolType
             }
             body { stack, friggaContext ->
-                val compareWith = friggaContext.findProperty("compareWith")!!
+                val compareWith = friggaContext.findParameter("compareWith")!!
                 val upon = friggaContext.findProperty(THIS_NAME)!!
-                val equals = upon.value == compareWith.value
+                val equals = upon.value == compareWith
 
                 stack.push(boolValue(equals))
             }
@@ -52,8 +52,8 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                     body { stack, context ->
                         val upon = context.findProperty(THIS_NAME)!!.value
                         val result = it.invoke(upon.value, *it.parameters.map { param ->
-                            val findProperty = context.findProperty(param.name)
-                            findProperty?.value?.value
+                            val findProperty = context.findParameter(param.name)
+                            findProperty?.value
                         }.toTypedArray())
 
                         stack.push(Value(signature.returned, result))
@@ -101,7 +101,7 @@ object StackType : Type("Stack") {
                 input = mapOf("value" to AnyType)
             }
             body { stack, friggaContext ->
-                stack.push(friggaContext.findProperty("value")!!.value)
+                stack.push(friggaContext.findParameter("value")!!)
             }
         }
     }

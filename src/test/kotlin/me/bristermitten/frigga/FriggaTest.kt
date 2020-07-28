@@ -15,7 +15,7 @@ abstract class FriggaTest {
 
     fun handleExceptions(result: FullExecutionResult) {
         result.exceptions.forEach {
-            throw it
+            it.printStackTrace()
         }
     }
 

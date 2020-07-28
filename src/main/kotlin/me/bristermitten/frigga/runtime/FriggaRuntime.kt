@@ -7,6 +7,7 @@ import getJVMType
 import loadTypes
 import me.bristermitten.frigga.runtime.data.FriggaFile
 import me.bristermitten.frigga.runtime.data.JVMNamespace
+import me.bristermitten.frigga.runtime.data.Position
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.data.function.Signature
@@ -14,6 +15,8 @@ import me.bristermitten.frigga.runtime.data.function.singleCommand
 import me.bristermitten.frigga.runtime.error.ExecutionException
 import me.bristermitten.frigga.runtime.type.AnyType
 import me.bristermitten.frigga.runtime.type.FunctionType
+import me.bristermitten.frigga.runtime.type.NothingType
+import me.bristermitten.frigga.runtime.type.functionType
 import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -37,11 +40,14 @@ class FriggaRuntime {
         val resource =
             javaClass.classLoader.getResource("std") ?: throw NoSuchElementException("Could not get std folder.")
         File(resource.toURI()).listFiles()?.forEach {
-            execute(it.readText())
+            val result = execute(it.readText())
+            result.exceptions.forEach { exception ->
+                exception.printStackTrace()
+            }
         }
 
-        val logicProperty = namespaces[STD_NAMESPACE]!!.findProperty(IF_NAME)!!
-        val runIfSignature = Signature(
+        val ifProperty = namespaces[STD_NAMESPACE]!!.findProperty(IF_NAME)!!
+        val ifSignature = Signature(
             emptyMap(),
             mapOf(
                 "test" to BoolType,
@@ -49,17 +55,47 @@ class FriggaRuntime {
             ),
             AnyType
         )
-        val function = Function("if", runIfSignature, listOf(
+        val ifFunction = Function(IF_NAME, ifSignature, listOf(
             singleCommand { stack, friggaContext ->
-                val condition = friggaContext.findProperty("test")!!.value
-                val run = friggaContext.findProperty("run")!!.value
-                require(condition.type is BoolType)
+                val condition = friggaContext.findParameter("test")!!
+                val run = friggaContext.findParameter("run")!!
                 if (condition.value as Boolean) {
                     (run.value as Function).call(stack, friggaContext, emptyList())
                 }
             }
         ))
-        logicProperty.value = Value(FunctionType(runIfSignature), function)
+        ifFunction.init(globalContext)
+        ifProperty.value = Value(FunctionType(ifSignature), ifFunction)
+
+
+        val loopProperty = namespaces[STD_NAMESPACE]!!.findProperty(LOOP_NAME)!!
+        val loopSignature = Signature(
+            emptyMap(),
+            mapOf(
+                "test" to functionType(returned = BoolType),
+                "run" to functionType(returned = NothingType)
+            ),
+            AnyType
+        )
+        val loopFunction = Function(LOOP_NAME, loopSignature, listOf(
+            singleCommand { stack, context ->
+                val run = context.findParameter("run")!!
+
+                val condition = context.findParameter("test")!!
+                val conditionFunction = condition.value as Function
+                fun eval(): Boolean {
+                    conditionFunction.call(stack, context, emptyList())
+                    return stack.pull().value as Boolean
+                }
+                while (eval()) {
+                    (run.value as Function).call(stack, context, emptyList())
+                }
+            }
+        ))
+        loopFunction.init(globalContext)
+        loopProperty.value = Value(FunctionType(loopSignature), loopFunction)
+
+
     }
 
     @OptIn(ExperimentalTime::class)
@@ -132,8 +168,8 @@ class FriggaRuntime {
         file.content.forEach {
             try {
                 it.command.eval(context.stack, context)
-            } catch (e: Exception) {
-                exceptions += ExecutionException(e, it.position)
+            } catch (e: Throwable) {
+                exceptions += ExecutionException(e, it.position ?: Position.INVALID, it.text ?: "")
             }
         }
         return ExecutionResult(

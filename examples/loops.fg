@@ -1,0 +1,12 @@
+loop5times = (run::() -> Any) -> {
+    repeat(5, {
+        run()
+    })
+
+    mutable someBoolean = true
+    mutable x = 0
+    loop(someBoolean, {
+        x++
+        someBoolean = x < 3
+    })
+}

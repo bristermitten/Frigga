@@ -55,7 +55,7 @@ data class CommandReferencedCall(
 
         val callFunction = Function(
             function.name, function.signature.copy(params = emptyMap()),
-            listOf(CommandCall(upon, calling, params))
+            listOf(CommandNode(CommandCall(upon, calling, params)))
         )
 
         stack.push(Value(FunctionType(callFunction.signature), callFunction))

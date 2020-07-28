@@ -22,7 +22,7 @@ object StringType : Type(
             }
             body { stack, context ->
                 val thisValue = context.findProperty(THIS_NAME)!!.value
-                val addTo = context.findProperty("value")!!.value
+                val addTo = context.findParameter("value")!!
                 stack.push(stringValue((thisValue.value as String) + addTo.value))
             }
         }
@@ -41,7 +41,7 @@ object CharType : Type(
             }
             body { stack, context ->
                 val thisValue = context.findProperty(THIS_NAME)!!.value
-                val addTo = context.findProperty("value")!!.value
+                val addTo = context.findParameter("value")!!
                 stack.push(stringValue((thisValue.value as Char).toString() + addTo.value))
             }
         }
@@ -81,7 +81,7 @@ object OutputType : Type("Output") {
                 input = mapOf("value" to AnyType)
             }
             body { _, friggaContext ->
-                println(friggaContext.findProperty("value")?.value?.value)
+                println(friggaContext.findParameter("value")?.value)
             }
         }
     }

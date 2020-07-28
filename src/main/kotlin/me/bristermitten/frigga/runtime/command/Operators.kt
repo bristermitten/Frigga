@@ -29,6 +29,12 @@ const val OPERATOR_GREATER = ">"
 const val OPERATOR_GREATER_OR_EQUAL_NAME = "greaterOrEqual"
 const val OPERATOR_GREATER_OR_EQUAL = ">="
 
+const val OPERATOR_LESS_NAME = "less"
+const val OPERATOR_LESS = "<"
+
+const val OPERATOR_LESS_OR_EQUAL_NAME = "lessOrEqual"
+const val OPERATOR_LESS_OR_EQUAL = "<="
+
 fun operatorFromSymbol(symbol: String): String? {
     return when (symbol) {
         OPERATOR_ADD -> OPERATOR_ADD_NAME
@@ -39,6 +45,8 @@ fun operatorFromSymbol(symbol: String): String? {
         OPERATOR_EQUAL -> OPERATOR_EQUAL_NAME
         OPERATOR_GREATER -> OPERATOR_GREATER_NAME
         OPERATOR_GREATER_OR_EQUAL -> OPERATOR_GREATER_OR_EQUAL_NAME
+        OPERATOR_LESS -> OPERATOR_LESS_NAME
+        OPERATOR_LESS_OR_EQUAL -> OPERATOR_LESS_OR_EQUAL_NAME
         else -> null
     }
 }

@@ -73,4 +73,31 @@ class SimpleTests : FriggaTest() {
         result.leftoverStack.shouldBeSingleton()
         result.leftoverStack.first() shouldBe decValue(5.0)
     }
+
+    @Test
+    fun `Test Property Definition and reassignment adding 1`() {
+        val code = """
+            mutable x = 3
+            x = x + 1
+            x
+        """.trimIndent()
+        val result = runtime.execute(code)
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe intValue(4)
+    }
+
+    @Test
+    fun `Test Property Definition and reassignment adding 1 twice`() {
+        val code = """
+            mutable x = 3
+            x = x + 1
+            x = x + 1
+            x
+        """.trimIndent()
+        val result = runtime.execute(code)
+
+        handleExceptions(result)
+        result.leftoverStack.first() shouldBe intValue(5)
+    }
 }

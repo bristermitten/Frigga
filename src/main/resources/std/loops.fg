@@ -1,0 +1,15 @@
+namespace "std"
+
+repeat = (times::Int, task::() -> _) -> _ {
+    mutable counter = 0
+    test = {
+        println(counter)
+        counter <= times
+    }
+    loop(test, {
+        task()
+        counter = counter + 1
+    })
+}
+
+native loop::(() -> Bool, () -> _) -> _

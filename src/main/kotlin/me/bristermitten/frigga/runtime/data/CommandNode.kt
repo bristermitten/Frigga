@@ -4,10 +4,10 @@ import me.bristermitten.frigga.runtime.command.Command
 
 data class CommandNode(
     val command: Command,
-    val position: Position,
-    val text: String
-){
+    val position: Position? = null,
+    val text: String? = null
+) {
     override fun toString(): String {
-        return text
+        return "CommandNode(command=$command, position=$position, text=$text)"
     }
 }

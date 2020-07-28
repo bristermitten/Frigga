@@ -2,6 +2,7 @@ package me.bristermitten.frigga.transform
 
 import FriggaParser.*
 import me.bristermitten.frigga.runtime.command.Command
+import me.bristermitten.frigga.runtime.command.CommandFunctionValue
 import me.bristermitten.frigga.runtime.command.CommandValue
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
@@ -37,11 +38,8 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
             val body = this.block().body().line()
                 .map(LineContext::expression)
                 .map(NodeTransformers::transform)
-                .map(CommandNode::command)
 
-            val function = Function(name, functionSignature, body)
-
-            CommandValue(Value(FunctionType(functionSignature), function))
+            CommandFunctionValue(name, functionSignature, body)
         }
     }
 }

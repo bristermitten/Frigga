@@ -25,7 +25,7 @@ class Struct(
                 val newInstance = TypeInstance(
                     this@Struct,
                     elements.map {
-                        it to friggaContext.findProperty(it.name)!!.value
+                        it to friggaContext.findParameter(it.name)!!
                     }.toMap()
                 )
 

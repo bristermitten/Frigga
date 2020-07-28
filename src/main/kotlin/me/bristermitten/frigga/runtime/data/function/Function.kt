@@ -3,6 +3,7 @@ package me.bristermitten.frigga.runtime.data.function
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.command.Command
+import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.error.BreakException
 import me.bristermitten.frigga.runtime.type.Type
@@ -10,8 +11,13 @@ import me.bristermitten.frigga.runtime.type.Type
 data class Function(
     val name: String,
     val signature: Signature,
-    val content: List<Command>
+    val content: List<CommandNode>
 ) {
+
+    private var scope: FriggaContext? = null
+    fun init(context: FriggaContext) {
+        this.scope = context.copy()
+    }
 
     fun call(stack: Stack, context: FriggaContext, params: List<Value>) {
         val namedParams = signature.params.entries.mapIndexed { index, entry ->
@@ -22,6 +28,7 @@ data class Function(
     }
 
     fun call(stack: Stack, context: FriggaContext, params: Map<String, Value>) {
+        val context = scope ?: context
         context.enterFunctionScope(name)
 
         val params = signature.params.mapValues {
@@ -38,12 +45,12 @@ data class Function(
         }
 
         params.forEach {
-            context.defineProperty(it.key, it.value)
+            context.defineParameter(it.key, it.value)
         }
 
         for (it in content) {
             try {
-                it.eval(stack, context)
+                it.command.eval(stack, context)
             } catch (breakException: BreakException) {
                 if (name != "yield" && name != "break" && name != "if") { //TODO replace with something a bit more extendable. annotations perhaps?
                     break

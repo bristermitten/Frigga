@@ -6,7 +6,10 @@ import me.bristermitten.frigga.runtime.data.function.Signature
 data class FunctionType(
     val signature: Signature
 ) : Type(
-    signature.params.values.joinToString(prefix = "(", postfix = ")") { it.toString() } + " -> " + signature.returned.name
+    signature.params.values.joinToString(
+        prefix = "(",
+        postfix = ")"
+    ) { it.toString() } + " -> " + signature.returned.name
 ) {
     override fun accepts(other: Type): Boolean {
         if (other is FunctionType) {
@@ -27,4 +30,16 @@ data class FunctionType(
             )
         )
     }
+}
+
+fun functionType(
+    type: Map<String, Type> = emptyMap(),
+    params: Map<String, Type> = emptyMap(),
+    returned: Type = NothingType
+): FunctionType {
+    return FunctionType(
+        Signature(
+            type, params, returned
+        )
+    )
 }

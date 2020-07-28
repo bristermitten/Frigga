@@ -19,6 +19,7 @@ class StrongTypingTests : FriggaTest() {
         val result = runtime.execute(code)
         result.exceptions.shouldNotBeEmpty()
     }
+
     @Test
     fun `Assert that Dec cannot be substituted for Int`() {
         val code = """
@@ -39,6 +40,20 @@ class StrongTypingTests : FriggaTest() {
                 #do nothing
             }
             takeInt(3)
+        """.trimIndent()
+
+        val result = runtime.execute(code)
+        result.exceptions.shouldBeEmpty()
+    }
+
+    @Test
+    fun `Assert that Function yielding Any can be substituted for Function yielding Nothing`() {
+        val code = """
+            takeInt = (value::() -> _) -> _ {
+                #do nothing
+            }
+            fun = {}
+            takeInt(fun)
         """.trimIndent()
 
         val result = runtime.execute(code)

@@ -30,7 +30,7 @@ object IntType : Type("Int", NumType) {
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     val result = intValue(intOperator(thisValue.value as Long, other.value as Long))
                     stack.push(result)
                 }
@@ -43,7 +43,7 @@ object IntType : Type("Int", NumType) {
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     stack.push(decValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
             }
@@ -62,7 +62,7 @@ object IntType : Type("Int", NumType) {
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     stack.push(boolValue(intOperator(thisValue.value as Long, other.value as Long)))
                 }
             }
@@ -74,7 +74,7 @@ object IntType : Type("Int", NumType) {
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     stack.push(boolValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
             }
@@ -90,6 +90,8 @@ object IntType : Type("Int", NumType) {
 
         defineIntAndDecMathLogicFunctions(OPERATOR_GREATER_NAME, { a, b -> a > b }, { a, b -> a > b })
         defineIntAndDecMathLogicFunctions(OPERATOR_GREATER_OR_EQUAL_NAME, { a, b -> a >= b }, { a, b -> a >= b })
+        defineIntAndDecMathLogicFunctions(OPERATOR_LESS_NAME, { a, b -> a < b }, { a, b -> a < b })
+        defineIntAndDecMathLogicFunctions(OPERATOR_LESS_OR_EQUAL_NAME, { a, b -> a <= b }, { a, b -> a <= b })
     }
 
     override fun coerceValueTo(value: Value, other: Type): Value {
@@ -119,7 +121,7 @@ object DecType : Type(
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     val otherCoerced = other.type.coerceTo(other, DecType)
                     stack.push(decValue(decOperator(thisValue.value as Double, otherCoerced.value as Double)))
                 }
@@ -138,7 +140,7 @@ object DecType : Type(
                 }
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
-                    val other = context.findProperty("value")!!.value
+                    val other = context.findParameter("value")!!
                     val otherCoerced = other.type.coerceTo(other, DecType)
                     stack.push(boolValue(operator(thisValue.value as Double, otherCoerced.value as Double)))
                 }
@@ -153,6 +155,9 @@ object DecType : Type(
 
         defineLogicalMathFunction(OPERATOR_GREATER_NAME) { a, b -> a > b }
         defineLogicalMathFunction(OPERATOR_GREATER_OR_EQUAL_NAME) { a, b -> a >= b }
+        defineLogicalMathFunction(OPERATOR_LESS_NAME) { a, b -> a < b }
+        defineLogicalMathFunction(OPERATOR_LESS_OR_EQUAL_NAME) { a, b -> a <= b }
+
     }
 
     override fun accepts(other: Type): Boolean {
