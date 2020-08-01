@@ -5,16 +5,20 @@ import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandInfixFunction
 import me.bristermitten.frigga.runtime.command.operatorFromSymbol
 
-object BinaryOperatorTransformer : NodeTransformer<FriggaParser.BinaryOperatorExpressionContext>() {
-    override fun transformNode(node: FriggaParser.BinaryOperatorExpressionContext): Command {
+object BinaryOperatorTransformer : NodeTransformer<FriggaParser.BinaryOperatorExpressionContext>()
+{
+    override fun transformNode(node: FriggaParser.BinaryOperatorExpressionContext): Command
+    {
+        with(node) {
 
-        val left = NodeTransformers.transform(node.left)
-        val right = NodeTransformers.transform(node.right)
-        val operator = node.operator.text
+            val left = NodeTransformers.transform(left)
+            val right = NodeTransformers.transform(right)
+            val operator = operator.text
 
-        return CommandInfixFunction(
-            left, right,
-            operatorFromSymbol(operator) ?: throw UnsupportedOperationException("No such operator $operator")
-        )
+            return CommandInfixFunction(
+                left, right,
+                operatorFromSymbol(operator) ?: throw UnsupportedOperationException("No such operator $operator")
+            )
+        }
     }
 }

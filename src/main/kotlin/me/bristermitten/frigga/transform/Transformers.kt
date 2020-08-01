@@ -1,7 +1,6 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser
-import FriggaParser.UseContext
 import getType
 import me.bristermitten.frigga.runtime.data.*
 import me.bristermitten.frigga.runtime.data.function.Signature
@@ -11,19 +10,42 @@ import me.bristermitten.frigga.runtime.type.TupleType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.transform.NodeTransformers.transform
 
-fun FriggaParser.FriggaFileContext.load(): FriggaFile {
+fun FriggaParser.FriggaFileContext.load(): FriggaFile
+{
+    val header = header()
+
     return FriggaFile(
-        this.namespace()?.transform(),
-        this.usingList()?.use()?.map(UseContext::transform)?.toSet() ?: emptySet(),
-        this.body().line().map {
-            val exp = it.expression()
-            transform(exp)
-        }
+        header?.getNamespace(),
+        header.useDeclaration()?.map(FriggaParser.UseDeclarationContext::transform)?.toSet() ?: emptySet(),
+        body().transformBody()
     )
 }
 
-fun FriggaParser.NamespaceContext.transform(): SimpleNamespace {
-    val namespace = STRING().text.removeSurrounding("\"")
+fun FriggaParser.BodyContext.transformBody(): List<CommandNode>
+{
+    return lines().line().map { line ->
+        when (line)
+        {
+            is FriggaParser.StatementLineContext ->
+            {
+                transform(line.statement())
+            }
+            is FriggaParser.ExpressionLineContext ->
+            {
+                transform(line.expression())
+            }
+            else ->
+            {
+                transform(line)
+            }
+        }
+    }
+}
+
+fun FriggaParser.HeaderContext.getNamespace(): SimpleNamespace
+{
+    val namespace = this.namespaceDeclaration()?.namespaceName()?.text?.removeSurrounding("\"")
+    namespace ?: return SimpleNamespace("")
     require(NAMESPACE_FORMAT.matches(namespace)) {
         "Illegal Namespace Format $namespace"
     }
@@ -31,48 +53,61 @@ fun FriggaParser.NamespaceContext.transform(): SimpleNamespace {
     return SimpleNamespace(namespace)
 }
 
-fun UseContext.transform(): Namespace {
-    val namespace = this.STRING().text.removeSurrounding("\"")
-    if (NAMESPACE_FORMAT.matches(namespace)) {
-        return SimpleNamespace(namespace)
+fun FriggaParser.UseDeclarationContext.transform(): Namespace
+{
+    val namespace = this.useNamespaceName()
+
+    val simpleNamespace = namespace.namespaceName()
+    if (simpleNamespace != null)
+    {
+        return SimpleNamespace(simpleNamespace.text.removeSurrounding("\""))
     }
-    if (JVM_NAMESPACE_FORMAT.matches(namespace)) {
-        return JVMNamespace(Class.forName(namespace.removePrefix("JVM:")))
+
+    val jvm = namespace.javaPackageName()
+    if (jvm != null)
+    {
+        return JVMNamespace(Class.forName(jvm.text.removeSurrounding("\"")))
     }
-    throw IllegalArgumentException("Illegal namespace format $namespace")
+
+    throw IllegalArgumentException("Illegal namespace format ${namespace.text}")
 }
 
-fun FriggaParser.TypeContext.toType(): Type {
-    val simpleType = ID()
-    if (simpleType != null) {
-        return getType(simpleType.text)
+fun FriggaParser.TypeContext.toType(): Type
+{
+    val simple = structType()
+    if (simple != null)
+    {
+        return getType(simple.ID().text)
     }
-
-    val nothingType = this.NOTHING()
-    if (nothingType != null) {
+    val nothing = nothingType()
+    if (nothing != null)
+    {
         return NothingType
     }
 
-    val functionType = this.functionType()
-    if (functionType != null) {
+    val functionType = functionType()
+    if (functionType != null)
+    {
         return FunctionType(
             Signature(
                 emptyMap(),
-                functionType.functionParamTypes().type().map {
+                functionType.functionTypeParameterTypes().type().map {
                     val toType = it.toType()
                     toType.name to toType
                 }.toMap(),
-                functionType.type().toType()
+                functionType.functionTypeReturnType().type().toType()
             )
         )
     }
-    val tupleType = this.tuple()
-    if (tupleType != null) {
-        val tupleTypes = tupleType.tupleParam().map {
-            it.ID().text to it.typeSpec().type().toType()
+    val tupleType = tupleType()
+    if (tupleType != null)
+    {
+        val tupleTypes = tupleType.tupleTypeParam().map {
+            it.ID().text to it.type().toType()
         }.toMap()
 
         return TupleType(tupleTypes)
     }
-    throw UnsupportedOperationException(javaClass.name + " " + text)
+
+    throw UnsupportedOperationException(this.text)
 }

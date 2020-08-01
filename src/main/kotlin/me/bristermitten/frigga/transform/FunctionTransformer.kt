@@ -1,33 +1,46 @@
 package me.bristermitten.frigga.transform
 
-import FriggaParser.*
+import FriggaParser.FunctionExpressionContext
+import FriggaParser.PropertyAssignmentContext
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandFunctionValue
-import me.bristermitten.frigga.runtime.command.CommandValue
-import me.bristermitten.frigga.runtime.data.CommandNode
-import me.bristermitten.frigga.runtime.data.Value
-import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.data.function.Signature
-import me.bristermitten.frigga.runtime.type.FunctionType
 
-object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
+object FunctionTransformer : NodeTransformer<FunctionExpressionContext>()
+{
 
-    override fun transformNode(node: FunctionExpressionContext): Command {
-        val parent = node.parent
-        val name: String
-        name = if (parent is AssignmentContext) {
-            parent.declaration().ID().text
-        } else {
+    override fun transformNode(node: FunctionExpressionContext): Command
+    {
+        var parent = node.parent
+        while (parent !is PropertyAssignmentContext)
+        {
+            parent = parent.parent
+            if (parent == null)
+            {
+                break
+            }
+        }
+
+        val name = if (parent is PropertyAssignmentContext)
+        {
+            val assignedName =
+                parent.typedPropertyDeclaration()?.ID()
+                    ?: parent.untypedPropertyDeclaration()?.ID()
+                    ?: throw IllegalArgumentException("How did we get here?")
+
+            assignedName.text
+        } else
+        {
             "Anonymous"
         }
 
-        return with(node.function()) {
-            this.generic() //TODO
-            val signature = this.functionSignature()
-            val params = signature.functionParams().functionParam().map {
-                it.ID().text to it.typeSpec().type().toType()
+        return with(node.functionValue()) {
+            val signatureContext = this.functionSignature()
+            signatureContext.typeSignature() //TODO
+            val params = signatureContext.functionArguments().functionArgument().map {
+                it.ID().text to it.type().toType()
             }.toMap()
-            val returnType = signature.type().toType()
+            val returnType = signatureContext.type().toType()
 
             val functionSignature = Signature(
                 emptyMap(),
@@ -35,9 +48,7 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>() {
                 returnType
             )
 
-            val body = this.block().body().line()
-                .map(LineContext::expression)
-                .map(NodeTransformers::transform)
+            val body = functionBody().body().transformBody()
 
             CommandFunctionValue(name, functionSignature, body)
         }

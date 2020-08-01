@@ -65,7 +65,7 @@ class LogicalLessOrEqualTests : FriggaTest() {
             $a <= $b
         """.trimIndent()
 
-        val result = runtime.execute(code)
+        val result = runtime.execute(code, "less-or-equal.fg")
         handleExceptions(result)
 
         result.leftoverStack.first() shouldBe boolValue(a <= b)

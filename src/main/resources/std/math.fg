@@ -1,5 +1,5 @@
-namespace "std"
-use "JVM:java.lang.Math"
+namespace std
+use JVM:java.lang.Math
 
 sqrt = (value::Dec) -> Dec {
     sqrt = Math.sqrt(value)

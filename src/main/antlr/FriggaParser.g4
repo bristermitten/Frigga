@@ -2,120 +2,344 @@ parser grammar FriggaParser;
 
 options { tokenVocab=FriggaLexer; }
 
-friggaFile:
-    namespace?
-    usingList
-    body
-    EOF;
-
-//Headers
-use: USE STRING;
-namespace: NAMESPACE STRING;
-
-usingList:
-    (use)*;
-
-//Body
-body: line+? | NEWLINE*;
-
-line: expression NEWLINE*?;
-
-callableExpression:
-         ID #propertyReference
-       | callableExpression DOT ID #accessExpression //something.property
+literal
+    : IntLiteral
+    | DecLiteral
+    | CharLiteral
+    | BoolLiteral
+    | StringLiteral
+    | tupleLiteral
     ;
-expression:
-           assignment #assignmentExpression
-         | literal #literalExpression
-         | function #functionExpression
-         | lambda #lambdaExpression
-         | parenthesizedExpression #parenthesisExpression
-         | left=expression operator=(POWER | DIVIDE | TIMES | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_EQUAL_THAN | LESS_THAN) right=expression #binaryOperatorExpression
-         | left=expression WHITESPACE infixFunction=ID WHITESPACE right=expression #infixFunction
-         | expression referencedCall #referencedCallExpression
-         | structureDef #structureDefinition
-         | inverse #booleanNot
-         | callableExpression call #callExpression //something()
-         | fullDeclaration #declarationExpression
-         | callableExpression #callable
-
-        ;
-
-parenthesizedExpression: LPAREN expression RPAREN;
-
-propertyModifier:
-     MUTABLE
-   | STATEFUL
-   | SECRET
-   | STATIC
-   | NATIVE;
-
-fullDeclaration: propertyModifier* ID typeSpec;
-declaration: propertyModifier* ID typeSpec?;
-assignment: declaration ASSIGN expression;
-block: LCPAREN body RCPAREN;
-
-call:  LPAREN args RPAREN;
-
-referencedCall: LSPAREN args RSPAREN;
-
-args: expression? (COMMA expression)*;
-typeSpec: DOUBLE_COLON type;
-
-type: functionType | ID | NOTHING | tuple;
-
-tuple: LPAREN (tupleParam COMMA tupleParam)+ RPAREN;
-tupleParam : ID typeSpec;
 
 /*
-Structures
+* Tuples
+* Tuple literals can be made with either named syntax (eg `(age: 30, name: "Steve")`)
+* or indexed syntax (eg `(30, "Steve"))
 */
-structureDef:
-      structDef #structDefinition
-    | traitDef #traitDefinition;
 
-traitDef: TRAIT ID parents? structureBody?;
-structDef: STRUCT ID parents? structureBody?;
-parents: DOUBLE_COLON ID (COMMA ID)*;
-structureBody: LCPAREN structureLine* RCPAREN;
-structureLine: fullDeclaration #declarationLine | line #normalLine;
+tupleLiteral
+    : namedTupleLiteral
+    | indexedTupleLiteral
+    ;
+
+indexedTupleLiteral
+    : LPAREN indexedTupleValues RPAREN
+    ;
+
+indexedTupleValues
+    : (expression COMMA expression)+
+    ;
+
+
+namedTupleLiteral
+    : LPAREN namedTupleValues RPAREN
+    ;
+
+namedTupleValues
+    :(namedTupleValue COMMA namedTupleValue)+
+    ;
+
+namedTupleValue
+    : ID COLON expression
+    ;
+
+
+type
+    : structType //eg StructName
+    | nothingType //_
+    | functionType //eg (Int) -> _
+    | tupleType //eg (name: String, age: Int)
+    ;
+
+nothingType
+    : UNDERSCORE
+    ;
+
+structType
+    : ID typeArguments?
+    ;
+
+functionType
+    : LPAREN functionTypeParameterTypes RPAREN ARROW functionTypeReturnType
+    ;
+
+functionTypeParameterTypes
+    :  type? (COMMA type) *
+    ;
+
+functionTypeReturnType
+    : type
+    ;
+
+tupleType
+    : LPAREN tupleTypeParam (COMMA tupleTypeParam)? RPAREN
+    ;
+tupleTypeParam
+    : ID COLON type
+    ;
+
+
+typeArguments //eg <Int, String>
+    : '<' typeArgumentList '>'
+    ;
+
+typeArgumentList //eg Int, String
+    : typeArgument (COMMA typeArgument)*
+    ;
+
+typeArgument //eg Int - this will be improved on in future to add things like wildcards
+    : type
+    ;
 
 /*
-Generics
+* Names
 */
-generic: LESS_THAN typeParam (COMMA typeParam)* MORE_THAN;
-typeParam: (ID typeSpec) | ID;
+
+namespaceName
+    : ID
+    | namespaceName '/' ID
+    ;
+
+javaPackageName
+    : ID (DOT javaPackageName)*
+    ;
+
+useNamespaceName
+    : namespaceName
+    | JVM COLON javaPackageName
+    ;
+
+structName
+    : ID
+    | namespaceName '/' ID
+    ;
+
 /*
-Functions
+* Headers
 */
-function: generic? (functionSignature block); //{} OR (a::Int) -> Int {}
-functionSignature: functionParams ARROW type; //() -> _ OR (a::Int) -> Int
-functionParams: (LPAREN functionParam? (COMMA functionParam)* RPAREN); //(a::Int) OR (a::Int, b::Int, etc)
-functionParam: ID typeSpec; //a::Int
 
-lambda: block | (lambdaParams ARROW (expression | block)); //{} OR (a::Int) -> Int OR (a::Int) -> Int {}
+header
+    : (namespaceDeclaration ENDLINE)? (useDeclaration ENDLINE)*
+    ;
+
+namespaceDeclaration
+    : NAMESPACE namespaceName
+    ;
+
+useDeclaration
+    : USE useNamespaceName
+    ;
+
+friggaFile
+    : header body EOF
+    ;
+
+
 /*
-(a, b) -> 3
-(a::Int, b::Int) -> a + b
-() -> {}
+* Body
 */
-lambdaParams: (LPAREN lamdaParam? (COMMA lamdaParam)* RPAREN); //(a::Int) OR (a, b, etc)
-lamdaParam: functionParam | ID; //a::Int OR a
+
+body
+    : lines
+    ;
+
+lines
+    : ENDLINE* | (ENDLINE* line (ENDLINE* line)* ENDLINE?)
+    ;
+
+
+
+line
+    : statement #statementLine
+    | expression #expressionLine
+    ;
+
+untypedPropertyDeclaration
+    : propertyModifier* ID
+    ;
+
+typedPropertyDeclaration
+    : propertyModifier* ID DOUBLE_COLON type
+    ;
+
+propertyAssignment
+    :
+    ( untypedPropertyDeclaration | typedPropertyDeclaration )
+    ASSIGN expression
+    ;
+
+propertyDeclaration
+    : typedPropertyDeclaration //for native properties (and possibly more in the future)
+    ;
+
+propertyModifier
+    : NATIVE
+    | SECRET
+    | MUTABLE
+    ;
 
 /*
-Function Types
+* Functions
 */
-functionType: (functionParamTypes) ARROW type;
-functionParamTypes: LPAREN type? (COMMA type)* RPAREN;
 
-literal:
-      MINUS? INT #intLiteral
-    | MINUS? DEC #decLiteral
-    | BOOL #boolLiteral
-    | STRING #stringLiteral
-    | CHAR #charLiteral
-    | LPAREN (expression COMMA expression)+ RPAREN #tupleLiteral;
+functionValue
+    : functionSignature functionBody
+    ;
+
+functionBody
+    : LCPAREN body RCPAREN
+    ;
+
+functionSignature
+    : typeSignature? functionArguments ARROW type
+    ;
+
+functionArguments
+    : LPAREN (functionArgument? (COMMA functionArgument)*) RPAREN
+    ;
+
+functionArgument
+    : ID DOUBLE_COLON type
+    ;
+
+typeSignature
+    : '<' typeParameters '>'
+    ;
+
+typeParameters
+    : typeParameter (COMMA typeParameter)*
+    ;
+
+typeParameter
+    : ID DOUBLE_COLON type
+    ;
 
 
-inverse: INVERSE expression; //!hello == 3
+/*
+* Statements
+*/
+statement
+    : propertyDeclaration #propertyDeclarationStatement
+    | propertyAssignment  #propertyAssignmentStatement
+    | structDeclaration   #structDeclarationStatement
+    | traitDeclaration    #traitDeclarationStatement
+    ;
 
+/*
+* Expressions
+*/
+propertyAccess //eg SomeStruct.prop or someValue.prop or prop
+    : propertyAccess DOT ID #childAccess
+    | ID #directAccess
+    ;
+
+functionCall
+    : propertyAccess //the function name
+      functionCallParameters //parameters
+      functionBody? //a Lambda body
+    ;
+
+referencedCall
+    : propertyAccess
+      refererencedCallParameters
+    ;
+
+refererencedCallParameters
+    : LSPAREN functionCallParametersList RSPAREN
+    ;
+
+functionCallParameters
+    : LPAREN functionCallParametersList RPAREN
+    ;
+
+
+
+functionCallParametersList
+    : (indexedFunctionCallParameter? (COMMA indexedFunctionCallParameter)*) //Indexed calls
+    | (namedFunctionCallParameter? (COMMA namedFunctionCallParameter)*) //named calls
+    ;
+
+
+indexedFunctionCallParameter // 3
+    : expression
+    ;
+
+namedFunctionCallParameter //age: 30
+    : ID COLON expression
+    ;
+
+infixFunctionCall
+    : assignableExpression ID expression
+    ;
+
+prefixOperatorCall
+    :
+       operator=(NOT | BIN_NOT)
+       right=expression
+    ;
+
+//Expresssions that can be used in assignment (eg x = 3) but cannot be used stanalone (eg 3)
+assignableExpression
+    : literal #literalExpression
+    | functionValue #functionExpression
+    | lambdaValue #lambdaExpression
+    ;
+
+notBinaryExpression
+    : functionCall #callExpression
+    | referencedCall #referencedCallExpression
+    | infixFunctionCall #infixCallExpression
+    | assignableExpression #assignableExpressionExpression
+    | propertyAccess #accessExpression
+    | prefixOperatorCall #prefixOperatorExpression
+    | LPAREN expression RPAREN #parenthesisedExpression
+    ;
+
+expression
+    : notBinaryExpression #notBinaryExpressionExpression
+    | left=expression
+      operator=(POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN )
+      right=expression
+      #binaryOperatorExpression //we can't have this in its own rule because antlr doesn't like mutual left-recursion :(
+    ;
+
+/*
+* Lambdas
+*/
+
+lambdaValue
+    : functionBody #blockLambda //eg { println("Hello") }
+    | functionArguments ARROW expression #typedSingleExpressionLambda //single expression typed lambda eg (a::Int) -> blah(a)
+    | lambdaArguments ARROW expression #untypedSingleExpressionLambda //single expression untyped lambda eg (a) -> blah(a)
+    | functionArguments ARROW functionBody #blockTypedParamsLambda //block typed lambda
+    | lambdaArguments ARROW functionBody #blockUntypedParamsLambda //block untyped lambda
+    ;
+
+lambdaArguments
+    : LPAREN ID (COMMA ID)* RPAREN;
+
+
+/*
+* Structs and Traits
+*/
+
+structDeclaration
+    : STRUCT ID structParentDeclaration?
+    structBody?
+    ;
+
+traitDeclaration
+    : TRAIT ID structParentDeclaration?
+    structBody?
+    ;
+
+structBody
+    : LCPAREN
+    (ENDLINE* statement (ENDLINE* statement)* ENDLINE?) //TODO this bit should probably be alongside the body rule, rather than being redefined...
+    RCPAREN
+    ;
+
+structParentDeclaration
+    : COLON
+    ID (COMMA ID)*
+    ;

@@ -11,7 +11,7 @@ class IfFunctionTest : FriggaTest() {
     @Test
     fun `Assert Correct Functionality of If Function`() {
         val code = """
-            use "std"
+            use std
             if(true, {
                 true
             })
@@ -26,7 +26,7 @@ class IfFunctionTest : FriggaTest() {
     @Test
     fun `Assert Correct Functionality of If Function 2`() {
         val code = """
-            use "std"
+            use std
             if(false, {
                 true
             })

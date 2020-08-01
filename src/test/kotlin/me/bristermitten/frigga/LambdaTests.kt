@@ -8,6 +8,8 @@ class LambdaTests : FriggaTest() {
     @Test
     fun `Test correct handling of a Simple Lambda that yields a value`() {
         val code = """
+            use std
+            
             getValue = {
                 yield(3)
             }

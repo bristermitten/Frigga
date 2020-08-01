@@ -6,16 +6,20 @@ import me.bristermitten.frigga.runtime.command.CommandDeclaration
 import me.bristermitten.frigga.runtime.data.PropertyDeclaration
 import me.bristermitten.frigga.transform.AssignmentTransformer.toModifier
 
-object DeclarationTransformer : NodeTransformer<FriggaParser.DeclarationExpressionContext>() {
+object DeclarationTransformer : NodeTransformer<FriggaParser.PropertyDeclarationStatementContext>()
+{
 
-    override fun transformNode(node: FriggaParser.DeclarationExpressionContext): Command {
-        val full = node.fullDeclaration()
-        return CommandDeclaration(
-            PropertyDeclaration(
-                full.propertyModifier().map { it.toModifier() }.toSet(),
-                full.ID().text,
-                full.typeSpec().type().toType()
+    override fun transformNode(node: FriggaParser.PropertyDeclarationStatementContext): Command
+    {
+        with(node.propertyDeclaration()) {
+            val full = this.typedPropertyDeclaration()
+            return CommandDeclaration(
+                PropertyDeclaration(
+                    full.propertyModifier().map { it.toModifier() }.toSet(),
+                    full.ID().text,
+                    full.type().toType()
+                )
             )
-        )
+        }
     }
 }

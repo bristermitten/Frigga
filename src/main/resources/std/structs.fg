@@ -1,4 +1,4 @@
-namespace "std"
+namespace std
 
 struct Stack {
     push::(Any) -> _

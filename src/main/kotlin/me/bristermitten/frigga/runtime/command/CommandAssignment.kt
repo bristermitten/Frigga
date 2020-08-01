@@ -7,11 +7,13 @@ import me.bristermitten.frigga.runtime.data.Modifier
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
+import me.bristermitten.frigga.runtime.type.Type
 
 data class CommandAssignment(
-        val name: String,
-        val modifiers: Set<Modifier>,
-        val value: CommandNode
+    val name: String,
+    val modifiers: Set<Modifier>,
+    val value: CommandNode,
+    val expectedType: Type? = null
 ) : Command()
 {
 
@@ -22,34 +24,35 @@ data class CommandAssignment(
         value.command.eval(stack, context)
         val propertyValue = stack.pull()
 
+        require(expectedType?.accepts(propertyValue.type) ?: true) {
+            "Property $name is of type $expectedType but was assigned to a value of type ${propertyValue.type}"
+        }
+
         if (existing == null)
         {
             defineProperty(context, name, modifiers, propertyValue)
             return
         }
-
         val existingProperty = existing.second
         val existingValue = existingProperty.value.value
 
+        if (existingValue is Function)
+        {
+            require(existingProperty.value.type.accepts(propertyValue.type).not()) {
+                //only allow duplicate definitions of functions with different signatures
+                "Function conflicts with existing function ${existingValue.name} ${existingValue.signature}"
+            }
+
+            defineProperty(context, name, modifiers, propertyValue)
+            return
+        }
 
         if (existing.first == context.deepestScope || context.deepestScope.isFunctionScope)
         { //Allow property shadowing
 
             val mutable = Modifier.MUTABLE in existingProperty.modifiers
 
-            if (!mutable)
-            {
-                if (existingValue is Function && existingProperty.value.type.accepts(propertyValue.type))
-                {
-                    throw IllegalArgumentException("Function conflicts with existing function ${existingValue.name} ${existingValue.signature}")
-                } else
-                {
-                    defineProperty(context, name, modifiers, propertyValue)
-                    return
-                }
-            }
-
-            require(Modifier.MUTABLE in existingProperty.modifiers) {
+            require(mutable) {
                 "Cannot redefine a non mutable property ${existingProperty.name}"
             }
 

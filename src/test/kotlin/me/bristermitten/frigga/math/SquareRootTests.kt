@@ -10,7 +10,7 @@ class SquareRootTests : FriggaTest() {
     @Test
     fun `Assert Simple Integer sqrt Functioning Correctly`() {
         val code = """
-            use "std"
+            use std
             x = 16
             sqrt(x)
         """.trimIndent()

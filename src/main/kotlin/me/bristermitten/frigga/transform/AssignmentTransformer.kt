@@ -4,33 +4,63 @@ import FriggaParser
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandAssignment
 import me.bristermitten.frigga.runtime.data.Modifier
+import me.bristermitten.frigga.runtime.type.Type
 
-object AssignmentTransformer : NodeTransformer<FriggaParser.AssignmentExpressionContext>() {
+object AssignmentTransformer : NodeTransformer<FriggaParser.PropertyAssignmentContext>()
+{
 
-    override fun transformNode(node: FriggaParser.AssignmentExpressionContext): Command {
-        with(node.assignment()) {
-            val declaration = this.declaration()
-            val modifiers = declaration.propertyModifier()
-                .mapNotNull {
-                    it.toModifier()
-                }.toSet()
+    override fun transformNode(node: FriggaParser.PropertyAssignmentContext): Command
+    {
+        with(node) {
+            val typed = typedPropertyDeclaration()
+
+            val modifiers: Set<Modifier>
+            val name: String
+            val type: Type?
+            if (typed != null)
+            {
+                modifiers = typed.propertyModifier()
+                    .mapNotNull {
+                        it.toModifier()
+                    }.toSet()
+
+                name = typed.ID().text
+                type = typed.type().toType()
+            } else
+            {
+                val untyped = untypedPropertyDeclaration()
+                if (untyped != null)
+                {
+                    modifiers = untyped.propertyModifier()
+                        .mapNotNull {
+                            it.toModifier()
+                        }.toSet()
+
+                    name = untyped.ID().text
+                    type = null
+                } else
+                {
+                    throw UnsupportedOperationException(this.text)
+                }
+            }
 
 
-            val name = declaration.ID().text
-
-            val expression = this.expression()
+            val expression = expression()
 
             val value = NodeTransformers.transform(expression)
 
-            return CommandAssignment(name, modifiers, value)
+            return CommandAssignment(name, modifiers, value, type)
         }
     }
 
-    fun FriggaParser.PropertyModifierContext.toModifier(): Modifier {
-        if (MUTABLE() != null) {
+    fun FriggaParser.PropertyModifierContext.toModifier(): Modifier
+    {
+        if (MUTABLE() != null)
+        {
             return Modifier.MUTABLE
         }
-        if (NATIVE() != null) {
+        if (NATIVE() != null)
+        {
             return Modifier.NATIVE
         }
 

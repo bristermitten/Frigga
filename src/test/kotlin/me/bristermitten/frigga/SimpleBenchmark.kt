@@ -6,13 +6,16 @@ import org.junit.jupiter.api.Test
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class SimpleBenchmark : FriggaTest() {
+class SimpleBenchmark : FriggaTest()
+{
 
     @OptIn(ExperimentalTime::class)
     @Test
-    fun `Perform a simple Factorial function and get average parse time`() {
+    fun `Perform a simple Factorial function and get average parse time`()
+    {
         val code = """
-            use "std"
+            use std
+            
             factorial = (value::Int) -> Int {
                 if(value == 1, yield[1])
                 yield(value * factorial(value - 1))
@@ -20,7 +23,7 @@ class SimpleBenchmark : FriggaTest() {
             factorial(8) 
         """.trimIndent()
 
-        val times = 1000
+        val times = 100
         var totalParseTime = 0.0.toBigDecimal()
         var totalExecutionTime = 0.0.toBigDecimal()
         var totalTime = 0.0.toBigDecimal()
@@ -28,6 +31,8 @@ class SimpleBenchmark : FriggaTest() {
         repeat(times) {
             val result = runtime.execute(code)
             handleExceptions(result)
+            runtime.reset()
+
             totalParseTime += result.timings.parseTime.toBigDecimal()
             totalExecutionTime += result.timings.runtimeTime.toBigDecimal()
             totalTime += result.timings.totalTime.toBigDecimal()
@@ -56,16 +61,20 @@ class SimpleBenchmark : FriggaTest() {
 
             totalTime += time.inMilliseconds.toBigDecimal()
         }
-        println("""
+        println(
+            """
             ==Kotlin==
             Average Execution Time = ${totalTime / times.toBigDecimal()} ms
             
             Therefore, JVM Compiled Kotlin is about ${averageFriggaExecutionTime / (totalTime / times.toBigDecimal())}x faster than interpreted Frigga.
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
-    private fun factorial(value: Int): Long {
-        if (value == 1) {
+    private fun factorial(value: Int): Long
+    {
+        if (value == 1)
+        {
             return 1
         }
         return value * factorial(value - 1)

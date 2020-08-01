@@ -1,30 +1,38 @@
 package me.bristermitten.frigga.transform
 
-import FriggaParser.*
+import FriggaParser.LiteralContext
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandValue
 import me.bristermitten.frigga.runtime.data.*
 
-object LiteralTransformer : NodeTransformer<LiteralContext>() {
+object LiteralTransformer : NodeTransformer<LiteralContext>()
+{
 
-    override fun transformNode(node: LiteralContext): Command {
+    override fun transformNode(node: LiteralContext): Command
+    {
         with(node) {
             return CommandValue(
-                when (this) {
-                    is IntLiteralContext -> {
+                when
+                {
+                    IntLiteral() != null ->
+                    {
                         intValue(text.toLong())
                     }
-                    is DecLiteralContext -> {
+                    DecLiteral() != null ->
+                    {
                         decValue(text.toDouble())
                     }
-                    is StringLiteralContext -> {
-                        stringValue(this.STRING().text.removeSurrounding("\""))
+                    StringLiteral() != null ->
+                    {
+                        stringValue(this.text.removeSurrounding("\""))
                     }
-                    is CharLiteralContext -> {
-                        charValue(this.CHAR().text[1])
+                    CharLiteral() != null ->
+                    {
+                        charValue(this.text[1])
                     }
-                    is BoolLiteralContext -> {
-                        boolValue(this.BOOL().text!!.toBoolean())
+                    BoolLiteral() != null ->
+                    {
+                        boolValue(this.text!!.toBoolean())
                     }
                     else -> throw IllegalArgumentException("Unknown Literal Type $javaClass")
                 }

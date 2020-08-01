@@ -31,7 +31,7 @@ class DivisionTests : FriggaTest() {
         val result = runtime.execute(code)
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(1)
+        result.leftoverStack.first() shouldBe intValue(4000 / 400 / 5 / 2)
     }
 
     @Test

@@ -41,6 +41,7 @@ class FunctionTests : FriggaTest() {
     @Test
     fun `Test correct handling of a Simple Function that yields a value`() {
         val code = """
+            use std
             getValue = () -> Int {
                 yield(3)
             }
@@ -55,6 +56,7 @@ class FunctionTests : FriggaTest() {
     @Test
     fun `Test correct handling of a nested call`() {
         val code = """
+            use std
             getANumber = () -> Int {
                 yield(10)
             }
@@ -73,6 +75,7 @@ class FunctionTests : FriggaTest() {
     @Test
     fun `Test yield function correctly breaking out of execution`() {
         val code = """
+            use std
             getValue = () -> Int {
                 yield(3)
                 println("Hello")
@@ -95,6 +98,7 @@ class FunctionTests : FriggaTest() {
     @Test
     fun `Test Referenced Call correctly functioning`() {
         val code = """
+
             printHello = println["Hello"]
             printHello()
         """.trimIndent()

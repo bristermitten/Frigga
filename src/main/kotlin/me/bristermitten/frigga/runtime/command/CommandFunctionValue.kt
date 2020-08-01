@@ -15,7 +15,7 @@ data class CommandFunctionValue(
 ) : Command() {
 
     override fun eval(stack: Stack, context: FriggaContext) {
-        val function = Function("Anonymous", signature, content)
+        val function = Function(name, signature, content)
 
         function.init(context)
         stack.push(Value(FunctionType(signature), function))

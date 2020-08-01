@@ -1,40 +1,40 @@
 lexer grammar FriggaLexer;
 
-WHITESPACE: ([ ] | NEWLINE)+ -> skip;
-NEWLINE: ('\r'? '\n' | '\r') +;
+WHITESPACE: [ \t]+ -> skip;
+
+fragment SEMICOLON : ';';
+fragment NEWLINE   : '\r' '\n' | '\n' | '\r';
+ENDLINE : SEMICOLON NEWLINE* | NEWLINE+;
+
+COMMENT: '#' ~[\r\n]* -> skip;
+MULTI_COMMENT: '#=' .*? '=#' -> skip;
 
 //Numbers
-fragment DIGIT: '0'..'9';
-fragment HEX_DIGIT: [0-9A-F];
-SCIENTIFIC: 'E' [+-];
+fragment Digit: '0'..'9';
+fragment HexDigit: [0-9A-F];
+ScientificNotation: 'E' [+-];
 
 //Literals
-INT: DIGIT+ (SCIENTIFIC DIGIT+)?;
-DEC: INT '.' INT ;
-BOOL: 'true' | 'false';
-CHAR: '\'' (. | '\\' .) '\'';
-STRING: QUOTE ( '\\"' | . )*? QUOTE;
+
+IntLiteral: MINUS? AbsoluteIntLiteral;
+AbsoluteIntLiteral: Digit+ (ScientificNotation Digit+)?;
+DecLiteral: IntLiteral '.' AbsoluteIntLiteral ;
+BoolLiteral: 'true' | 'false';
+CharLiteral: '\'' (. | '\\' .) '\'';
+StringLiteral: QUOTE ( '\\"' | . )*? QUOTE;
 
 // Keywords
 MUTABLE: 'mutable';
 STATEFUL: 'stateful';
 SECRET: 'secret';
-STATIC: 'static';
+NATIVE: 'native';
 USE: 'use';
 NAMESPACE: 'namespace';
 TRAIT: 'trait';
 STRUCT: 'struct';
-NATIVE: 'native';
+JVM: 'JVM';
 
-
-//Operators
-PLUS: '+';
-MINUS: '-';
-TIMES: '*';
-DIVIDE: '/';
-POWER: '^';
-INVERSE: '!';
-ASSIGN: '=';
+//Symbols
 COMMA: ',';
 LPAREN: '(';
 RPAREN: ')';
@@ -44,6 +44,21 @@ LCPAREN: '{';
 RCPAREN: '}';
 COLON: ':';
 DOT: '.';
+
+//Identifier
+ID: [a-zA-Z_0-9]+;
+
+//Operators
+PLUS: '+';
+MINUS: '-';
+TIMES: '*';
+DIVIDE: '/';
+POWER: '^';
+NOT: '!';
+BIN_NOT: '~';
+ASSIGN: '=';
+
+
 DOUBLE_COLON: COLON COLON;
 ARROW: '->';
 QUOTE: '"';
@@ -52,13 +67,8 @@ MORE_THAN: '>';
 MORE_EQUAL_THAN: '>=';
 LESS_EQUAL_THAN: '<=';
 LESS_THAN: '<';
-COMMENT: '#' ~('\r'|'\n')* -> skip;
-MULTI_COMMENT: '##' .*? '##' -> skip;
 BACKSLASH: '\\';
-NOTHING: '_';
+UNDERSCORE: '_';
 AT: '@';
-
-//Identifier
-ID: [a-zA-Z_0-9]+;
 
 ERROR_CHAR: .;

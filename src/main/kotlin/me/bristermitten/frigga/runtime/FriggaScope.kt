@@ -6,14 +6,16 @@ import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.type.Type
 
 class FriggaScope(val name: String, val isFunctionScope: Boolean = false) {
-    internal val properties = HashMultimap.create<String, Property>()
+    internal val properties = HashMultimap.create<String, Property>(1, 1)
     internal val types = mutableMapOf<String, Type>()
 
     internal val parameters = mutableMapOf<String, Value>()
-
-    override fun toString(): String {
-        return "FriggaScope(name='$name', properties=$properties, types=$types)"
+    
+    override fun toString(): String
+    {
+        return "FriggaScope(name='$name', isFunctionScope=$isFunctionScope, properties=$properties, types=$types, parameters=$parameters)"
     }
+
 
 
 }

@@ -38,7 +38,7 @@ class BoolLiteralTests : FriggaTest() {
     fun `Assert Correct Functionality of Repeated Negation`() {
         val code = """
             bool = false
-            !!!!!!!!!!!!!!!!!!!!!bool
+            !!!bool
         """.trimIndent()
 
         val result = runtime.execute(code)

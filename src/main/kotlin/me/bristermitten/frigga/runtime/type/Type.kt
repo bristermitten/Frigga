@@ -12,7 +12,8 @@ import me.bristermitten.frigga.util.set
 abstract class Type(
     val name: String,
     val parent: Type? = AnyType
-) {
+)
+{
     val staticProperty = Property(
         name,
         emptySet(),
@@ -20,15 +21,18 @@ abstract class Type(
     )
     private val properties: Multimap<String, TypeProperty> = HashMultimap.create()
 
-    fun getProperty(name: String): TypeProperty? {
+    fun getProperty(name: String): TypeProperty?
+    {
         return properties[name].firstOrNull { it.type !is FunctionType }
     }
 
-    fun getFunctions(name: String): List<TypeProperty> {
+    fun getFunctions(name: String): List<TypeProperty>
+    {
         return properties[name].filter { it.type is FunctionType } + (parent?.getFunctions(name) ?: emptyList())
     }
 
-    fun getFunction(name: String, params: List<Type>): TypeProperty? {
+    fun getFunction(name: String, params: List<Type>): TypeProperty?
+    {
         val byName = getFunctions(name)
             .filter {
                 (it.type as FunctionType).signature.typesMatch(params)
@@ -41,7 +45,8 @@ abstract class Type(
         }
     }
 
-    protected fun defineProperty(property: TypeProperty) {
+    protected fun defineProperty(property: TypeProperty)
+    {
         val existing = properties[property.name]
         require(existing.isEmpty()) {
             "Cannot redefine existing Type Property ${property.name}"
@@ -49,19 +54,24 @@ abstract class Type(
         properties[property.name] = property
     }
 
-    protected fun defineFunction(function: Function) {
+    protected fun defineFunction(function: Function)
+    {
         properties[function.name] = TypeProperty(function.name, FunctionType(function.signature), function)
     }
 
-    protected inline fun defineFunction(closure: FunctionDefiner.() -> Unit) {
+    protected inline fun defineFunction(closure: FunctionDefiner.() -> Unit)
+    {
         val value = function(closure)
         defineFunction(value)
     }
 
-    open fun isSubtypeOf(other: Type): Boolean {
+    open fun isSubtypeOf(other: Type): Boolean
+    {
         var thisParent = this.parent
-        while (thisParent != null) {
-            if (thisParent === other) {
+        while (thisParent != null)
+        {
+            if (thisParent === other)
+            {
                 return true
             }
             thisParent = thisParent.parent
@@ -69,16 +79,24 @@ abstract class Type(
         return false
     }
 
-    fun coerceTo(value: Value, other: Type): Value {
-        if (value.type.isSubtypeOf(other)) {
+    fun coerceTo(value: Value, other: Type): Value
+    {
+        if (value.type == other)
+        {
+            return value
+        }
+        if (value.type.isSubtypeOf(other))
+        {
             return value //avoid unnecessary coercion between things like Int and Any
         }
         require(other.accepts(value.type)) {
             "Cannot coerce between incompatible types ${value.type} and $other"
         }
 
-        if (other is FunctionType && !this.accepts(other)) { //No coercion necessary if the 2 function types are the same
-            if (other.signature.params.isEmpty() && other.signature.returned.accepts(this)) {
+        if (other is FunctionType && !this.accepts(other))
+        { //No coercion necessary if the 2 function types are the same
+            if (other.signature.params.isEmpty() && other.signature.returned.accepts(this))
+            {
                 return Value(other, function {
                     signature {
                         output = this@Type
@@ -93,9 +111,12 @@ abstract class Type(
         return coerceValueTo(value, other)
     }
 
-    open fun accepts(other: Type): Boolean {
-        if (this is FunctionType) {
-            if (signature.params.isEmpty() && signature.returned.accepts(other)) {
+    open fun accepts(other: Type): Boolean
+    {
+        if (this is FunctionType)
+        {
+            if (signature.params.isEmpty() && signature.returned.accepts(other))
+            {
                 return true //allow coercion between things like Int and () -> Int
             }
         }
@@ -105,7 +126,8 @@ abstract class Type(
 
     protected open fun coerceValueTo(value: Value, other: Type) = Value(other, value.value)
 
-    override fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean
+    {
         if (this === other) return true
         if (other !is Type) return false
 
@@ -114,7 +136,8 @@ abstract class Type(
         return true
     }
 
-    override fun hashCode(): Int {
+    override fun hashCode(): Int
+    {
         return name.hashCode()
     }
 

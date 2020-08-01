@@ -122,8 +122,7 @@ object DecType : Type(
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findParameter("value")!!
-                    val otherCoerced = other.type.coerceTo(other, DecType)
-                    stack.push(decValue(decOperator(thisValue.value as Double, otherCoerced.value as Double)))
+                    stack.push(decValue(decOperator(thisValue.value as Double, other.value as Double)))
                 }
             }
         }
@@ -141,8 +140,7 @@ object DecType : Type(
                 body { stack, context ->
                     val thisValue = context.findProperty(THIS_NAME)!!.value
                     val other = context.findParameter("value")!!
-                    val otherCoerced = other.type.coerceTo(other, DecType)
-                    stack.push(boolValue(operator(thisValue.value as Double, otherCoerced.value as Double)))
+                    stack.push(boolValue(operator(thisValue.value as Double, other.value as Double)))
                 }
             }
         }

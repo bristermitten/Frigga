@@ -1,7 +1,7 @@
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_ADD_NAME
-import me.bristermitten.frigga.runtime.command.OPERATOR_NOT_NAME
+import me.bristermitten.frigga.runtime.command.PREFIX_OPERATOR_NOT_NAME
 import me.bristermitten.frigga.runtime.data.boolValue
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
@@ -53,7 +53,7 @@ object BoolType : Type(
 ) {
     init {
         defineFunction {
-            name = OPERATOR_NOT_NAME
+            name = PREFIX_OPERATOR_NOT_NAME
             signature {
                 output = BoolType
             }

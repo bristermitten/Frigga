@@ -29,6 +29,8 @@ class StructTests : FriggaTest() {
     @Test
     fun `Test Basic Struct Function Functionality`() {
         val code = """
+        use std
+        
         struct TestStruct { 
             someFunction::() -> _
         }

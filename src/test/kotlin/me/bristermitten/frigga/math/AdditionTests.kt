@@ -9,10 +9,12 @@ import me.bristermitten.frigga.runtime.data.intValue
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
-class AdditionTests : FriggaTest() {
+class AdditionTests : FriggaTest()
+{
 
     @Test
-    fun `Assert Simple Integer Addition Functioning Correctly`() {
+    fun `Assert Simple Integer Addition Functioning Correctly`()
+    {
         val code = """
             x = 3
             x + 1
@@ -20,35 +22,40 @@ class AdditionTests : FriggaTest() {
 
         val result = runtime.execute(code)
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(4)
+        result.leftoverStack.first() shouldBe intValue(3 + 1)
     }
 
     @Test
-    fun `Assert More Complex Integer Addition Functioning Correctly`() {
+    fun `Assert More Complex Integer Addition Functioning Correctly`()
+    {
+        val x = 3
         val code = """
-            x = 3
-            x + x + 5 + (x + 1)
+            x = $x
+            (x + x) + 5 + x
         """.trimIndent()
         val result = runtime.execute(code)
 
         handleExceptions(result)
-        result.leftoverStack.first() shouldBe intValue(3 + 3 + 5 + (3 + 1))
+        result.leftoverStack.first() shouldBe intValue((x + x + 5 + x).toLong())
     }
 
 
     @Test
-    fun `Assert Simple Decimal Addition Functioning Correctly`() {
+    fun `Assert Simple Decimal Addition Functioning Correctly`()
+    {
         val code = """
             x = 3.0
             x + 1
         """.trimIndent()
         val result = runtime.execute(code)
         result.exceptions.shouldBeEmpty()
+
         result.leftoverStack.first() shouldBe decValue(4.0)
     }
 
     @Test
-    fun `Assert Simple Decimal Reassignment Functioning Correctly`() {
+    fun `Assert Simple Decimal Reassignment Functioning Correctly`()
+    {
         val code = """
             mutable x = 3.0
             x = 4
@@ -61,17 +68,20 @@ class AdditionTests : FriggaTest() {
     }
 
     @RepeatedTest(RANDOM_TEST_COUNT)
-    fun `Assert Random Decimal Addition Functioning Correctly`() {
+    fun `Assert Random Decimal Addition Functioning Correctly`()
+    {
         val start = Math.random()
         val param1 = Math.random()
         val param2 = Math.random()
 
         val code = """
+            use std
             x = $start
             x + $param1 + $param2
+            
         """.trimIndent()
-        val result = runtime.execute(code)
 
+        val result = runtime.execute(code)
         handleExceptions(result)
         result.leftoverStack.first() shouldBe decValue(start + param1 + param2)
     }

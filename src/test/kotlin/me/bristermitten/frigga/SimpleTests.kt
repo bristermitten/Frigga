@@ -8,10 +8,12 @@ import me.bristermitten.frigga.runtime.data.decValue
 import me.bristermitten.frigga.runtime.data.intValue
 import org.junit.jupiter.api.Test
 
-class SimpleTests : FriggaTest() {
+class SimpleTests : FriggaTest()
+{
 
     @Test
-    fun `Test Simple Property Declaration`() {
+    fun `Test Simple Property Declaration`()
+    {
         val code = """
             x = 3
             x
@@ -24,23 +26,26 @@ class SimpleTests : FriggaTest() {
     }
 
     @Test
-    fun `Test Simple Property With Explicit Type`() {
+    fun `Test Simple Property With Explicit Type`()
+    {
         val code = """
             x::Int = 3
             x
+            
         """.trimIndent()
         val result = runtime.execute(code)
 
         result.leftoverStack shouldContain intValue(3)
         result.leftoverStack.shouldBeSingleton()
-
     }
 
     @Test
-    fun `Test Immutable Property Redefinition throws Exception`() {
+    fun `Test Immutable Property Redefinition throws Exception`()
+    {
         val code = """
             x = 3
             x = 4
+            x
         """.trimIndent()
         val result = runtime.execute(code)
 
@@ -49,7 +54,8 @@ class SimpleTests : FriggaTest() {
     }
 
     @Test
-    fun `Test Mutable Property Redefinition does not throw Exception`() {
+    fun `Test Mutable Property Redefinition does not throw Exception`()
+    {
         val code = """
             mutable x = 3
             x = 4
@@ -61,7 +67,8 @@ class SimpleTests : FriggaTest() {
     }
 
     @Test
-    fun `Test Property Definition and reassignment with different types`() {
+    fun `Test Property Definition and reassignment with different types`()
+    {
         val code = """
             mutable x = 3.0
             x = 4
@@ -75,7 +82,8 @@ class SimpleTests : FriggaTest() {
     }
 
     @Test
-    fun `Test Property Definition and reassignment adding 1`() {
+    fun `Test Property Definition and reassignment adding 1`()
+    {
         val code = """
             mutable x = 3
             x = x + 1
@@ -88,7 +96,8 @@ class SimpleTests : FriggaTest() {
     }
 
     @Test
-    fun `Test Property Definition and reassignment adding 1 twice`() {
+    fun `Test Property Definition and reassignment adding 1 twice`()
+    {
         val code = """
             mutable x = 3
             x = x + 1

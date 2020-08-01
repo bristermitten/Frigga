@@ -15,7 +15,7 @@ abstract class FriggaTest {
 
     fun handleExceptions(result: FullExecutionResult) {
         result.exceptions.forEach {
-            it.printStackTrace()
+            throw it
         }
     }
 
@@ -33,4 +33,4 @@ abstract class FriggaTest {
     }
 }
 
-const val RANDOM_TEST_COUNT = 1
+const val RANDOM_TEST_COUNT = 5

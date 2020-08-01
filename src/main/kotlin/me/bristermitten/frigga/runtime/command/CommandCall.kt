@@ -32,12 +32,8 @@ data class CommandCall(
             stack.pull()
         }
 
-        if (callingUpon != null) {
-            context.defineProperty(THIS_NAME, callingUpon, true)
-        }
-
         if (function != null) {
-            function?.call(stack, context, paramValues)
+            function?.call(callingUpon, stack, context, paramValues)
             return
         }
 
@@ -57,7 +53,7 @@ data class CommandCall(
             "No such function $uponType#$calling(${paramTypes.joinToString(prefix = "", postfix = "")})"
         }
 
-        function.call(stack, context, paramValues)
+        function.call(callingUpon, stack, context, paramValues)
 
     }
 }
