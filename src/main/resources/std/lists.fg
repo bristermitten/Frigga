@@ -1,2 +1,10 @@
-struct List<T> {
+namespace std
+
+struct List<T>{
+    first::Node<T>
+}
+
+struct Node<T> {
+    prev::Node<T>
+    next::Node<T>
 }
