@@ -241,7 +241,7 @@ propertyAccess //eg SomeStruct.prop or someValue.prop or prop
 
 referencedCall
     :
-      refererencedCallParameters
+      typeSignature? refererencedCallParameters
     ;
 
 refererencedCallParameters
@@ -252,6 +252,10 @@ functionCallParameters
     : LPAREN functionCallParametersList RPAREN
     ;
 
+functionCall
+    :
+      typeSignature? functionCallParameters functionBody?
+    ;
 
 
 functionCallParametersList
@@ -290,7 +294,7 @@ assignableExpression
 
 
 expression
-    : expression functionCallParameters functionBody? #callExpression //blah("hello")
+    : expression functionCall #callExpression //blah("hello")
     | expression referencedCall #referencedCallExpression //blah["hello"]
     | prefixOperatorCall #prefixOperatorExpression //!true
     | expression DOT ID #accessExpression //a.b
