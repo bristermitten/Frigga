@@ -12,7 +12,7 @@ object PropertyAccessTransformer : NodeTransformer<FriggaParser.PropertyAccessCo
     {
         if (node is FriggaParser.DirectAccessContext)
         {
-            return CommandPropertyReference(node.ID().text)
+            return CommandPropertyReference(node.structName().text)
         }
 
         if (node is FriggaParser.ChildAccessContext)

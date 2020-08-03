@@ -1,0 +1,7 @@
+namespace std
+
+use JVM:kotlin.text.Regex
+
+String.stripAll = (toStrip::String) -> String {
+    yield(Regex(toStrip).replace(this, ""))
+}

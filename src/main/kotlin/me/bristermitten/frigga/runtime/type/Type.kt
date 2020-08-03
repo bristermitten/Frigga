@@ -89,6 +89,7 @@ abstract class Type(
         {
             return value //avoid unnecessary coercion between things like Int and Any
         }
+
         require(other.accepts(value.type)) {
             "Cannot coerce between incompatible types ${value.type} and $other"
         }

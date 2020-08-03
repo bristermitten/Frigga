@@ -2,6 +2,7 @@ package me.bristermitten.frigga.transform
 
 import FriggaParser.FunctionExpressionContext
 import FriggaParser.PropertyAssignmentContext
+import getType
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandFunctionValue
 import me.bristermitten.frigga.runtime.data.function.Signature
@@ -50,7 +51,9 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>()
 
             val body = functionBody().body().transformBody()
 
-            CommandFunctionValue(name, functionSignature, body)
+            val extensionType = (parent as? PropertyAssignmentContext)?.extensionDefinition()?.type()?.text?.let(::getType)
+
+            CommandFunctionValue(name, functionSignature, body, extensionType)
         }
     }
 }

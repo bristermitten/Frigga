@@ -31,12 +31,12 @@ object StructDeclarationTransformer : NodeTransformer<FriggaParser.StructDeclara
                             val typed = assignment.typedPropertyDeclaration()
                             if (typed != null)
                             {
-                                TypeProperty(typed.ID().text, typed.type().toType(), assignment.expression())
+                                TypeProperty(typed.ID().text, typed.type().toType(), null)
                             }
                             val untyped = assignment.untypedPropertyDeclaration()
                             if (untyped != null)
                             {
-                                TypeProperty(untyped.ID().text, AnyType, assignment.expression())
+                                TypeProperty(untyped.ID().text, AnyType, null)
                             } else
                             {
                                 throw IllegalArgumentException("Illegal statement inside struct ${it.text}")

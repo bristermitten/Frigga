@@ -22,6 +22,7 @@ import me.bristermitten.frigga.transform.load
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.atn.PredictionMode
+import org.antlr.v4.runtime.misc.ParseCancellationException
 import java.io.File
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -125,6 +126,10 @@ class FriggaRuntime
             try
             {
                 parser.friggaFile()
+            } catch (cancel: ParseCancellationException)
+            {
+                println("Error in $fileName")
+                throw cancel
             } catch (ex: Exception)
             {
                 stream.seek(0)

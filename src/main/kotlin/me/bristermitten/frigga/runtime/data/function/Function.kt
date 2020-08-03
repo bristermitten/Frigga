@@ -11,7 +11,8 @@ import me.bristermitten.frigga.runtime.type.Type
 data class Function(
     val name: String,
     val signature: Signature,
-    val content: List<CommandNode>
+    val content: List<CommandNode>,
+    val extensionType: Type? = null
 )
 {
 
@@ -23,6 +24,11 @@ data class Function(
 
     fun call(upon: Value?, stack: Stack, context: FriggaContext, params: List<Value>)
     {
+        if (signature.params.size != params.size)
+        {
+            throw IllegalArgumentException("Wrong amount of parameters provided to function $name. Expected ${signature.params.size} and got ${params.size}")
+        }
+
         val namedParams = signature.params.entries.mapIndexed { index, entry ->
             entry.key to params[index]
         }.toMap()
@@ -35,25 +41,38 @@ data class Function(
         val context = scope?.copy()?.apply {
             use(context)
         } ?: context
+
         context.enterFunctionScope(name)
+
+
+        if (extensionType != null)
+        {
+            requireNotNull(upon) {
+                "Extension functions must have the upon parameter provided!"
+            }
+        }
 
         if (upon != null) //should this ever BE null?
         {
             context.defineProperty(THIS_NAME, upon, true)
         }
 
-        val parameters = signature.params.mapValues {
+        val parameters = signature.params
+            .mapValues {
 
-            val param = requireNotNull(params[it.key]) {
-                "No value provided for parameter ${it.key}"
+                val providedParameter = requireNotNull(params[it.key]) {
+                    "No value provided for parameter ${it.key}"
+                }
+
+                val expectedType = it.value.reestablish(context)
+
+                require(expectedType.accepts(providedParameter.type)) {
+                    "Cannot use value of Type ${providedParameter.type} in place of $expectedType for parameter ${it.key}"
+                }
+
+                providedParameter.type.coerceTo(providedParameter, expectedType)
             }
 
-            require(it.value.accepts(param.type)) {
-                "Cannot use value of Type ${param.type} in place of ${it.value} for parameter ${it.key}"
-            }
-
-            param.type.coerceTo(param, it.value)
-        }
         parameters.forEach {
             context.defineParameter(it.key, it.value)
         }

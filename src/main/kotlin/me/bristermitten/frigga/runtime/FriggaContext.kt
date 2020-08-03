@@ -1,5 +1,6 @@
 package me.bristermitten.frigga.runtime
 
+import InputType
 import OutputType
 import me.bristermitten.frigga.runtime.data.Property
 import me.bristermitten.frigga.runtime.data.Value
@@ -9,6 +10,7 @@ import me.bristermitten.frigga.runtime.type.StackType
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
 import me.bristermitten.frigga.util.set
+import findType as findInternalType
 
 class FriggaContext(val name: String)
 {
@@ -61,6 +63,14 @@ class FriggaContext(val name: String)
                 Unit
             )
         )
+        globalScope.properties[STDIN_NAME] = Property(
+            STDIN_NAME,
+            emptySet(),
+            Value(
+                InputType,
+                Unit
+            )
+        )
 
         return globalScope
     }
@@ -68,6 +78,25 @@ class FriggaContext(val name: String)
     internal fun findProperty(name: String): Property?
     {
         return findPropertyScope(name)?.second
+    }
+
+    private fun findPropertyScopes(name: String): List<Pair<FriggaScope, Property>>
+    {
+        val props = mutableListOf<Pair<FriggaScope, Property>>()
+        for (scope in scope)
+        {
+            val properties = scope.properties[name]
+            for (property in properties)
+            {
+                props.add(scope to property)
+            }
+        }
+
+        for (other in using)
+        {
+            props.addAll(other.findPropertyScopes(name))
+        }
+        return props
     }
 
     internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>?
@@ -94,6 +123,12 @@ class FriggaContext(val name: String)
 
     internal fun findType(name: String): Type?
     {
+        val type = findInternalType(name) //global types
+        if (type != null)
+        {
+            return type
+        }
+
         for (scope in scope)
         {
             val type = scope.types[name]
@@ -114,6 +149,16 @@ class FriggaContext(val name: String)
         return null
     }
 
+    fun findExtensionFunction(type: Type, name: String, parameterTypes: List<Type>): Function?
+    {
+        return findFunctions(name)
+            .filter { it.extensionType == type }
+            .firstOrNull {
+                it.signature.typesMatch(parameterTypes)
+            }
+
+    }
+
     fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function?
     {
         val function = type.getFunction(name, parameterTypes) ?: return null
@@ -122,6 +167,12 @@ class FriggaContext(val name: String)
         if (functionValue != null)
         {
             return functionValue
+        }
+
+        val extensionFunction = findExtensionFunction(type, name, parameterTypes)
+        if (extensionFunction != null)
+        {
+            return extensionFunction
         }
 
         for (other in using)
@@ -135,12 +186,30 @@ class FriggaContext(val name: String)
         return null
     }
 
+    private fun findFunctions(name: String): List<Function>
+    {
+        val functionProperties = findPropertyScopes(name)
+
+        return functionProperties.map {
+            it.second.value.value
+        }.filterIsInstance<Function>()
+    }
+
     internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function?
     {
         if (type != null)
         {
-            val value = type.getFunction(name, parameterTypes)?.value
-            return value as Function?
+            val value = type.getFunction(name, parameterTypes)?.value as? Function
+            if (value != null)
+            {
+                return value
+            }
+            val extensionFunction = findExtensionFunction(type, name, parameterTypes)
+            if (extensionFunction != null)
+            {
+                return extensionFunction
+            }
+            return null
         }
 
         val functionParameter = findParameter(name)?.value as? Function
@@ -149,10 +218,13 @@ class FriggaContext(val name: String)
             return functionParameter
         }
 
-        val functionProperty = findProperty(name)?.value?.value as? Function
-        if (functionProperty != null)
+
+        val matching = findFunctions(name)
+            .firstOrNull { it.signature.typesMatch(parameterTypes) }
+
+        if (matching != null)
         {
-            return functionProperty
+            return matching
         }
 
         //Constructors
@@ -162,6 +234,7 @@ class FriggaContext(val name: String)
         {
             return findFunction(constructorType, CONSTRUCTOR, parameterTypes)
         }
+
         for (other in using)
         {
             val function = other.findFunction(type, name, parameterTypes)

@@ -45,7 +45,7 @@ object AssignmentTransformer : NodeTransformer<FriggaParser.PropertyAssignmentCo
             }
 
 
-            val expression = expression()
+            val expression = assignableExpression()
 
             val value = NodeTransformers.transform(expression)
 

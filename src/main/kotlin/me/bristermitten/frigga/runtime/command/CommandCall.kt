@@ -2,21 +2,24 @@ package me.bristermitten.frigga.runtime.command
 
 import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
-import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.Function
+import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
+import me.bristermitten.frigga.runtime.type.TypeType
 
 data class CommandCall(
     val upon: CommandNode?,
     val calling: String,
     val params: List<CommandNode>
-) : Command() {
+) : Command()
+{
 
     private var function: Function? = null
 
-    override fun eval(stack: Stack, context: FriggaContext) {
+    override fun eval(stack: Stack, context: FriggaContext)
+    {
 
         val callingUpon = upon?.let {
             it.command.eval(stack, context)
@@ -32,18 +35,28 @@ data class CommandCall(
             stack.pull()
         }
 
-        if (function != null) {
+        if (function != null)
+        {
             function?.call(callingUpon, stack, context, paramValues)
             return
         }
 
         val paramTypes = paramValues.map(Value::type)
-        val uponType = callingUpon?.type
+        val uponType = if (callingUpon?.type == TypeType)
+        {
+            callingUpon.value as Type
+        } else
+        {
+            callingUpon?.type
+        } //this is such a hack but it works... :D
 
         val typeInstance = callingUpon?.value as? TypeInstance
-        val function = if (typeInstance != null) {
+
+        val function = if (typeInstance != null)
+        {
             context.findTypeFunction(callingUpon.type, typeInstance, calling, paramTypes)
-        } else {
+        } else
+        {
             context.findFunction(uponType, calling, paramTypes)
         }
 

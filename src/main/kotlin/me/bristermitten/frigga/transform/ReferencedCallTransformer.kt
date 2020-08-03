@@ -13,14 +13,16 @@ object ReferencedCallTransformer : NodeTransformer<FriggaParser.ReferencedCallEx
     {
         val referencedCall = node.referencedCall()
 
-        val access = NodeTransformers.transform(referencedCall.propertyAccess())
+        val access = NodeTransformers.transform(node.expression())
 
-        val calling = if (access.command is CommandAccess)
+        val command = access.command
+        val calling = if (command is CommandAccess)
         {
-            access.command.property
-        } else
+            command.property
+        }
+        else
         {
-            (access.command as CommandPropertyReference).referencing
+            (command as CommandPropertyReference).referencing
         }
 
         val upon = (access.command as? CommandAccess)?.upon
@@ -32,7 +34,7 @@ object ReferencedCallTransformer : NodeTransformer<FriggaParser.ReferencedCallEx
                 .refererencedCallParameters()
                 .functionCallParametersList()
                 .indexedFunctionCallParameter()
-                .map { it.expression() }
+                .map { it.assignableExpression() }
                 .map(NodeTransformers::transform)
         )
     }

@@ -2,6 +2,7 @@ package me.bristermitten.frigga.runtime.type
 
 import BoolType
 import getJVMType
+import me.bristermitten.frigga.runtime.CONSTRUCTOR
 import me.bristermitten.frigga.runtime.THIS_NAME
 import me.bristermitten.frigga.runtime.command.OPERATOR_EQUAL_NAME
 import me.bristermitten.frigga.runtime.data.Value
@@ -11,14 +12,26 @@ import me.bristermitten.frigga.runtime.data.function.signature
 import me.bristermitten.frigga.runtime.error.BreakException
 import java.lang.reflect.Modifier
 
+
+object TypeType : Type("Type", null)
+{
+    override fun accepts(other: Type): Boolean
+    {
+        return other == this
+    }
+}
+
 object AnyType : Type(
     "Any", null
-) {
-    override fun accepts(other: Type): Boolean {
+)
+{
+    override fun accepts(other: Type): Boolean
+    {
         return true
     }
 
-    init {
+    init
+    {
         defineFunction {
             name = OPERATOR_EQUAL_NAME
             signature {
@@ -36,8 +49,10 @@ object AnyType : Type(
     }
 }
 
-data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
-    fun init() {
+data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName)
+{
+    fun init()
+    {
         jvmClass.methods.filterNot { it.isSynthetic }
             .filter { Modifier.isPublic(it.modifiers) }
             .forEach {
@@ -60,17 +75,38 @@ data class JVMType(val jvmClass: Class<*>) : Type(jvmClass.simpleName) {
                     }
                 }
             }
+
+        jvmClass.constructors.forEach {
+            defineFunction {
+                name = CONSTRUCTOR
+                signature {
+                    input = it.parameters.map { param ->
+                        param.name to getJVMType(param.type)
+                    }.toMap()
+                    output = this@JVMType
+                }
+                body { stack, context ->
+                    val result = it.newInstance(*it.parameters.map { param ->
+                        val findProperty = context.findParameter(param.name)
+                        findProperty?.value
+                    }.toTypedArray())
+
+                    stack.push(Value(signature.returned, result))
+                }
+            }
+        }
     }
-
-
 }
 
-object CallerType : Type("__Caller") {
-    init {
+object CallerType : Type("__Caller")
+{
+    init
+    {
         defineFunction {
             name = "ensureInsideFunction"
             body { _, friggaContext ->
-                if (!friggaContext.deepestScope.isFunctionScope) {
+                if (!friggaContext.deepestScope.isFunctionScope)
+                {
                     throw IllegalStateException("Must be called from inside a Function.")
                 }
             }
@@ -86,15 +122,19 @@ object CallerType : Type("__Caller") {
 }
 
 
-object NothingType : Type("Nothing", null) {
+object NothingType : Type("Nothing", null)
+{
     val INSTANCE = Unit
-    override fun isSubtypeOf(other: Type): Boolean {
+    override fun isSubtypeOf(other: Type): Boolean
+    {
         return true
     }
 }
 
-object StackType : Type("Stack") {
-    init {
+object StackType : Type("Stack")
+{
+    init
+    {
         defineFunction {
             name = "push"
             signature {

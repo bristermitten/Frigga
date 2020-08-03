@@ -5,6 +5,7 @@ import me.bristermitten.frigga.runtime.command.PREFIX_OPERATOR_NOT_NAME
 import me.bristermitten.frigga.runtime.data.boolValue
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
+import me.bristermitten.frigga.runtime.data.intValue
 import me.bristermitten.frigga.runtime.data.stringValue
 import me.bristermitten.frigga.runtime.type.*
 
@@ -12,8 +13,10 @@ import me.bristermitten.frigga.runtime.type.*
 object StringType : Type(
     "String",
     AnyType
-) {
-    init {
+)
+{
+    init
+    {
         defineFunction {
             name = OPERATOR_ADD_NAME
             signature {
@@ -26,13 +29,28 @@ object StringType : Type(
                 stack.push(stringValue((thisValue.value as String) + addTo.value))
             }
         }
+
+        defineFunction{
+            name = "toInt"
+            signature {
+                output = IntType
+            }
+            body { stack, context ->
+                val thisValue = context.findProperty(THIS_NAME)!!.value.value as String
+                val thisToInt = thisValue.toLong()
+
+                stack.push(intValue(thisToInt))
+            }
+        }
     }
 }
 
 object CharType : Type(
     "Char"
-) {
-    init {
+)
+{
+    init
+    {
         defineFunction {
             name = OPERATOR_ADD_NAME
             signature {
@@ -50,8 +68,10 @@ object CharType : Type(
 
 object BoolType : Type(
     "Bool"
-) {
-    init {
+)
+{
+    init
+    {
         defineFunction {
             name = PREFIX_OPERATOR_NOT_NAME
             signature {
@@ -67,16 +87,25 @@ object BoolType : Type(
     }
 }
 
-private class SimpleType(name: String) : Type(name) {
-    override fun reestablish(context: FriggaContext): Type {
+private class SimpleType(name: String) : Type(name)
+{
+    override fun reestablish(context: FriggaContext): Type
+    {
         return context.findType(name) ?: this
+    }
+
+    override fun toString(): String
+    {
+        return "SimpleType($name)"
     }
 }
 
-object OutputType : Type("Output") {
-    init {
+object OutputType : Type("Output")
+{
+    init
+    {
         defineFunction {
-            this.name = "println"
+            name = "println"
             signature {
                 input = mapOf("value" to AnyType)
             }
@@ -87,10 +116,29 @@ object OutputType : Type("Output") {
     }
 }
 
+object InputType : Type("Input")
+{
+    init
+    {
+        defineFunction {
+            name = "readLine"
+            signature {
+                output = StringType
+            }
+            body { stack, _ ->
+                val text = readLine() ?: ""
+
+                stack.push(stringValue(text))
+            }
+        }
+    }
+}
+
 
 private val types = mutableMapOf<String, Type>()
 
-fun loadTypes() {
+fun loadTypes()
+{
     fun Type.load() = types.put(name, this)
     NumType.load()
     IntType.load()
@@ -101,20 +149,26 @@ fun loadTypes() {
     AnyType.load()
     NothingType.load()
     CallerType.load()
+    InputType.load()
     OutputType.load()
+    TypeType.load()
 }
 
+fun findType(name: String) = types[name]
 fun getType(name: String) = types.getOrPut(name) {
     SimpleType(name)
 }
 
-fun getJVMType(jvmClass: Class<*>): Type {
+fun getJVMType(jvmClass: Class<*>): Type
+{
     var type = JVM_EQUIVALENTS[jvmClass]
-    if (type != null) {
+    if (type != null)
+    {
         return type
     }
     type = types[jvmClass.name]
-    if (type != null) {
+    if (type != null)
+    {
         return type
     }
     type = JVMType(jvmClass)
@@ -131,6 +185,7 @@ val JVM_EQUIVALENTS = mapOf(
     Object::class.java to AnyType,
     Any::class.java to AnyType,
     String::class.java to StringType,
+    CharSequence::class.java to StringType,
     Type::class.java to AnyType,
     Void::class.java to NothingType,
     Class::class.java to AnyType

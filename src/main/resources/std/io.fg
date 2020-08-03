@@ -3,3 +3,10 @@ namespace std
 println = (value::Any) -> _ {
     __stdout.println(value)
 }
+
+readln = (type::Type) -> Any {
+    #TODO actually check the type :)
+    yield(__stdin.readLine())
+}
+
+readln = readln[String]

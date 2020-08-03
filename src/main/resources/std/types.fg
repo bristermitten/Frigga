@@ -3,3 +3,6 @@ namespace std
 trait Any {
     equals::(Any) -> Bool
 }
+
+trait Type {
+}

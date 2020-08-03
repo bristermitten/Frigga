@@ -1,5 +1,6 @@
 package me.bristermitten.frigga.transform
 
+import FriggaParser
 import FriggaParser.*
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.data.CommandNode
@@ -19,42 +20,29 @@ object NodeTransformers
             AssignmentTransformer,
             PropertyAssignmentStatementContext::propertyAssignment
         ),
+        PropertyAssignmentContext::class.java to AssignmentTransformer,
 
-        AssignableExpressionExpressionContext::class.java to object :
-            NodeTransformer<AssignableExpressionExpressionContext>()
+        OtherExpressionContext::class.java to object :
+            NodeTransformer<OtherExpressionContext>()
         {
-            override fun transformNode(node: AssignableExpressionExpressionContext): Command
+            override fun transformNode(node: OtherExpressionContext): Command
             {
-                return transform(node.assignableExpression()).command
-            }
-
-        },
-        //I hate this... with a passion...
-        NotBinaryExpressionExpressionContext::class.java to object :
-            NodeTransformer<NotBinaryExpressionExpressionContext>()
-        {
-            override fun transformNode(node: NotBinaryExpressionExpressionContext): Command
-            {
-                return transform(node.notBinaryExpression()).command
+                return transform(node.expression()).command
             }
 
         },
 
         PropertyAccessContext::class.java to PropertyAccessTransformer,
 
-        AccessExpressionContext::class.java to delegateTransformer(
+        PropertyAccessExpressionContext::class.java to delegateTransformer(
             PropertyAccessTransformer,
-            AccessExpressionContext::propertyAccess
+            PropertyAccessExpressionContext::propertyAccess
         ),
 
-        PropertyAssignmentContext::class.java to AssignmentTransformer,
+        AccessExpressionContext::class.java to AccessTransformer,
         BinaryOperatorExpressionContext::class.java to BinaryOperatorTransformer,
         ParenthesisedExpressionContext::class.java to ParenthesisExpressionTransformer,
-        CallExpressionContext::class.java to delegateTransformer(
-            CallTransformer,
-            CallExpressionContext::functionCall
-        ),
-        FunctionCallContext::class.java to CallTransformer,
+        CallExpressionContext::class.java to CallTransformer,
         PrefixOperatorExpressionContext::class.java to PrefixOperatorTransformer,
         PropertyDeclarationStatementContext::class.java to DeclarationTransformer,
         FunctionExpressionContext::class.java to FunctionTransformer,

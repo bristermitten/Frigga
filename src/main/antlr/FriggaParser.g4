@@ -119,7 +119,7 @@ structName
 */
 
 header
-    : (namespaceDeclaration ENDLINE)? (useDeclaration ENDLINE)*
+    : (namespaceDeclaration)? (useDeclaration)*
     ;
 
 namespaceDeclaration
@@ -144,14 +144,14 @@ body
     ;
 
 lines
-    : ENDLINE* | (ENDLINE* line (ENDLINE* line)* ENDLINE?)
+    : (line)*
     ;
 
 
 
 line
     : statement #statementLine
-    | expression #expressionLine
+    | assignableExpression #expressionLine
     ;
 
 untypedPropertyDeclaration
@@ -164,8 +164,14 @@ typedPropertyDeclaration
 
 propertyAssignment
     :
+    extensionDefinition?
     ( untypedPropertyDeclaration | typedPropertyDeclaration )
-    ASSIGN expression
+    ASSIGN assignableExpression
+    ;
+
+extensionDefinition
+    :
+    type DOT
     ;
 
 propertyDeclaration
@@ -230,17 +236,11 @@ statement
 */
 propertyAccess //eg SomeStruct.prop or someValue.prop or prop
     : propertyAccess DOT ID #childAccess
-    | ID #directAccess
-    ;
-
-functionCall
-    : propertyAccess //the function name
-      functionCallParameters //parameters
-      functionBody? //a Lambda body
+    | structName #directAccess
     ;
 
 referencedCall
-    : propertyAccess
+    :
       refererencedCallParameters
     ;
 
@@ -261,16 +261,13 @@ functionCallParametersList
 
 
 indexedFunctionCallParameter // 3
-    : expression
+    : assignableExpression
     ;
 
 namedFunctionCallParameter //age: 30
-    : ID COLON expression
+    : ID COLON assignableExpression
     ;
 
-infixFunctionCall
-    : assignableExpression ID expression
-    ;
 
 prefixOperatorCall
     :
@@ -278,39 +275,40 @@ prefixOperatorCall
        right=expression
     ;
 
-//Expresssions that can be used in assignment (eg x = 3) but cannot be used stanalone (eg 3)
+
+//Expresssions that can be used in assignment (eg x = 3) but cannot be used stanalone (eg 3, 3 + 2,  or () -> {})
 assignableExpression
     : literal #literalExpression
     | functionValue #functionExpression
     | lambdaValue #lambdaExpression
+    | left=assignableExpression
+      operator=defaultBinaryOperator
+      right=assignableExpression #binaryOperatorExpression //3 + 4
+    | expression #otherExpression
+    | LPAREN assignableExpression RPAREN #parenthesisedExpression //(blah)
     ;
 
-notBinaryExpression
-    : functionCall #callExpression
-    | referencedCall #referencedCallExpression
-    | infixFunctionCall #infixCallExpression
-    | assignableExpression #assignableExpressionExpression
-    | propertyAccess #accessExpression
-    | prefixOperatorCall #prefixOperatorExpression
-    | LPAREN expression RPAREN #parenthesisedExpression
-    ;
 
 expression
-    : notBinaryExpression #notBinaryExpressionExpression
-    | left=expression
-      operator=(POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN )
-      right=expression
-      #binaryOperatorExpression //we can't have this in its own rule because antlr doesn't like mutual left-recursion :(
+    : expression functionCallParameters functionBody? #callExpression //blah("hello")
+    | expression referencedCall #referencedCallExpression //blah["hello"]
+    | prefixOperatorCall #prefixOperatorExpression //!true
+    | expression DOT ID #accessExpression //a.b
+    | propertyAccess #propertyAccessExpression //a
+    | expression ID expression #infixCallExpression //"a" to "b"
     ;
 
+defaultBinaryOperator
+    : POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN
+    ;
 /*
 * Lambdas
 */
 
 lambdaValue
     : functionBody #blockLambda //eg { println("Hello") }
-    | functionArguments ARROW expression #typedSingleExpressionLambda //single expression typed lambda eg (a::Int) -> blah(a)
-    | lambdaArguments ARROW expression #untypedSingleExpressionLambda //single expression untyped lambda eg (a) -> blah(a)
+    | functionArguments ARROW assignableExpression #typedSingleExpressionLambda //single expression typed lambda eg (a::Int) -> blah(a)
+    | lambdaArguments ARROW assignableExpression #untypedSingleExpressionLambda //single expression untyped lambda eg (a) -> blah(a)
     | functionArguments ARROW functionBody #blockTypedParamsLambda //block typed lambda
     | lambdaArguments ARROW functionBody #blockUntypedParamsLambda //block untyped lambda
     ;
@@ -335,7 +333,7 @@ traitDeclaration
 
 structBody
     : LCPAREN
-    (ENDLINE* statement (ENDLINE* statement)* ENDLINE?) //TODO this bit should probably be alongside the body rule, rather than being redefined...
+    statement*
     RCPAREN
     ;
 

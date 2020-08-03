@@ -1,13 +1,9 @@
 package me.bristermitten.frigga.transform
-
 import FriggaParser
 import getType
 import me.bristermitten.frigga.runtime.data.*
 import me.bristermitten.frigga.runtime.data.function.Signature
-import me.bristermitten.frigga.runtime.type.FunctionType
-import me.bristermitten.frigga.runtime.type.NothingType
-import me.bristermitten.frigga.runtime.type.TupleType
-import me.bristermitten.frigga.runtime.type.Type
+import me.bristermitten.frigga.runtime.type.*
 import me.bristermitten.frigga.transform.NodeTransformers.transform
 
 fun FriggaParser.FriggaFileContext.load(): FriggaFile
@@ -32,7 +28,7 @@ fun FriggaParser.BodyContext.transformBody(): List<CommandNode>
             }
             is FriggaParser.ExpressionLineContext ->
             {
-                transform(line.expression())
+                transform(line.assignableExpression())
             }
             else ->
             {
@@ -106,7 +102,7 @@ fun FriggaParser.TypeContext.toType(): Type
             it.ID().text to it.type().toType()
         }.toMap()
 
-        return TupleType(tupleTypes)
+        return NamedTupleType(tupleTypes)
     }
 
     throw UnsupportedOperationException(this.text)

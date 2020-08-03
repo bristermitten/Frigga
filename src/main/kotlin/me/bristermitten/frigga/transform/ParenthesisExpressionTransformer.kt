@@ -7,6 +7,6 @@ import me.bristermitten.frigga.runtime.command.CommandParenthesisExpression
 object ParenthesisExpressionTransformer : NodeTransformer<FriggaParser.ParenthesisedExpressionContext>() {
 
     override fun transformNode(node: FriggaParser.ParenthesisedExpressionContext): Command {
-        return CommandParenthesisExpression(NodeTransformers.transform( node.expression()))
+        return CommandParenthesisExpression(NodeTransformers.transform( node.assignableExpression()))
     }
 }

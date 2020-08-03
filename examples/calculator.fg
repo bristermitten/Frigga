@@ -1,22 +1,21 @@
-use "std"
-use "io"
+            use std
+            use io
+            use JVM:kotlin.text.Regex
 
-main = {
-   format = "[+-*/]"
-   regex = Regex(format)
-   println("Hello, please enter a calculation in the format <number>$format<number>")
-   calculation = readln(String).stripAll(" ")
-   number1 = calculation.untilFirst(regex)
-   operand = calculation.firstCharMatching(regex)
-   number2 = calculation.afterFirst(regex)
+            format = "[+-\\*/]"
+            regex = Regex(format)
+            println("Hello, please enter a calculation in the format <number>[+-*/]<number>")
+            calculation = readln(String).stripAll(" ")
+            number1 = calculation.untilFirst(regex)
+            operand = calculation.firstCharMatching(regex)
+            number2 = calculation.afterFirst(regex)
 
-   operator::(Int, Int) -> Int = operand.match(
-        ('+', (a, b) -> a + b),
-        ('-', (a, b) -> a - b),
-        ('*', (a, b) -> a * b),
-        ('/', (a, b) -> a / b),
-        throw(IllegalArgError("Unknown operation " + operand))
-    )
+            operator::(Int, Int) -> Int = operand.match(
+                ('+', (a, b) -> a + b),
+                ('-', (a, b) -> a - b),
+                ('*', (a, b) -> a * b),
+                ('/', (a, b) -> a / b),
+                throw(IllegalArgError("Unknown operation " + operand))
+            )
 
-    println(operator(number1, number2))
-}
+            operator(number1, number2)

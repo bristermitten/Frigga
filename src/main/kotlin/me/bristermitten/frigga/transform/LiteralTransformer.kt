@@ -2,6 +2,7 @@ package me.bristermitten.frigga.transform
 
 import FriggaParser.LiteralContext
 import me.bristermitten.frigga.runtime.command.Command
+import me.bristermitten.frigga.runtime.command.CommandTuple
 import me.bristermitten.frigga.runtime.command.CommandValue
 import me.bristermitten.frigga.runtime.data.*
 
@@ -24,17 +25,47 @@ object LiteralTransformer : NodeTransformer<LiteralContext>()
                     }
                     StringLiteral() != null ->
                     {
-                        stringValue(this.text.removeSurrounding("\""))
+                        stringValue(text.removeSurrounding("\""))
                     }
                     CharLiteral() != null ->
                     {
-                        charValue(this.text[1])
+                        charValue(text[1])
                     }
                     BoolLiteral() != null ->
                     {
-                        boolValue(this.text!!.toBoolean())
+                        boolValue(text!!.toBoolean())
                     }
-                    else -> throw IllegalArgumentException("Unknown Literal Type $javaClass")
+
+                    this.tupleLiteral() != null ->
+                    {
+                        val tuple = tupleLiteral()
+                        val indexed = tuple.indexedTupleLiteral()
+                        if (indexed != null)
+                        {
+                            val parameters = indexed.indexedTupleValues().expression()
+                                .map {
+                                    CommandTuple.TupleParam(null, NodeTransformers.transform(it).command)
+                                }
+                            return CommandTuple(parameters)
+                        }
+                        val named = tuple.namedTupleLiteral()
+                        if (named != null)
+                        {
+                            val parameters = named.namedTupleValues().namedTupleValue()
+                                .map {
+                                    CommandTuple.TupleParam(
+                                        it.ID().text,
+                                        NodeTransformers.transform(it.expression()).command
+                                    )
+                                }
+                            return CommandTuple(parameters)
+                        } else
+                        {
+                            throw UnsupportedOperationException(tuple.text)
+                        }
+
+                    }
+                    else -> throw IllegalArgumentException("Unknown Literal Type $javaClass - $text")
                 }
             )
         }

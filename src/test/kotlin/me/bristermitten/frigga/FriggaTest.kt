@@ -21,11 +21,11 @@ abstract class FriggaTest {
 
     companion object {
 
-        @BeforeAll
-        @JvmStatic
-        fun setUpAll() {
-            runtime = FriggaRuntime()
-        }
+            @BeforeAll
+            @JvmStatic
+            fun setUpAll() {
+                runtime = FriggaRuntime()
+            }
 
         @JvmStatic
         lateinit var runtime: FriggaRuntime

@@ -1,10 +1,9 @@
 lexer grammar FriggaLexer;
 
-WHITESPACE: [ \t]+ -> skip;
+fragment SPACE: [ \t];
+WHITESPACE: SPACE+ -> skip;
 
-fragment SEMICOLON : ';';
-fragment NEWLINE   : '\r' '\n' | '\n' | '\r';
-ENDLINE : SEMICOLON NEWLINE* | NEWLINE+;
+NEWLINE   : ('\r' '\n' | '\n' | '\r') -> skip;
 
 COMMENT: '#' ~[\r\n]* -> skip;
 MULTI_COMMENT: '#=' .*? '=#' -> skip;

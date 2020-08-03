@@ -1,33 +1,32 @@
 package me.bristermitten.frigga.transform
 
 import FriggaParser
-import me.bristermitten.frigga.runtime.command.Command
-import me.bristermitten.frigga.runtime.command.CommandAccess
-import me.bristermitten.frigga.runtime.command.CommandCall
-import me.bristermitten.frigga.runtime.command.CommandPropertyReference
+import me.bristermitten.frigga.runtime.command.*
 
-object CallTransformer : NodeTransformer<FriggaParser.FunctionCallContext>()
+object CallTransformer : NodeTransformer<FriggaParser.CallExpressionContext>()
 {
 
-    override fun transformNode(node: FriggaParser.FunctionCallContext): Command
+    override fun transformNode(node: FriggaParser.CallExpressionContext): Command
     {
-        val access = NodeTransformers.transform(node.propertyAccess())
+        val access = NodeTransformers.transform(node.expression())
 
-        val calling = if (access.command is CommandAccess)
+        val command = access.command
+        val calling = if (command is CommandAccess)
         {
-            access.command.property
-        } else
+            command.property
+        }
+        else
         {
-            (access.command as CommandPropertyReference).referencing
+            (command as CommandPropertyReference).referencing
         }
 
-        val upon = (access.command as? CommandAccess)?.upon
+        val upon = (command as? CommandAccess)?.upon
 
         return CommandCall(
             upon,
             calling,
             node.functionCallParameters().functionCallParametersList().indexedFunctionCallParameter()
-                .map { it.expression() }
+                .map { it.assignableExpression() }
                 .map(NodeTransformers::transform))
     }
 
