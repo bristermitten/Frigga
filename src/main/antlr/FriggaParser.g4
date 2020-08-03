@@ -217,7 +217,7 @@ typeParameters
     ;
 
 typeParameter
-    : ID DOUBLE_COLON type
+    : ID (DOUBLE_COLON type)?
     ;
 
 
@@ -322,12 +322,12 @@ lambdaArguments
 */
 
 structDeclaration
-    : STRUCT ID structParentDeclaration?
+    : STRUCT ID typeSignature? structParentDeclaration?
     structBody?
     ;
 
 traitDeclaration
-    : TRAIT ID structParentDeclaration?
+    : TRAIT ID typeSignature? structParentDeclaration?
     structBody?
     ;
 
