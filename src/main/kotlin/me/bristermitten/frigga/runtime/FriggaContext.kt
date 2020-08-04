@@ -14,313 +14,353 @@ import findType as findInternalType
 
 class FriggaContext(val name: String)
 {
-    val stack = Stack()
+	val stack = Stack()
 
-    private var globalScope = loadGlobalScope()
+	private var globalScope = loadGlobalScope()
 
-    private val scope = ArrayDeque<FriggaScope>().apply {
-        add(globalScope)
-    }
+	private val scope = ArrayDeque<FriggaScope>().apply {
+		add(globalScope)
+	}
 
-    private val using = mutableSetOf<FriggaContext>()
+	private val using = mutableSetOf<FriggaContext>()
 
-    fun copy(): FriggaContext
-    {
-        return FriggaContext(name).apply {
-            globalScope = this@FriggaContext.globalScope
-            scope.clear()
-            scope.addAll(this@FriggaContext.scope)
+	fun copy(): FriggaContext
+	{
+		return FriggaContext(name).apply {
+			globalScope = this@FriggaContext.globalScope
+			scope.clear()
+			scope.addAll(this@FriggaContext.scope)
 
-            using.clear()
-            using.addAll(this@FriggaContext.using)
-        }
-    }
+			using.clear()
+			using.addAll(this@FriggaContext.using)
+		}
+	}
 
-    private fun loadGlobalScope(): FriggaScope
-    {
-        val globalScope = FriggaScope("global")
-        globalScope.properties[STACK_NAME] = Property(
-            STACK_NAME,
-            emptySet(),
-            Value(
-                StackType,
-                stack
-            )
-        )
-        globalScope.properties[CALLER_NAME] = Property(
-            CALLER_NAME,
-            emptySet(),
-            Value(
-                CallerType,
-                Unit
-            )
-        )
-        globalScope.properties[STDOUT_NAME] = Property(
-            STDOUT_NAME,
-            emptySet(),
-            Value(
-                OutputType,
-                Unit
-            )
-        )
-        globalScope.properties[STDIN_NAME] = Property(
-            STDIN_NAME,
-            emptySet(),
-            Value(
-                InputType,
-                Unit
-            )
-        )
+	private fun loadGlobalScope(): FriggaScope
+	{
+		val globalScope = FriggaScope("global")
+		globalScope.properties[STACK_NAME] = Property(
+			STACK_NAME,
+			emptySet(),
+			Value(
+				StackType,
+				stack
+			)
+		)
+		globalScope.properties[CALLER_NAME] = Property(
+			CALLER_NAME,
+			emptySet(),
+			Value(
+				CallerType,
+				Unit
+			)
+		)
+		globalScope.properties[STDOUT_NAME] = Property(
+			STDOUT_NAME,
+			emptySet(),
+			Value(
+				OutputType,
+				Unit
+			)
+		)
+		globalScope.properties[STDIN_NAME] = Property(
+			STDIN_NAME,
+			emptySet(),
+			Value(
+				InputType,
+				Unit
+			)
+		)
 
-        return globalScope
-    }
+		return globalScope
+	}
 
-    internal fun findProperty(name: String): Property?
-    {
-        return findPropertyScope(name)?.second
-    }
+	internal fun findProperty(name: String): Property?
+	{
+		return findPropertyScope(name)?.second
+	}
 
-    private fun findPropertyScopes(name: String): List<Pair<FriggaScope, Property>>
-    {
-        val props = mutableListOf<Pair<FriggaScope, Property>>()
-        for (scope in scope)
-        {
-            val properties = scope.properties[name]
-            for (property in properties)
-            {
-                props.add(scope to property)
-            }
-        }
+	internal fun findProperty(type: TypeInstance, name: String): Property?
+	{
+		val property = type.type.getProperty(name)
+		val instanceProperty = type.properties[property]
+		if (instanceProperty != null)
+		{
+			return Property(name, property?.property?.modifiers ?: emptySet(), instanceProperty)
+		}
+		return property?.property ?: findProperty(name)
+	}
 
-        for (other in using)
-        {
-            props.addAll(other.findPropertyScopes(name))
-        }
-        return props
-    }
+	private fun findPropertyScopes(name: String): List<Pair<FriggaScope, Property>>
+	{
+		val props = mutableListOf<Pair<FriggaScope, Property>>()
+		for (scope in scope)
+		{
+			val properties = scope.properties[name]
+			for (property in properties)
+			{
+				props.add(scope to property)
+			}
+		}
 
-    internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>?
-    {
-        for (scope in scope)
-        {
-            val property = scope.properties[name].firstOrNull()
-            if (property != null)
-            {
-                return scope to property
-            }
-        }
+		for (other in using)
+		{
+			props.addAll(other.findPropertyScopes(name))
+		}
+		return props
+	}
 
-        for (other in using)
-        {
-            val property = other.findPropertyScope(name)
-            if (property != null)
-            {
-                return property
-            }
-        }
-        return null
-    }
+	internal fun findPropertyScope(name: String): Pair<FriggaScope, Property>?
+	{
+		for (scope in scope)
+		{
+			val property = scope.properties[name].firstOrNull()
+			if (property != null)
+			{
+				return scope to property
+			}
+		}
 
-    internal fun findType(name: String): Type?
-    {
-        val type = findInternalType(name) //global types
-        if (type != null)
-        {
-            return type
-        }
+		for (other in using)
+		{
+			val property = other.findPropertyScope(name)
+			if (property != null)
+			{
+				return property
+			}
+		}
+		return null
+	}
 
-        for (scope in scope)
-        {
-            val type = scope.types[name]
-            if (type != null)
-            {
-                return type
-            }
-        }
+	internal fun findType(name: String): Type?
+	{
+		val internalType = findInternalType(name) //global types
+		if (internalType != null)
+		{
+			return internalType
+		}
 
-        for (other in using)
-        {
-            val type = other.findType(name)
-            if (type != null)
-            {
-                return type
-            }
-        }
-        return null
-    }
+		for (scope in scope)
+		{
+			val type = scope.typeParameters[name] ?: scope.types[name]
+			if (type != null)
+			{
+				return type
+			}
+		}
 
-    fun findExtensionFunction(type: Type, name: String, parameterTypes: List<Type>): Function?
-    {
-        return findFunctions(name)
-            .filter { it.extensionType == type }
-            .firstOrNull {
-                it.signature.typesMatch(parameterTypes)
-            }
-
-    }
-
-    fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function?
-    {
-        val function = type.getFunction(name, parameterTypes) ?: return null
-        var functionValue = value.properties[function]?.value as Function?
-
-        if (functionValue != null)
-        {
-            return functionValue
-        }
-
-        val extensionFunction = findExtensionFunction(type, name, parameterTypes)
-        if (extensionFunction != null)
-        {
-            return extensionFunction
-        }
-
-        for (other in using)
-        {
-            functionValue = other.findTypeFunction(type, value, name, parameterTypes)
-            if (functionValue != null)
-            {
-                return functionValue
-            }
-        }
-        return null
-    }
-
-    private fun findFunctions(name: String): List<Function>
-    {
-        val functionProperties = findPropertyScopes(name)
-
-        return functionProperties.map {
-            it.second.value.value
-        }.filterIsInstance<Function>()
-    }
-
-    internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function?
-    {
-        if (type != null)
-        {
-            val value = type.getFunction(name, parameterTypes)?.value as? Function
-            if (value != null)
-            {
-                return value
-            }
-            val extensionFunction = findExtensionFunction(type, name, parameterTypes)
-            if (extensionFunction != null)
-            {
-                return extensionFunction
-            }
-            return null
-        }
-
-        val functionParameter = findParameter(name)?.value as? Function
-        if (functionParameter != null)
-        {
-            return functionParameter
-        }
+		for (other in using)
+		{
+			val type = other.findType(name)
+			if (type != null)
+			{
+				return type
+			}
+		}
+		return null
+	}
 
 
-        val matching = findFunctions(name)
-            .firstOrNull { it.signature.typesMatch(parameterTypes) }
+	fun findExtensionFunction(type: Type, name: String, parameterTypes: List<Type>): Function?
+	{
+		return findFunctions(name)
+			.filter { it.extensionType == type }
+			.firstOrNull {
+				it.signature.typesMatch(parameterTypes)
+			}
 
-        if (matching != null)
-        {
-            return matching
-        }
+	}
 
-        //Constructors
-        val constructorType = findType(name)
+	fun findTypeFunction(type: Type, value: TypeInstance, name: String, parameterTypes: List<Type>): Function?
+	{
+		val property = type.getFunction(name, parameterTypes)
+		if (property != null)
+		{
 
-        if (constructorType != null)
-        {
-            return findFunction(constructorType, CONSTRUCTOR, parameterTypes)
-        }
+			val functionValue = (value.properties[property]?.value ?: property.property.value?.value) as Function?
 
-        for (other in using)
-        {
-            val function = other.findFunction(type, name, parameterTypes)
-            if (function != null)
-            {
-                return function
-            }
-        }
-        return null
-    }
+			if (functionValue != null)
+			{
+				return functionValue
+			}
+		}
 
-    internal fun defineProperty(property: Property, force: Boolean = false)
-    {
-        if (property.name in reservedNames && !force)
-        {
-            throw IllegalArgumentException("Cannot define property with reserved name ${property.name}")
-        }
-        scope[0].properties[property.name] = property
-    }
+		val extensionFunction = findExtensionFunction(type, name, parameterTypes)
+		if (extensionFunction != null)
+		{
+			return extensionFunction
+		}
 
-    internal fun defineProperty(name: String, value: Value, forceReservedName: Boolean = false)
-    {
-        return defineProperty(
-            Property(name, emptySet(), value),
-            forceReservedName
-        )
-    }
+		for (other in using)
+		{
+			val functionValue = other.findTypeFunction(type, value, name, parameterTypes)
+			if (functionValue != null)
+			{
+				return functionValue
+			}
+		}
+		return null
+	}
 
-    internal fun defineParameter(name: String, value: Value)
-    {
-        scope[0].parameters[name] = value
-    }
+	private fun findFunctions(name: String): List<Function>
+	{
+		val functionProperties = findPropertyScopes(name)
 
-    fun findParameter(name: String): Value?
-    {
-        for (scope in scope)
-        {
-            val param = scope.parameters[name]
-            if (param != null)
-            {
-                return param
-            }
-        }
-        return null
-    }
+		return functionProperties.mapNotNull {
+			it.second.value?.value
+		}.filterIsInstance<Function>()
+	}
 
-    fun enterScope(name: String)
-    {
-        scope.addFirst(FriggaScope(name))
-    }
+	private fun findFunctionInType(type: Type, name: String, parameterTypes: List<Type>): Function?
+	{
+		val value = type.getFunction(name, parameterTypes)?.property?.value?.value as? Function
+		if (value != null)
+		{
+			return value
+		}
 
-    fun enterFunctionScope(name: String)
-    {
-        scope.addFirst(FriggaScope(name, true))
-    }
+		val extensionFunction = findExtensionFunction(type, name, parameterTypes)
+		if (extensionFunction != null)
+		{
+			return extensionFunction
+		}
+		return null
+	}
 
-    fun exitScope(): FriggaScope
-    {
-        return scope.removeFirst()
-    }
+	internal fun findFunction(type: Type? = null, name: String, parameterTypes: List<Type>): Function?
+	{
+		if (type != null)
+		{
+			return findFunctionInType(type, name, parameterTypes)
+		}
 
-    val deepestScope
-        get() = scope.first()
+		val functionParameter = findParameter(name)?.value as? Function
+		if (functionParameter != null)
+		{
+			return functionParameter
+		}
 
-    fun reset()
-    {
-        stack.clear()
 
-        scope.forEach {
-            it.properties.clear()
-            it.types.clear()
-        }
+		val matching = findFunctions(name)
+			.firstOrNull { it.signature.typesMatch(parameterTypes) }
 
-        scope.clear()
-        globalScope = loadGlobalScope()
-        scope += globalScope
-    }
+		if (matching != null)
+		{
+			return matching
+		}
 
-    fun defineType(type: Type)
-    {
-        scope[0].types[type.name] = type
-    }
+		//Constructors
+		val constructorType = findType(name) //If there is a type matching the function name (eg String)
+		if (constructorType != null)
+		{
+			return findFunction(constructorType, CONSTRUCTOR, parameterTypes)
+		}
 
-    fun use(namespace: FriggaContext)
-    {
-        using += namespace
-    }
+		for (other in using)
+		{
+			val function = other.findFunction(type, name, parameterTypes)
+			if (function != null)
+			{
+				return function
+			}
+		}
+		return null
+	}
+
+	internal fun defineProperty(property: Property, force: Boolean = false)
+	{
+		if (property.name in reservedNames && !force)
+		{
+			throw IllegalArgumentException("Cannot define property with reserved name ${property.name}")
+		}
+		scope[0].properties[property.name] = property
+	}
+
+	internal fun defineProperty(name: String, value: Value, forceReservedName: Boolean = false)
+	{
+		return defineProperty(
+			Property(name, emptySet(), value),
+			forceReservedName
+		)
+	}
+
+	internal fun defineParameter(name: String, value: Value)
+	{
+		scope[0].parameters[name] = value
+	}
+
+	internal fun defineTypeParameter(name: String, type: Type)
+	{
+		scope[0].typeParameters[name] = type
+	}
+
+	internal fun findTypeParameter(name: String): Type?
+	{
+		for (scope in scope)
+		{
+			val parameter = scope.typeParameters[name]
+			if (parameter != null)
+			{
+				return parameter
+			}
+		}
+		return null
+	}
+
+
+	fun findParameter(name: String): Value?
+	{
+		for (scope in scope)
+		{
+			val param = scope.parameters[name]
+			if (param != null)
+			{
+				return param
+			}
+		}
+		return null
+	}
+
+	fun enterScope(name: String)
+	{
+		scope.addFirst(FriggaScope(name))
+	}
+
+	fun enterFunctionScope(name: String)
+	{
+		scope.addFirst(FriggaScope(name, true))
+	}
+
+	fun exitScope(): FriggaScope
+	{
+		return scope.removeFirst()
+	}
+
+	val deepestScope
+		get() = scope.first()
+
+	fun reset()
+	{
+		stack.clear()
+
+		scope.forEach {
+			it.properties.clear()
+			it.types.clear()
+		}
+
+		scope.clear()
+		globalScope = loadGlobalScope()
+		scope += globalScope
+	}
+
+	fun defineType(type: Type)
+	{
+		scope[0].types[type.name] = type
+	}
+
+	fun use(namespace: FriggaContext)
+	{
+		using += namespace
+	}
 
 }

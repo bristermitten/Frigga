@@ -1,10 +1,38 @@
 namespace std
 
-struct List<T>{
-    first::Node<T>
+struct Node {
+    value::Any
+    mutable next::Node = _
 }
 
-struct Node<T> {
-    prev::Node<T>
-    next::Node<T>
+struct List {
+    mutable head::Node = _
+
+
+    add = (element::Any) -> _ {
+        newNode = Node(element)
+        if(head == _, {
+            head = newNode
+            println("Made new head " + element)
+            yield()
+        })
+
+        mutable last = head
+        loop(() -> last.next != _, {
+            last = last.next
+        })
+
+        last.next = newNode
+        println("Linked " + newNode + " to " + last)
+    }
+}
+
+List.forEach = (consumer::(Any) -> _ ) -> _ {
+    mutable current = head
+    println(current)
+    loop(() -> current != _, {
+        consumer(current.value)
+
+        current = current.next
+    })
 }

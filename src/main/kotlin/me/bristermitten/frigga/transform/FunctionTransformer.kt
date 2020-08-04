@@ -1,7 +1,6 @@
 package me.bristermitten.frigga.transform
 
-import FriggaParser.FunctionExpressionContext
-import FriggaParser.PropertyAssignmentContext
+import FriggaParser.*
 import getType
 import me.bristermitten.frigga.runtime.command.Command
 import me.bristermitten.frigga.runtime.command.CommandFunctionValue
@@ -13,7 +12,7 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>()
     override fun transformNode(node: FunctionExpressionContext): Command
     {
         var parent = node.parent
-        while (parent !is PropertyAssignmentContext)
+        while (parent !is PropertyDeclarationStatementContext)
         {
             parent = parent.parent
             if (parent == null)
@@ -22,11 +21,12 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>()
             }
         }
 
-        val name = if (parent is PropertyAssignmentContext)
+        val name = if (parent is PropertyDeclarationStatementContext)
         {
+            val propertyDeclaration = parent.propertyDeclaration()
             val assignedName =
-                parent.typedPropertyDeclaration()?.ID()
-                    ?: parent.untypedPropertyDeclaration()?.ID()
+                propertyDeclaration.typedPropertyDeclaration()?.ID()
+                    ?: propertyDeclaration.untypedPropertyDeclaration()?.ID()
                     ?: throw IllegalArgumentException("How did we get here?")
 
             assignedName.text
@@ -51,7 +51,7 @@ object FunctionTransformer : NodeTransformer<FunctionExpressionContext>()
 
             val body = functionBody().body().transformBody()
 
-            val extensionType = (parent as? PropertyAssignmentContext)?.extensionDefinition()?.type()?.text?.let(::getType)
+            val extensionType = (parent as? PropertyDeclarationContext)?.extensionDefinition()?.type()?.text?.let(::getType)
 
             CommandFunctionValue(name, functionSignature, body, extensionType)
         }

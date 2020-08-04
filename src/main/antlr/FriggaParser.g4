@@ -159,14 +159,20 @@ untypedPropertyDeclaration
     ;
 
 typedPropertyDeclaration
-    : propertyModifier* ID DOUBLE_COLON type
+    : propertyModifier* ID propertyType
     ;
 
+propertyType
+	:  DOUBLE_COLON type
+	;
+
+propertyDeclaration
+	: extensionDefinition? (untypedPropertyDeclaration | typedPropertyDeclaration) ASSIGN assignableExpression
+	;
+
 propertyAssignment
-    :
-    extensionDefinition?
-    ( untypedPropertyDeclaration | typedPropertyDeclaration )
-    ASSIGN assignableExpression
+    : propertyAccess propertyType?
+      ASSIGN assignableExpression
     ;
 
 extensionDefinition
@@ -174,7 +180,7 @@ extensionDefinition
     type DOT
     ;
 
-propertyDeclaration
+standalonePropertyDeclaration
     : typedPropertyDeclaration //for native properties (and possibly more in the future)
     ;
 
@@ -227,6 +233,7 @@ typeParameter
 statement
     : propertyDeclaration #propertyDeclarationStatement
     | propertyAssignment  #propertyAssignmentStatement
+	| standalonePropertyDeclaration #standlonePropertyDeclarationStatement
     | structDeclaration   #structDeclarationStatement
     | traitDeclaration    #traitDeclarationStatement
     ;
@@ -303,7 +310,7 @@ expression
     ;
 
 defaultBinaryOperator
-    : POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN
+    : POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | NOT_EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN
     ;
 /*
 * Lambdas

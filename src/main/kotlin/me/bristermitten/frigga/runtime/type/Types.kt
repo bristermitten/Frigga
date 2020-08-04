@@ -26,17 +26,17 @@ object StringType : Type(
             body { stack, context ->
                 val thisValue = context.findProperty(THIS_NAME)!!.value
                 val addTo = context.findParameter("value")!!
-                stack.push(stringValue((thisValue.value as String) + addTo.value))
+                stack.push(stringValue((thisValue!!.value as String) + addTo.value))
             }
         }
 
-        defineFunction{
+        defineFunction {
             name = "toInt"
             signature {
                 output = IntType
             }
             body { stack, context ->
-                val thisValue = context.findProperty(THIS_NAME)!!.value.value as String
+                val thisValue = context.findProperty(THIS_NAME)!!.value!!.value as String
                 val thisToInt = thisValue.toLong()
 
                 stack.push(intValue(thisToInt))
@@ -60,7 +60,7 @@ object CharType : Type(
             body { stack, context ->
                 val thisValue = context.findProperty(THIS_NAME)!!.value
                 val addTo = context.findParameter("value")!!
-                stack.push(stringValue((thisValue.value as Char).toString() + addTo.value))
+                stack.push(stringValue((thisValue!!.value as Char).toString() + addTo.value))
             }
         }
     }
@@ -79,7 +79,7 @@ object BoolType : Type(
             }
             body { stack, friggaContext ->
                 val upon = friggaContext.findProperty(THIS_NAME)!!.value
-                val value = upon.value as Boolean
+                val value = upon!!.value as Boolean
 
                 stack.push(boolValue(value.not()))
             }
@@ -135,11 +135,11 @@ object InputType : Type("Input")
 }
 
 
-private val types = mutableMapOf<String, Type>()
+private val internalTypes = mutableMapOf<String, Type>()
 
 fun loadTypes()
 {
-    fun Type.load() = types.put(name, this)
+    fun Type.load() = internalTypes.put(name, this)
     NumType.load()
     IntType.load()
     DecType.load()
@@ -148,16 +148,15 @@ fun loadTypes()
     BoolType.load()
     AnyType.load()
     NothingType.load()
+    internalTypes["_"] = NothingType
     CallerType.load()
     InputType.load()
     OutputType.load()
     TypeType.load()
 }
 
-fun findType(name: String) = types[name]
-fun getType(name: String) = types.getOrPut(name) {
-    SimpleType(name)
-}
+fun findType(name: String) = internalTypes[name]
+fun getType(name: String) = internalTypes[name] ?: SimpleType(name)
 
 fun getJVMType(jvmClass: Class<*>): Type
 {
@@ -166,13 +165,13 @@ fun getJVMType(jvmClass: Class<*>): Type
     {
         return type
     }
-    type = types[jvmClass.name]
+    type = internalTypes[jvmClass.name]
     if (type != null)
     {
         return type
     }
     type = JVMType(jvmClass)
-    types[jvmClass.name] = type
+    internalTypes[jvmClass.name] = type
     type.init()
     return type
 }

@@ -4,6 +4,7 @@ import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.Stack
 import me.bristermitten.frigga.runtime.data.CommandNode
 import me.bristermitten.frigga.runtime.data.Value
+import me.bristermitten.frigga.runtime.data.establishType
 import me.bristermitten.frigga.runtime.data.function.Function
 import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
@@ -20,7 +21,6 @@ data class CommandCall(
 
     override fun eval(stack: Stack, context: FriggaContext)
     {
-
         val callingUpon = upon?.let {
             it.command.eval(stack, context)
 
@@ -41,14 +41,8 @@ data class CommandCall(
             return
         }
 
-        val paramTypes = paramValues.map(Value::type)
-        val uponType = if (callingUpon?.type == TypeType)
-        {
-            callingUpon.value as Type
-        } else
-        {
-            callingUpon?.type
-        } //this is such a hack but it works... :D
+        val paramTypes = paramValues.map { it.establishType(context) }
+        val uponType = callingUpon?.establishType(context)
 
         val typeInstance = callingUpon?.value as? TypeInstance
 

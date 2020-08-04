@@ -62,6 +62,7 @@ DOUBLE_COLON: COLON COLON;
 ARROW: '->';
 QUOTE: '"';
 EQUAL: '==';
+NOT_EQUAL: '!=';
 MORE_THAN: '>';
 MORE_EQUAL_THAN: '>=';
 LESS_EQUAL_THAN: '<=';

@@ -1,39 +1,54 @@
 package me.bristermitten.frigga.runtime.data.structure
 
 import me.bristermitten.frigga.runtime.CONSTRUCTOR
-import me.bristermitten.frigga.runtime.FriggaContext
 import me.bristermitten.frigga.runtime.data.Value
 import me.bristermitten.frigga.runtime.data.function.body
 import me.bristermitten.frigga.runtime.data.function.signature
-import me.bristermitten.frigga.runtime.type.Type
 import me.bristermitten.frigga.runtime.type.TypeInstance
 import me.bristermitten.frigga.runtime.type.TypeProperty
 
 class Struct(
-    name: String,
-    override val parents: List<Structure>,
-    val elements: List<TypeProperty>
-) : Structure(name) {
-    init {
-        defineFunction {
-            this.name = CONSTRUCTOR
-            signature {
-                output = this@Struct
-                input = elements.map { it.name to it.type }.toMap()
-            }
-            body { stack, friggaContext ->
-                val newInstance = TypeInstance(
-                    this@Struct,
-                    elements.map {
-                        it to friggaContext.findParameter(it.name)!!
-                    }.toMap()
-                )
+	name: String,
+	override val parents: List<Structure>,
+	val elements: List<TypeProperty>
+) : Structure(name)
+{
 
-                stack.push(Value(this@Struct, newInstance))
-            }
-        }
+	fun init()
+	{
+		val constructorElements = elements.filter { it.property.value == null }
 
-        elements.forEach(this::defineProperty)
-    }
+		defineFunction {
+			this.name = CONSTRUCTOR
+			signature {
+				output = this@Struct
+				input = constructorElements.map { it.property.name to it.type() }.toMap()
+			}
+			body { stack, friggaContext ->
+				val newInstance = TypeInstance(
+					this@Struct,
+					elements.mapNotNull {
+						val value = friggaContext.findParameter(it.property.name) ?: it.property.value
+						if (value == null)
+						{
+							null
+						} else
+						{
+							it to value
+						}
+					}.toMap().toMutableMap()
+				)
+
+				stack.push(Value(this@Struct, newInstance))
+			}
+		}
+
+		elements.forEach(this::defineProperty)
+	}
+
+	override fun toString(): String
+	{
+		return name
+	}
 
 }

@@ -48,7 +48,7 @@ class AdditionTests : FriggaTest()
             x + 1
         """.trimIndent()
         val result = runtime.execute(code)
-        result.exceptions.shouldBeEmpty()
+        handleExceptions(result)
 
         result.leftoverStack.first() shouldBe decValue(4.0)
     }

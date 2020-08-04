@@ -25,7 +25,7 @@ object CallTransformer : NodeTransformer<FriggaParser.CallExpressionContext>()
         return CommandCall(
             upon,
             calling,
-            node.functionCallParameters().functionCallParametersList().indexedFunctionCallParameter()
+            node.functionCall().functionCallParameters().functionCallParametersList().indexedFunctionCallParameter()
                 .map { it.assignableExpression() }
                 .map(NodeTransformers::transform))
     }

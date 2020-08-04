@@ -29,7 +29,7 @@ object IntType : Type("Int", NumType) {
                     output = IntType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     val result = intValue(intOperator(thisValue.value as Long, other.value as Long))
                     stack.push(result)
@@ -42,7 +42,7 @@ object IntType : Type("Int", NumType) {
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     stack.push(decValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
@@ -61,7 +61,7 @@ object IntType : Type("Int", NumType) {
                     output = IntType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     stack.push(boolValue(intOperator(thisValue.value as Long, other.value as Long)))
                 }
@@ -73,7 +73,7 @@ object IntType : Type("Int", NumType) {
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     stack.push(boolValue(decOperator(thisValue.value as Long, other.value as Double)))
                 }
@@ -120,7 +120,7 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     stack.push(decValue(decOperator(thisValue.value as Double, other.value as Double)))
                 }
@@ -138,7 +138,7 @@ object DecType : Type(
                     output = DecType
                 }
                 body { stack, context ->
-                    val thisValue = context.findProperty(THIS_NAME)!!.value
+                    val thisValue = context.findProperty(THIS_NAME)!!.value!!
                     val other = context.findParameter("value")!!
                     stack.push(boolValue(operator(thisValue.value as Double, other.value as Double)))
                 }
