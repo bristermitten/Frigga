@@ -166,10 +166,15 @@ propertyType
 	:  DOUBLE_COLON type
 	;
 
-propertyDeclaration
-	: extensionDefinition? (untypedPropertyDeclaration | typedPropertyDeclaration) ASSIGN assignableExpression
+//Declaring a property (ie creating one)
+//For example: List.functionName = () -> _ { blah }
+propertyCreation
+	: extensionDefinition?
+	  (untypedPropertyDeclaration | typedPropertyDeclaration)
+	  ASSIGN assignableExpression
 	;
 
+//Assigning an already existing property (eg prop.value = 3)
 propertyAssignment
     : propertyAccess propertyType?
       ASSIGN assignableExpression
@@ -180,7 +185,8 @@ extensionDefinition
     type DOT
     ;
 
-standalonePropertyDeclaration
+//Declaring a property only. eg age::Int
+propertyDeclaration
     : typedPropertyDeclaration //for native properties (and possibly more in the future)
     ;
 
@@ -231,9 +237,9 @@ typeParameter
 * Statements
 */
 statement
-    : propertyDeclaration #propertyDeclarationStatement
+    : propertyCreation    #propertyCreationStatement
     | propertyAssignment  #propertyAssignmentStatement
-	| standalonePropertyDeclaration #standlonePropertyDeclarationStatement
+	| propertyDeclaration #propertyDeclarationStatement
     | structDeclaration   #structDeclarationStatement
     | traitDeclaration    #traitDeclarationStatement
     ;
@@ -293,13 +299,13 @@ assignableExpression
     | functionValue #functionExpression
     | lambdaValue #lambdaExpression
     | left=assignableExpression
-      operator=defaultBinaryOperator
+      operator=binaryOperation
       right=assignableExpression #binaryOperatorExpression //3 + 4
     | expression #otherExpression
     | LPAREN assignableExpression RPAREN #parenthesisedExpression //(blah)
     ;
 
-
+//Parts of code that can be written anywhere
 expression
     : expression functionCall #callExpression //blah("hello")
     | expression referencedCall #referencedCallExpression //blah["hello"]
@@ -309,7 +315,7 @@ expression
     | expression ID expression #infixCallExpression //"a" to "b"
     ;
 
-defaultBinaryOperator
+binaryOperation
     : POWER | TIMES | DIVIDE | PLUS | MINUS | EQUAL | NOT_EQUAL | MORE_THAN | MORE_EQUAL_THAN | LESS_THAN | LESS_EQUAL_THAN
     ;
 /*

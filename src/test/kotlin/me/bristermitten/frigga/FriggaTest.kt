@@ -1,7 +1,6 @@
 package me.bristermitten.frigga
 
 import me.bristermitten.frigga.runtime.FriggaRuntime
-import me.bristermitten.frigga.runtime.FullExecutionResult
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 
@@ -9,14 +8,7 @@ abstract class FriggaTest {
 
     @AfterEach
     fun setUp() {
-        runtime.reset()
-    }
-
-
-    fun handleExceptions(result: FullExecutionResult) {
-        result.exceptions.forEach {
-            throw it
-        }
+//        runtime.reset()
     }
 
     companion object {
