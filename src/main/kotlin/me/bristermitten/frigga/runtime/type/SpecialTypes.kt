@@ -5,4 +5,5 @@ package me.bristermitten.frigga.runtime.type
  */
 
 object AnyType : Type("Any", null)
+
 object NothingType : Type("Nothing", null)

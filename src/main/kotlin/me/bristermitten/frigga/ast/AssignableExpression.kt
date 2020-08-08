@@ -1,16 +1,17 @@
 package me.bristermitten.frigga.ast
 
+import me.bristermitten.frigga.runtime.context.Context
 import me.bristermitten.frigga.runtime.value.Value
 
 /**
  * @author AlexL
  */
-interface AssignableExpression : Element
+interface AssignableExpression : Element<Value>
 {
-	override fun execute()
+	override fun execute(context: Context): Value
 	{
-		evaluate()
+		return evaluate(context)
 	}
 
-	fun evaluate(): Value
+	fun evaluate(context: Context): Value
 }

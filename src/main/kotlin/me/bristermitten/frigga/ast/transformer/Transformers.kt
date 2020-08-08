@@ -26,8 +26,13 @@ object Transformers
 
 		registerTransformer(PropertyCreationStatementTransformer)
 		registerTransformer(PropertyCreationTransformer)
+
 		registerTransformer(LiteralTransformer)
 		registerTransformer(LiteralExpressionTransformer)
+
+		registerTransformer(PropertyAccessExpressionTransformer)
+		registerTransformer(DirectAccessTransformer)
+
 	}
 
 	fun transform(node: ParserRuleContext): Node

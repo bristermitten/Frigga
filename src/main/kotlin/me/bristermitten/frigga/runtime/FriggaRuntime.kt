@@ -3,6 +3,8 @@ package me.bristermitten.frigga.runtime
 import FriggaLexer
 import FriggaParser
 import me.bristermitten.frigga.ast.transformer.FriggaFileTransformer
+import me.bristermitten.frigga.runtime.context.Context
+import me.bristermitten.frigga.runtime.value.Value
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -11,7 +13,32 @@ import org.antlr.v4.runtime.CommonTokenStream
  */
 class FriggaRuntime
 {
-	fun execute(source: String, sourceName: String? = null)
+	fun execute(source: String, sourceName: String? = null): ExecutionResult
+	{
+		val friggaFile = loadAST(source, sourceName)
+		val context = Context()
+		val leftoverStack = mutableListOf<Value>()
+
+		for (node in friggaFile.content)
+		{
+			try
+			{
+				val element = node.element
+				val value = element.execute(context)
+				if (value is Value)
+				{
+					leftoverStack += value
+				}
+			} catch (exception: Exception)
+			{
+				throw ExecutionException(node, exception)
+			}
+		}
+
+		return ExecutionResult(leftoverStack)
+	}
+
+	private fun loadAST(source: String, sourceName: String?): FriggaFile
 	{
 		val stream = if (sourceName != null)
 		{
@@ -27,17 +54,6 @@ class FriggaRuntime
 		val parser = FriggaParser(tokens)
 
 		val friggaFile = parser.friggaFile()
-
-		val transformed = FriggaFileTransformer.transform(friggaFile)
-		for (node in transformed.content)
-		{
-			try
-			{
-				node.element.execute()
-			} catch (exception: Exception)
-			{
-				throw ExecutionException(node, exception)
-			}
-		}
+		return FriggaFileTransformer.transform(friggaFile)
 	}
 }

@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.ParserRuleContext
  */
 abstract class NodeTransformer<T : ParserRuleContext>
 {
-	protected open fun transformNode(node: T): Element? = null
+	protected open fun transformNode(node: T): Element<*>? = null
 
 	open fun transform(node: T): Node
 	{

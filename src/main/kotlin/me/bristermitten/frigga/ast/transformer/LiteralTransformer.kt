@@ -12,7 +12,7 @@ import me.bristermitten.frigga.runtime.value.Value
  */
 object LiteralTransformer : NodeTransformer<FriggaParser.LiteralContext>()
 {
-	override fun transformNode(node: FriggaParser.LiteralContext): Element
+	override fun transformNode(node: FriggaParser.LiteralContext): Element<*>
 	{
 		val int = node.IntLiteral()
 		if (int != null)

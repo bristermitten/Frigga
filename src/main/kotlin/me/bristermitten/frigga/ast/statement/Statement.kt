@@ -5,6 +5,7 @@ import me.bristermitten.frigga.ast.Element
 /**
  * @author AlexL
  */
-interface Statement : Element
+interface Statement : Element<Unit>
 {
+
 }

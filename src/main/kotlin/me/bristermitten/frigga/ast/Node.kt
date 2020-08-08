@@ -6,5 +6,5 @@ package me.bristermitten.frigga.ast
 data class Node(
 	val text: String,
 	val position: Position,
-	val element: Element
+	val element: Element<*>
 )

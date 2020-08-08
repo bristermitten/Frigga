@@ -1,9 +1,11 @@
 package me.bristermitten.frigga.ast
 
+import me.bristermitten.frigga.runtime.context.Context
+
 /**
  * @author AlexL
  */
-interface Element
+interface Element<T: Any>
 {
-	fun execute()
+	fun execute(context: Context): T
 }
